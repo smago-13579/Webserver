@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:40:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/02 21:22:22 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/03 15:13:07 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ private:
 
 	struct 	sockaddr_in	addr;
 	int 	socket_fd;
-	std::vector<int> FDs;
+	std::vector<int> FDs; // modify to map
 };
 
 

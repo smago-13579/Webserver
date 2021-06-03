@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/02 21:15:11 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/03 17:57:04 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ Server::Server()
 		throw str;
 	}
 
+	/*		CHECK SUBJECT 9 POINT			*/
 	/*		SET NON_BLOCK TO SERVER			*/
 	// flags = fcntl(socket_fd, F_GETFL);
 	// fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK);
@@ -80,11 +81,11 @@ int 	Server::server_read(int fd)
 {
 	int res;
 	char buffer[1024];
-	res = read(fd, buffer, 1023);
+	res = recv(fd, buffer, 1023, 0);
 	if (res > 0) {
 		buffer[res] = '\0';
 
-		std::cout << "\nREAD FROM CLIENT:\n";
+		std::cout << "\nREAD FROM CLIENT: " << fd << std::endl;
 		std::cout << buffer << std::endl;
 		return 1;
 	}
@@ -120,12 +121,14 @@ void	Server::server_run()
 			str += strerror(errno);
 			throw str;
 		}
-		if (FD_ISSET(socket_fd, &readfds))
+		if (FD_ISSET(socket_fd, &readfds)) {
 			accept_client();
+		}
 		for (int i = 0; i < FDs.size(); i++) 
 		{
 			if (FD_ISSET(FDs[i], &readfds)) {
 				if (!server_read(FDs[i])) {
+					std::cout << "socket closed: " << FDs[i] << std::endl;
 					close(FDs[i]);
 					FDs.erase(FDs.begin() + i);
 				}

@@ -6,11 +6,11 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/28 15:14:05 by smago             #+#    #+#             */
-/*   Updated: 2021/05/28 22:23:27 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/03 17:16:44 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
+#include "../webserv.hpp"
 
 int main()
 {
@@ -44,7 +44,7 @@ int main()
 	
 
 	/*		RECEIVE FROM SERVER				*/
-	// while ((buf = recv(socket_fd, buffer, 99, MSG_WAITALL)) > 0) {
+	// while ((buf = recv(socket_fd, buffer, 99, 0)) > 0) {
 	// 	buffer[buf] = '\0';
 	// 	std::cout << buffer;
 	// }
@@ -52,10 +52,24 @@ int main()
 	// if (buf < 0)
 	// 	std::cout << "RECV ERROR: " << strerror(errno) << std::endl;
 	// std::cout << std::endl;
+	
+	std::string str;
+	for (; ;) {
+		std::getline(std::cin, str);
+		if (str == "exit") {
+			exit(0);
+		}
+		send(socket_fd, str.c_str(), str.length(), 0);
+
+		/* 			RECEIVE FROM BUFFER				*/
+		// buf = recv(socket_fd, buffer, 99, 0);
+		// buffer[buf] = '\0';
+		// std::cout << buffer << std::endl;
+	}
 
 	/*		SEND TO SERVER					*/
-	if (send(socket_fd, "Another message", strlen("Another message"), MSG_SEND) < 0)
-		std::cout << "SEND ERROR: " << strerror(errno) << std::endl;
+	// if (send(socket_fd, "Another message", strlen("Another message"), MSG_SEND) < 0)
+	// 	std::cout << "SEND ERROR: " << strerror(errno) << std::endl;
 	// std::cout << 
 
 	close(socket_fd);
