@@ -24,7 +24,7 @@ private:
 	void	_free_env();		// need
 	void	_parse_cgi();		// need
 	void	_test_write_to_file();
-	
+	bool	_restore_fd_and_close(int pipe[2], int save[2]);
 
 public:
 	ft_cgi();

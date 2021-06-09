@@ -53,6 +53,19 @@ void		ft_cgi::_test_write_to_file()
 	std::cout << _response_body;
 	dup2(save_out, 1);
 	close(file_fd);
+	close(save_out);
+}
+
+bool		ft_cgi::_restore_fd_and_close(int pipe[2], int save[2])
+{
+	dup2(save[0], 0);
+	dup2(save[1], 1);
+	close(pipe[0]);
+	close(pipe[1]);
+	close(save[0]);
+	close(save[1]);
+	// _free_env();
+	return false;
 }
 
 // // // --- --- --- - setters and getters - --- --- --- // // //
@@ -73,46 +86,30 @@ void					ft_cgi::set_filename(str filename)
 
 bool		ft_cgi::execute()
 {
-	int		fd_pipe[2], ret;
-	int		save_in = dup(0);	// для чтения
-	int		save_out = dup(1);	// для записи
+	int		fd_pipe[2], fd_save[2], tmp;
 	char	buff[buffer_size];
-	// bool	check = true;
-	pid_t	pid;
 
+	fd_save[0] = dup(0);	// для чтения
+	fd_save[1] = dup(1);	// для записи
 	pipe(fd_pipe);
 	dup2(fd_pipe[0], 0);
 	dup2(fd_pipe[1], 1);
-
-	pid = fork();
-	if (pid == 0)
-	{
+	if (fork() == 0)
 		if(execve(_filename.c_str(), NULL, NULL) == -1) // 3 argument = _env
 		{
-			close(fd_pipe[0]);
-			close(fd_pipe[1]);
-			// _free_env();
-			return false;
+			_restore_fd_and_close(fd_pipe, fd_save);
+			exit(127);
 		}
-	}
-	wait(NULL); //waitpid(pid, &status, WNOHANG);
-	for(ret = buffer_size; ret == buffer_size ; _response_body += std::string(buff, ret))
-		if((ret = read(fd_pipe[0], buff, buffer_size)) == -1)
-		{
-			dup2(save_in, 0);
-			dup2(save_out, 1);
-			close(fd_pipe[0]);
-			close(fd_pipe[1]);
-			return false;
-		}
-	_test_write_to_file(); // for test
-	dup2(save_in, 0);
-	dup2(save_out, 1);
-	close(fd_pipe[0]);
-	close(fd_pipe[1]);
-	std::cout << _response_body << std::endl; // for test
+	wait(&tmp);
+	if(WEXITSTATUS(tmp) == 127)
+		return _restore_fd_and_close(fd_pipe, fd_save);
+	for(tmp = buffer_size; tmp == buffer_size ; _response_body += std::string(buff, tmp))
+		if((tmp = read(fd_pipe[0], buff, buffer_size)) == -1)
+			return _restore_fd_and_close(fd_pipe, fd_save);
 	// _parse_cgi();
-	// _free_env();
+	_restore_fd_and_close(fd_pipe, fd_save);
+	_test_write_to_file();						// for test
+	std::cout << _response_body << std::endl;	// for test
 	return true;
 }
 
@@ -135,14 +132,36 @@ bool		ft_cgi::execute()
 // 		{
 // 			close(fd_pipe[0]);
 // 			close(fd_pipe[1]);
+// 			close(save_in);
+// 			close(save_out);
 // 			// free _env();
-// 			return false;
+// 			exit(127);
 // 		}
 // 	}
 // 	wait(&status); //waitpid(pid, &status, WNOHANG);
-// 	for(ret = 1024; ret == 1024 ; response_body += std::string(buff, ret))
-// 		ret = read(fd_pipe[0], buff, 1024);
-
+// 	if(WEXITSTATUS(status) == 127)
+// 	{
+// 			dup2(save_in, 0);
+// 			dup2(save_out, 1);
+// 			close(fd_pipe[0]);
+// 			close(fd_pipe[1]);
+// 			close(save_in);
+// 			close(save_out);
+// 			// free _env();
+// 			return false;
+// 	}
+//  	for(ret = 1024; ret == 1024 ; response_body += std::string(buff, ret))
+// 		if((ret = read(fd_pipe[0], buff, 1024)) == -1)
+// 		{
+// 			dup2(save_in, 0);
+// 			dup2(save_out, 1);
+// 			close(fd_pipe[0]);
+// 			close(fd_pipe[1]);
+// 			close(save_in);
+// 			close(save_out);
+// 			// free _env();
+// 			return false;
+// 		}
 // 	// // // --- test write to file	// ---
 // 	int	file_fd = open("file.txt", O_RDWR | O_CREAT | O_APPEND, S_IWRITE | S_IREAD, 0755);
 // 	if(file_fd == -1)
@@ -152,13 +171,12 @@ bool		ft_cgi::execute()
 // 	std::cout << response_body;
 // 	close(file_fd);
 // 	// // // --- test write to file	// ---
-
 // 	dup2(save_in, 0);
 // 	dup2(save_out, 1);
 // 	close(fd_pipe[0]);
 // 	close(fd_pipe[1]);
-// 	if(ret == -1)
-// 		return false;
+// 	close(save_in);
+// 	close(save_out);
 // 	std::cout << response_body << std::endl; // for test
 // 	// parse_cgi();
 // 	// free _env();
