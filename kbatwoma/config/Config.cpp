@@ -15,7 +15,7 @@
 Config::Location::Location() : location(std::string()), index(std::string()), methods(std::vector<size_t>()), root(std::string()), autoindex(0), max_body(std::string())
 {}
 
-Config::Server::Server() : ip(std::string()), port(0), server_name(std::string()), error_page(std::string()), locations(std::vector<Location>())
+Config::Server::Server() : ip(std::string()), port(0), server_name(std::string("поставить по умолчанию")), error_page(std::string()), locations(std::vector<Location>())
 {} 
 
 Config::Config()
@@ -57,6 +57,7 @@ void    Config::parser()
     size_t  pos_begin = 0;
     size_t  pos_end = 0;
     size_t  flag = 0;
+    Config::Server *serv;
 
     if ((pos_begin = _config_line.find("server{")) == _config_line.npos)
         return;
@@ -66,7 +67,9 @@ void    Config::parser()
         if ((pos_end = _config_line.find("server{", pos_begin)) == _config_line.npos)
             flag = 1;
         _server_line = std::string(_config_line, pos_begin, pos_end - pos_begin);
-        _servers.push_back(*parser_server());
+        serv = parser_server();
+        _servers.push_back(*serv);
+        delete serv;
         pos_begin = pos_end + 7;
     }
 }
@@ -102,7 +105,6 @@ Config::Server  *Config::parser_server()
             return (point_to_serv);//error
         (*point_to_serv).server_name = std::string(_server_line, pos_begin, pos_end - pos_begin);
     }
-    //если нет, то сказать об ошибке
 
     //error_page
     pos_begin = 0;
@@ -117,6 +119,7 @@ Config::Server  *Config::parser_server()
     
     //locations
     pos_begin = 0;
+    Config::Location *loc;
     while (true)
     {
         if ((pos_begin = _server_line.find("location", pos_begin)) == _server_line.npos)
@@ -125,7 +128,9 @@ Config::Server  *Config::parser_server()
         if ((pos_end = _server_line.find("}", pos_begin)) == _server_line.npos)
             return (point_to_serv);//error
         _location_line = std::string(_server_line, pos_begin, pos_end - pos_begin);
-        (*point_to_serv).locations.push_back(*parser_location());
+        loc = parser_location();
+        (*point_to_serv).locations.push_back(*loc);
+        delete loc;
         pos_begin = pos_end + 1;
     }
 

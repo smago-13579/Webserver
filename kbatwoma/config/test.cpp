@@ -18,7 +18,7 @@ void    location(std::vector<Config::Location> &loc)
 
 int main()
 {
-    Config config("/Users/kbatwoma/Desktop/Webserver/webserv/config/Den/conf/serv_easy.conf");
+    Config config("/home/venus/Desktop/Nastya/Webserver/kbatwoma/config/Den/conf/serv_easy.conf");
     std::vector<Config::Server> servers = config.getServers();
     for (std::vector<Config::Server>::iterator it = servers.begin(); it != servers.end(); it++)
     {
