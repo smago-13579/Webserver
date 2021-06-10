@@ -1,48 +1,108 @@
-#include "ft_cgi.hpp"
+#include "cgi_handler.hpp"
+
+// test constructor
+cgi_handler::cgi_handler(str filename)
+	{ _filename = filename; }
 
 // default constructor
-ft_cgi::ft_cgi()
-	{ _create_env(); _construct_filename(); }
+cgi_handler::cgi_handler(Request request, t_client_addr client_addr)
+	{ _create_env(&request, &client_addr); _construct_filename(); }
 
 // filename constructor
-ft_cgi::ft_cgi(str filename)
-	{ _create_env(); set_filename(filename); }
+cgi_handler::cgi_handler(Request request, t_client_addr client_addr, str filename)
+	{ _create_env(&request, &client_addr); set_filename(filename); }
 
 // default destructor
-ft_cgi::~ft_cgi()
+cgi_handler::~cgi_handler()
 	{ _free_env(); }
 
 // copy constructor
-ft_cgi::ft_cgi(const ft_cgi & copy)
+cgi_handler::cgi_handler(const cgi_handler & copy)
 	{ *this = copy; }
 
 // assignment
-ft_cgi &	ft_cgi::operator=(const ft_cgi & rhs)
+cgi_handler &	cgi_handler::operator=(const cgi_handler & rhs)
 {
 	_free_env();
 	_env = rhs._env;
 	_filename = rhs._filename;
 	_response_body = rhs._response_body;
-	_response = rhs._response;
 	return *this;
 }
 
 // // // --- --- --- --- private methods --- --- --- --- // // //
 
-void		ft_cgi::_construct_filename()
+char *		cgi_handler::_ft_strjoin(std::string str1, std::string str2 = "", std::string str3 = "", std::string str4 = "")
 {
+	const char *	tmp;
+	char *			ret;
+	std::string		new_str = "";
+
+	new_str += str1;
+	new_str += str2;
+	new_str += str3;
+	new_str += str4;
+	tmp = new_str.c_str();
+
+	int i = 0;
+	for(; tmp[i] != '\0'; ++i)
+		ret[i] = tmp[i];
+	ret[i] = '\0';
 	
-	_filename = " r.pwd + '/' + r.filename";
+	return ret;
 }
 
-void					ft_cgi::_create_env()		// need
-{ _env = NULL; }
+void		cgi_handler::_create_env(Request * request, t_client_addr * client_addr)
+{
+	// _env = new char *[18 + request->get_headers().size()];
+	_env = new char *[18 + 0];
 
-void		ft_cgi::_free_env() {}					// need
+	_env[0] = _ft_strjoin("AUTH_TYPE=","");
+	_env[1] = _ft_strjoin("CONTENT_LENGTH=","");
+	_env[2] = _ft_strjoin("CONTENT_TYPE=","");
+	_env[3] = _ft_strjoin("GATEWAY_INTERFACE=CGI/1.1");
+	_env[4] = _ft_strjoin("PATH_INFO=","");
+	_env[5] = _ft_strjoin("PATH_TRANSLATED=","");
+	_env[6] = _ft_strjoin("QUERY_STRING=","");
+	_env[7] = _ft_strjoin("REMOTE_ADDR=","");
+	_env[8] = _ft_strjoin("REMOTE_IDENT=","");
+	_env[9] = _ft_strjoin("REMOTE_USER=","");
+	_env[10] = _ft_strjoin("REQUEST_METHOD=","");
+	_env[11] = _ft_strjoin("REQUEST_URI=","");
+	_env[12] = _ft_strjoin("SCRIPT_NAME=","");
+	_env[13] = _ft_strjoin("SERVER_NAME=","");
+	_env[14] = _ft_strjoin("SERVER_PORT=","");
+	_env[15] = _ft_strjoin("SERVER_PROTACOL=","");
+	_env[16] = _ft_strjoin("SERVER_SOFTWARE=web_serv");
 
-void		ft_cgi::_parse_cgi() {}					// need
+	int	i = 17;
+	std::map<std::string, std::string>::const_iterator	begin, end;
+	// begin = request->get_headers().cbegin();
+	// end = request->get_headers().cend();
+	begin = end;
+	for(; begin != end; ++begin, ++i)
+		_env[i] = _ft_strjoin("HTTP_", begin->first, "=", begin->second);
+	_env[i] = NULL;
+}
 
-void		ft_cgi::_test_write_to_file()
+void		cgi_handler::_construct_filename()
+{
+	_filename = "r.pwd + '/' + r.filename";
+}
+
+void		cgi_handler::_free_env()
+{
+	if(!_env)
+		return ;
+	int	i = 0;
+	for(; _env[i] != NULL; ++i)
+		delete _env[i];
+	delete _env;
+}
+
+void		cgi_handler::_parse_cgi() {}					// need
+
+void		cgi_handler::_test_write_to_file()
 {
 	int	save_out = dup(1);
 	int	file_fd = open("file.txt", O_RDWR | O_CREAT | O_APPEND, S_IWRITE | S_IREAD, 0755);
@@ -56,7 +116,7 @@ void		ft_cgi::_test_write_to_file()
 	close(save_out);
 }
 
-bool		ft_cgi::_restore_fd_and_close(int pipe[2], int save[2])
+bool		cgi_handler::_restore_fd_and_close(int pipe[2], int save[2])
 {
 	dup2(save[0], 0);
 	dup2(save[1], 1);
@@ -70,10 +130,10 @@ bool		ft_cgi::_restore_fd_and_close(int pipe[2], int save[2])
 
 // // // --- --- --- - setters and getters - --- --- --- // // //
 
-std::string const		ft_cgi::get_filename() const
+std::string const		cgi_handler::get_filename() const
 	{ return _filename; }
 
-void					ft_cgi::set_filename(str filename)
+void					cgi_handler::set_filename(str filename)
 {
 	_response_body = "";
 	if(filename[0] == '/' or (filename[0] == '.' and filename[1] == '/'))
@@ -84,7 +144,7 @@ void					ft_cgi::set_filename(str filename)
 
 // // // --- --- --- --- --- methods --- --- --- --- --- // // //
 
-bool		ft_cgi::execute()
+bool		cgi_handler::execute()
 {
 	int		fd_pipe[2], fd_save[2], tmp;
 	char	buff[buffer_size];
@@ -150,7 +210,8 @@ bool		ft_cgi::execute()
 // 			// free _env();
 // 			return false;
 // 	}
-//  	for(ret = 1024; ret == 1024 ; response_body += std::string(buff, ret))
+//  	for(ret = 1024; ret == 1024 ; )
+// 	{
 // 		if((ret = read(fd_pipe[0], buff, 1024)) == -1)
 // 		{
 // 			dup2(save_in, 0);
@@ -162,6 +223,8 @@ bool		ft_cgi::execute()
 // 			// free _env();
 // 			return false;
 // 		}
+// 		response_body += std::string(buff, ret)
+// 	}
 // 	// // // --- test write to file	// ---
 // 	int	file_fd = open("file.txt", O_RDWR | O_CREAT | O_APPEND, S_IWRITE | S_IREAD, 0755);
 // 	if(file_fd == -1)
