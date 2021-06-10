@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/10 19:36:13 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/10 20:18:15 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ int		Socket::accept_client()
 		std::string str =  "ACCEPT ERROR: ";
 		str += strerror(errno);
 		std::cout << str << std::endl;
-		return new_fd;
 	}
 	else {
 		std::cout << "\n----CONNECTION ACCEPTED----\n";
@@ -55,7 +54,7 @@ int		Socket::accept_client()
 		// ???			???			???
 		// fcntl(new_fd, F_SETFL, O_NONBLOCK);
 	}
-	return (0);
+	return new_fd;
 }
 
 int		Socket::create()

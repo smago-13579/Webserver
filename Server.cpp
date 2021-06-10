@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/10 19:30:13 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/10 20:24:52 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,16 +69,6 @@ void	Server::server_run()
 			message.clear();
 			continue;
 		}
-		for (serv_iter it = servers.begin(); it != servers.end(); it++) 
-		{
-			if (FD_ISSET(it->first, &readfds)) {
-				int fd = it->second.accept_client();
-				if (fd != -1) {
-					clients.insert(std::make_pair(fd, &(it->second)));
-				}
-				break;
-			}
-		}
 		for (cls_iter it = clients.begin(); it != clients.end(); it++)
 		{
 			if (FD_ISSET(it->first, &readfds)) {
@@ -86,7 +76,18 @@ void	Server::server_run()
 					std::cout << "socket closed: " << it->first << std::endl;
 					clients.erase(it->first);
 				}
-				message.push_back(it->first);
+				else
+					message.push_back(it->first);
+				break;
+			}
+		}
+		for (serv_iter it = servers.begin(); it != servers.end(); it++) 
+		{
+			if (FD_ISSET(it->first, &readfds)) {
+				int fd = it->second.accept_client();
+				if (fd != -1) {
+					clients.insert(std::make_pair(fd, &(it->second)));
+				}
 				break;
 			}
 		}
