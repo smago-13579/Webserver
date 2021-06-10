@@ -12,6 +12,8 @@ void    location(std::vector<Config::Location> &loc)
         std::cout << "  root: " << it->root << std::endl;
         std::cout << "  autoindex: " << it->autoindex << std::endl;
         std::cout << "  max body: " << it->max_body << std::endl;
+        std::cout << "  CGI_extension: " << it->CGI_extension << std::endl;
+        std::cout << "  CGI_path: " << it->CGI_path << std::endl;
         std::cout << std::endl;
     }
 }
@@ -28,7 +30,7 @@ int main()
         std::cout << "Error page: " << it->error_page << std::endl;
         std::cout << "Locations: " << std::endl;
         location(it->locations);
-        std::cout << "Client body size: " << it->client_body_size << std::endl;
+        // std::cout << "Client body size: " << it->client_body_size << std::endl;
         std::cout << std::endl;
     }
     return (0);

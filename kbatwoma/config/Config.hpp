@@ -17,6 +17,8 @@
 # include <string>
 # include <vector>
 # include <fstream>
+# include <limits>
+# include <exception>
 
 # define GET 0
 # define POST 1
@@ -42,7 +44,9 @@ class Config
             std::vector<size_t> methods;
             std::string         root;
             bool                autoindex;
-            std::string         max_body;
+            int                 max_body;
+            std::string         CGI_extension;
+            std::string         CGI_path;
             //...
         };
         struct Server
@@ -54,8 +58,23 @@ class Config
             std::string             server_name;
             std::string             error_page;
             std::vector<Location>   locations;
-            int                     client_body_size;
-            
+        };
+
+        class Missing_field : public std::exception
+        {
+            const char* what() const throw();
+        };
+        class Syntax_error : public std::exception
+        {
+            const char* what() const throw();
+        };
+        class File_error : public std::exception
+        {
+            const char* what() const throw();
+        };
+        class Data_error : public std::exception
+        {
+            const char* what() const throw();
         };
 
         std::vector<Server> const   &getServers();
@@ -68,7 +87,6 @@ class Config
         std::string         _config_line;
         std::string         _server_line;
         std::string         _location_line;
-        Server              _current_server;
 
         Server      *parser_server();
         Location    *parser_location();

@@ -12,22 +12,32 @@
 
 # include "Config.hpp"
 
-Config::Location::Location() : location(std::string()), index(std::string()), methods(std::vector<size_t>()), root(std::string()), autoindex(0), max_body(std::string())
+/*********************************************/
+/*                                           */
+/*   Constructors | Operator= | Destructor   */
+/*                                           */
+/*********************************************/
+Config::Location::Location() : location(std::string()), index(std::string()),
+                            methods(std::vector<size_t>()), root(std::string()),
+                            autoindex(OFF), max_body(std::numeric_limits<int>::max()),
+                            CGI_extension(std::string()), CGI_path(std::string())
 {}
 
-Config::Server::Server() : ip(std::string()), port(0), server_name(std::string("поставить по умолчанию")), error_page(std::string()), locations(std::vector<Location>())
-{} 
-
-Config::Config()
+Config::Server::Server() : ip(std::string()), port(int()), server_name(std::string()),
+                        error_page(std::string()), locations(std::vector<Location>())
 {}
 
-Config::Config(std::string config_name)
+Config::Config(std::string config_name) : _servers(std::vector<Server>()),
+                                        _config_line(std::string()),
+                                        _server_line(std::string()),
+                                        _location_line(std::string())
 {
     std::string     line;
     std::ifstream   config(config_name);
     int             len;
 
     if (config.is_open())
+    {
         while (getline(config, line))
         {
             len = line.length();
@@ -35,23 +45,68 @@ Config::Config(std::string config_name)
                 if (line[i] != ' ' && line[i] != '\t')
                     _config_line += line[i];
         }
-    config.close();
+        config.close();
+    }
+    else
+        throw(Config::File_error());
     parser();
 
     //checker();
 }
 
-Config::~Config()
+Config::Config(Config const &a) : _servers(a._servers), _config_line(a._config_line),
+                                _server_line(a._server_line), _location_line(a._location_line)
 {
-    // возможно, нужно будет чистить new
 }
 
+Config  &Config::operator=(Config const &a)
+{
+    if (this != &a)
+    {
+        _servers = a._servers;
+        _config_line = a._config_line;
+        _server_line = a._server_line;
+        _location_line = a._location_line;
+    }
+    return (*this);
+}
+
+Config::~Config()
+{
+}
+
+/******************/
+/*                */
+/*   Exceptions   */
+/*                */
+/******************/
+const char* Config::Missing_field::what() const throw()
+{ return ("ERROR -> configuration file: Missing a required field"); }
+
+const char* Config::Syntax_error::what() const throw()
+{ return ("ERROR -> configuration file: Syntax error"); }
+
+const char* Config::File_error::what() const throw()
+{ return ("ERROR -> configuration file: Unable to read the file"); }
+
+const char* Config::Data_error::what() const throw()
+{ return ("ERROR -> configuration file: Data error"); }
+
+/***************/
+/*             */
+/*   Getters   */
+/*             */
+/***************/
 std::vector<Config::Server> const   &Config::getServers()
 {
     return(_servers);
 }
 
-
+/**************/
+/*            */
+/*   Parser   */
+/*            */
+/**************/
 void    Config::parser()
 {
     size_t  pos_begin = 0;
@@ -63,7 +118,7 @@ void    Config::parser()
         return;
     pos_begin += 7;
     while (flag == 0)
-    {
+    {//проверить на }}
         if ((pos_end = _config_line.find("server{", pos_begin)) == _config_line.npos)
             flag = 1;
         _server_line = std::string(_config_line, pos_begin, pos_end - pos_begin);
@@ -72,6 +127,7 @@ void    Config::parser()
         delete serv;
         pos_begin = pos_end + 7;
     }
+    //проверка на наличие сервера
 }
 
 Config::Server  *Config::parser_server()
@@ -81,7 +137,9 @@ Config::Server  *Config::parser_server()
     std::string     help_line;
     Config::Server  *point_to_serv = new Config::Server;
 
-    //listen
+    /**************/
+    /*   listen   */ //обязательное поле
+    /**************/
     if ((pos_begin = _server_line.find("listen")) != _server_line.npos)
     {
         pos_begin += 6;
@@ -93,10 +151,19 @@ Config::Server  *Config::parser_server()
             return (point_to_serv);//error
         help_line = std::string(_server_line, pos_begin, pos_end - pos_begin);
         (*point_to_serv).port = atoi(help_line.c_str());
+        if ((*point_to_serv).port < 0)
+        {
+            throw(Config::Data_error());
+        }
     }
-    //если нет, то сказать об ошибке
+    else
+    {
+        //исключение
+    }
 
-    //server_name
+    /*******************/
+    /*   server_name   */ //не обязательный параметр (если нам дают не подходящий 
+    /*******************/ //под наши server_name, то отвечаем нашим первым server)
     pos_begin = 0;
     if ((pos_begin = _server_line.find("server_name")) != _server_line.npos)
     {
@@ -106,7 +173,9 @@ Config::Server  *Config::parser_server()
         (*point_to_serv).server_name = std::string(_server_line, pos_begin, pos_end - pos_begin);
     }
 
-    //error_page
+    /******************/
+    /*   error_page   */ //обязательное поле
+    /******************/
     pos_begin = 0;
     if ((pos_begin = _server_line.find("error_page")) != _server_line.npos)
     {
@@ -115,15 +184,22 @@ Config::Server  *Config::parser_server()
             return (point_to_serv);//error
         (*point_to_serv).error_page = std::string(_server_line, pos_begin, pos_end - pos_begin);
     }
-    //если нет, то сказать об ошибке
+    else
+    {
+        //исключение
+    }
     
-    //locations
+    /*****************/
+    /*   locations   */ //обязательное поле
+    /*****************/
     pos_begin = 0;
+    int count_locations = 0;
     Config::Location *loc;
     while (true)
     {
         if ((pos_begin = _server_line.find("location", pos_begin)) == _server_line.npos)
             break;
+        count_locations++;
         pos_begin += 8;
         if ((pos_end = _server_line.find("}", pos_begin)) == _server_line.npos)
             return (point_to_serv);//error
@@ -133,8 +209,10 @@ Config::Server  *Config::parser_server()
         delete loc;
         pos_begin = pos_end + 1;
     }
-
-    //client_body_size;
+    if (count_locations == 0)
+    {
+        //исключение
+    }
 
     return (point_to_serv);
 }
@@ -147,14 +225,21 @@ Config::Location  *Config::parser_location()
     std::string         help_line;
     Config::Location    *point_to_location = new Config::Location;
     
-    //location
+    
+    /****************/
+    /*   location   */ //обязательное поле
+    /****************/
     if ((pos_end = _location_line.find("{")) == _location_line.npos)
             return (point_to_location);//error
     (*point_to_location).location = std::string(_location_line, pos_begin, pos_end - pos_begin);
+    if ((*point_to_location).location.empty())
+        //исключение
     pos_begin = pos_end + 1;
     pos_start = pos_begin;
 
-    //index
+    /*************/
+    /*   index   */ //обязательное поле
+    /*************/
     if ((pos_begin = _location_line.find("index")) != _location_line.npos)
     {
         pos_begin += 5;
@@ -162,9 +247,14 @@ Config::Location  *Config::parser_location()
             return (point_to_location);//error
         (*point_to_location).index = std::string(_location_line, pos_begin, pos_end - pos_begin);
     }
-    //если нет, то сказать об ошибке
+    else
+    {
+        //исключение
+    }
 
-    //methods
+    /***************/
+    /*   methods   */ // не обязательное поле
+    /***************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("methods")) != _location_line.npos)
     {
@@ -192,7 +282,9 @@ Config::Location  *Config::parser_location()
         }
     }
 
-    //root
+    /************/
+    /*   root   */ //обязательное поле
+    /************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("root")) != _location_line.npos)
     {
@@ -201,8 +293,14 @@ Config::Location  *Config::parser_location()
             return (point_to_location);//error
         (*point_to_location).root = std::string(_location_line, pos_begin, pos_end - pos_begin);
     }
+    else
+    {
+        //исключение
+    }
 
-    //autoindex
+    /*****************/
+    /*   autoindex   */ //не обязательное поле - по умолчанию на off
+    /*****************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("autoindex")) != _location_line.npos)
     {
@@ -218,6 +316,51 @@ Config::Location  *Config::parser_location()
             return(point_to_location);//error
     }
 
-    //max_body
+    /****************/
+    /*   max_body   */ //не обязательное поле - по умолчанию на max int
+    /****************/
+    pos_begin = pos_start;
+    if ((pos_begin = _location_line.find("max_body")) != _location_line.npos)
+    {
+        pos_begin += 8;
+        if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+            return (point_to_location);//error
+        help_line = std::string(_location_line, pos_begin, pos_end - pos_begin);
+        (*point_to_location).max_body = atoi(help_line.c_str());
+        if ((*point_to_location).max_body < 0) 
+        {
+            //error
+        }
+    }
+
+    /*********************/
+    /*   CGI_extension   */ //не обязательное поле
+    /*********************/
+    pos_begin = pos_start;
+    if ((pos_begin = _location_line.find("CGI_extension")) != _location_line.npos)
+    {
+        pos_begin += 13;
+        if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+            return (point_to_location);//error
+        (*point_to_location).CGI_extension = std::string(_location_line, pos_begin, pos_end - pos_begin);
+    }
+
+    /****************/
+    /*   CGI_path   */ //не обязательное поле
+    /****************/
+    pos_begin = pos_start;
+    if ((pos_begin = _location_line.find("CGI_path")) != _location_line.npos)
+    {
+        pos_begin += 8;
+        if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+            return (point_to_location);//error
+        (*point_to_location).CGI_path = std::string(_location_line, pos_begin, pos_end - pos_begin);
+    }
+    if (((*point_to_location).CGI_extension.empty() && !((*point_to_location).CGI_path.empty()))
+        || (!((*point_to_location).CGI_extension.empty()) && (*point_to_location).CGI_path.empty()))
+    {
+        //исключение
+    }
+
     return (point_to_location);
 }
