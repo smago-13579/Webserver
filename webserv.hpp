@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/24 13:16:07 by smago             #+#    #+#             */
-/*   Updated: 2021/06/02 12:54:17 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/10 19:02:08 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,28 @@
 # include <list>
 # include <vector>
 # include <map>
+# include <sstream>
+# include <string>
 
 # include "Server.hpp"
+# include "Request.hpp"
+# include "Socket.hpp"
+# include "kbatwoma/config/Config.hpp"
 
+/*		Only for positive numbers		*/
+template <class T>
+std::string itoa(T n)
+{
+	std::string str;
+	if (n == 0)
+		str.push_back('0');
+	while (n != 0)
+	{
+		str.insert(str.begin(), (n % 10 + 48));
+		n /= 10;
+	}
+	return str;
+}
 
 
 #endif 
