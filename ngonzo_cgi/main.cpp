@@ -29,9 +29,9 @@ int			main(int argc, char **argv, char **env)
 	// std::string		file_cpp = "/Users/ngonzo/Desktop/projects/webserv/cgi/cgi-bin/cpp/hello";
 	// std::string		file_py = "/Users/ngonzo/Desktop/projects/webserv/cgi/cgi-bin/py/hello.py";
 	// std::string		cgi_tester = "/Users/ngonzo/Desktop/projects/webserv/cgi/cgi-bin/cgi_tester";
-	std::string		file_cpp = "./cgi-bin/cpp/hello1";
+	std::string		file_cpp = "./cgi-bin/cpp/hello";
 	std::string		file_py = "./cgi-bin/py/hello.py";
-	std::string		cgi_tester = "./cgi-bin/cgi_tester1";
+	std::string		cgi_tester = "./cgi-bin/cgi_tester";
 	ft_cgi			test;
 	bool			check;
 
