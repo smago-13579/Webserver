@@ -15,20 +15,22 @@ class cgi_handler
 {
 public:
 	typedef std::string			str;
-	typedef char **				cpp;
-	typedef char *				cp;
 
 private:
-	cpp		_env;
+	char **	_env;
 	str		_filename;
 	str		_response_body;
+	int		_status_code;
+	str		_str_status_code;
+	str		_str_content_type;
+
 
 	// private methods
-	cp		_ft_strjoin(str str1, str str2, str str3, str str4);
+	char *	_ft_strjoin(str str1, str str2, str str3, str str4);
 	void	_create_env(Request * request, t_client_addr * client_addr);
 	void	_construct_filename();// need ?
 	void	_free_env();
-	void	_parse_cgi();		// need
+	void	_parse_cgi();
 	void	_test_write_to_file();
 	bool	_restore_fd_and_close(int pipe[2], int save[2]);
 
@@ -44,10 +46,10 @@ public:
 	// setters and getters
 	str const	get_filename() const;
 	void		set_filename(str filename);
-	void		get_response_body();	//need
-	void		get_status_code();		//need
-	void		get_str_content_type();	//need
-	void		get_str_status_code();	//need
+	str const	get_response_body() const;
+	int const	get_status_code() const;
+	str const	get_str_content_type() const;
+	str const	get_str_status_code() const;
 
 	// methods
 	bool	execute();

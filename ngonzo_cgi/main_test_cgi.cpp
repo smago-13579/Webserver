@@ -1,9 +1,6 @@
 #include "main_test_cgi.hpp"
 #include "cgi_handler.hpp"
 
-// class Response {};	// test
-// class Request {};	// test
-
 int		ft_error(std::string message)
 {
 	PRINT(CLR_RED << message << CLR_END);
@@ -20,6 +17,8 @@ void		ft_wait()
 	sleep(1);
 }
 
+// class Response {};	// test
+// class Request {};	// test
 // void	_post_request_handle(Response & resp, Request & req)
 // {
 // 	std::string		file_path;
