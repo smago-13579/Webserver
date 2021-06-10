@@ -1,5 +1,5 @@
-#include "main.hpp"
-#include "cgi-bin/cpp/ft_cgi.hpp"
+#include "main_test_cgi.hpp"
+#include "ft_cgi.hpp"
 
 int		ft_error(std::string message)
 {
