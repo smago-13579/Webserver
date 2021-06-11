@@ -6,13 +6,13 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/08 14:19:24 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/11 22:19:53 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-int		Request::str_to_un_int(std::string str) {
+size_t		Request::str_to_size_t(std::string str) {
 	int ui = 0;
 	int len = str.length();
 	for(int i = 0; i < len; i++) {
@@ -24,9 +24,9 @@ int		Request::str_to_un_int(std::string str) {
 	return ui;
 }
 
-int		Request::hex_to_dec(std::string st)
+size_t		Request::hex_to_size_t(std::string st)
 {
-    int i, k;
+    size_t i, k;
     unsigned int s = 0;
     for (i = 0; st[i] != '\0'; i++)
     {
@@ -59,154 +59,136 @@ int		Request::hex_to_dec(std::string st)
     return s;
 }
 
-void	Request::request_init() {
-	index = 0;
-	i_end = 0;
-	len = 0;
-	f_error = 0;
-	buf.clear();
+void	Request::request_init() 
+{
 	_f_sl_status = 0;
 	_f_hd_status = 0;
 	_f_bd_status = 0;
-	_f_end_request = 0;
-	method_body = 0;
+	_request_done = 0;
 }
 
-int		Request::find_end(std::string end, int i) {
-	int j = buf.find(end);
-	if( j != -1) {
-		i_end = i + j;
+size_t		Request::find_end(std::string str, std::string end) 
+{
+	size_t len = str.find(end);
+
+	if (len == std::string::npos)
 		return 1;
+
+	for (size_t i = 0; i < end.length(); i++)
+	{
+		if (str[len + i] != end[i])
+			return 1;
 	}
 	return 0;
 }
 
-void	Request::new_buf() {
-	buf.erase(0, i_end);
-	index = 0;
-	i_end = 0;
-}
+void	Request::filling_start_line(std::string& str) 
+{
+	size_t i = str.find("\r\n");
+	size_t len = str.find_first_of(" \t\r\n");
+	size_t start = 0;
 
-void	Request::filling_start_line() {
-	std::string word;
-	int flag = 0;
-	for(int i = 0; i < len; i++) {
-		if(buf[i] == ' ' && flag == 0) {
-			_type_request = word;
-			word.clear();
-			flag = 1;
-			continue;
-		} else if (buf[i] == ' ' && flag == 1) {
-			_resource_name = word;
-			word.clear();
-			flag = 2;
-			continue;
-		} else if (buf[i] == '\r' && buf[i + 1] == '\n' && flag == 2) {
-			_protocol_version = word;
-			word.clear();
-			flag = 3;
-			break;
-		} 
-		word += buf[i];
+	while (len < i)
+	{
+		if (type.length() == 0)
+			type = str.substr(start, len - start);
+		else if (resource.length() == 0)
+			resource = str.substr(start, len - start);
+		start = str.find_first_not_of(" \t\r\n", len);
+		len = str.find_first_of(" \t\r\n", start);
 	}
+	version = str.substr(start, len - start);
+	str.erase(0, i + 2);
 	_f_sl_status = 1;
 }
 
-void	Request::filling_headers() {
-	std::string word;
+void	Request::filling_headers(std::string& str) 
+{
 	std::string key;
-	int flag = 0;
-	for(int i = 0; i < len; i++) {
-		if(buf[i] == ':' && buf[i + 1] == ' ' && flag == 0) {
-			i += 2;
-			key = word;
-			word.clear();
-			flag = 1;
-		} else if (buf[i] == '\r' && buf[i + 1] == '\n' && flag == 1) {
-			i += 2;
+	std::string word;
+	size_t i = str.find("\r\n\r\n");
+	size_t start = 0;
+	size_t len = str.find(":");
+	
+	while (len < i)
+	{
+		if (key.length() == 0)
+		{
+			key = str.substr(start, len - start);
+			start = str.find_first_not_of(" \t\r\n", len + 1);
+			len = str.find_first_of("\r\n", start);
+		}
+		else
+		{
+			word = str.substr(start, len - start);
 			headers.insert(make_pair(key, word));
+			key.clear();
 			word.clear();
-			flag = 0;
+			start = str.find_first_not_of(" \t\r\n", len);
+			len = str.find_first_of(": ", start);
 		}
-		word += buf[i];
 	}
-	if(headers.count("Content-Length")) {
-		method_body = str_to_un_int(headers["Content-Length"]);
-	}
-	if(headers.count("Transfer-Encoding")) {
-		method_body = -1;
-	}
+	str.erase(0, i + 4);
 	_f_hd_status = 1;
+	if (str.empty())
+		_request_done = 1;
 }
 
-void	Request::filling_body_length() {
-	int i = 0;
-	std::string tmp;
-	for(; i < method_body; i++) {
-		_body += buf[i];
-	}
-	for (; i < len; i++) {
-		tmp += buf[i];
-	}
-	buf.clear();
-	buf = tmp;
-	_f_bd_status = 1;
+void	Request::filling_body(std::string& str)
+{
+	body = str;
+	str.clear();
+	_request_done = 1;
 }
 
-void	Request::filling_body_encoding() {
-	std::string tmp;
-	int cache = -1;
-	int i = 0;
-	for(; i < len; i++) {
-		if(buf[i] == '\r' && buf[i + 1] == '\n' && cache == -1) {
-			cache = hex_to_dec(tmp);
-			tmp.clear();
-			i += 2;
-		} else if (cache != -1 && buf[i] == '\r' && buf[i + 1] == '\n') {
-			if(tmp.length() == cache) {
-				std::cout << "ok" << std::endl;
-			} else {
-				
-				std::cout << "not ok" << tmp.length() << std::endl;
+void	Request::func_request(std::string str) 
+{
+	while (!str.empty())
+	{
+		if(_f_sl_status == 0)
+			filling_start_line(str);
+		else if (_f_hd_status == 0)
+			filling_headers(str);
+		else if (_f_bd_status == 0)
+			filling_body(str);
+	}
+}
+
+int		Request::check_request(std::string str)
+{
+	size_t len;
+
+	if ((len = str.find("\r\n\r\n")) != std::string::npos) 
+	{
+		if (str.find("Content-Length: ") == std::string::npos)
+		{
+			if (str.find("Transfer-Encoding: chunked") != std::string::npos)
+			{
+				if (find_end(str, "0\r\n\r\n") == 0)
+					return (0);
+				else
+					return (1);
 			}
-			_body += tmp;
-			tmp.clear();
-			cache = -1;
-			i += 2;
+			else
+				return (0);
 		}
-		tmp += buf[i];
+		
+		std::string tmp = str.substr(str.find("Content-Length: ") + 16, 10);
+		if (std::atoi(tmp.c_str()) + 4 + len <= str.length())
+			return (0);
+		else
+			return (1);
 	}
-}
 
-void	Request::func_request(std::string str) {
-	buf += str;
-	len = buf.length();
-	while (!buf.empty()) {
-		if(_f_sl_status == 0 && find_end("\r\n", 2)) {
-			filling_start_line();
-			new_buf();
-		} else if(_f_sl_status == 1 && _f_hd_status == 0 &&\
-			find_end("\r\n\r\n", 4)) {
-			filling_headers();
-			new_buf();
-		} else if(_f_sl_status == 1 && _f_hd_status == 1 &&\
-			_f_bd_status == 0 && method_body > 0) {
-			filling_body_length();
-			new_buf();
-		} else if(_f_sl_status == 1 && _f_hd_status == 1 &&\
-			_f_bd_status == 0 && method_body == -1 && find_end("\r\n0\r\n", 5)) {	
-			filling_body_encoding();
-			new_buf();
-		}
-	}
+	return (1);
 }
 
 void	Request::see_request() {
 	std::cout << "------------------------------------------------------------------------" << std::endl;
 	std::cout << "-------------------------------start line-------------------------------" << std::endl;
-	std::cout << "Type:\t\t" << _type_request << std::endl;
-	std::cout << "Resource:\t" << _resource_name << std::endl;
-	std::cout << "Version:\t" << _protocol_version << std::endl;
+	std::cout << "Type:\t\t" << type << std::endl;
+	std::cout << "Resource:\t" << resource << std::endl;
+	std::cout << "Version:\t" << version << std::endl;
 	std::cout << "-------------------------------headers----------------------------------" << std::endl;
 	std::map<std::string, std::string>::iterator it;
 	for (it = headers.begin(); it != headers.end(); it++) {
@@ -218,46 +200,59 @@ void	Request::see_request() {
 			std::cout << "key\t" << it->first << "\tvalue\t\t" << it->second << std::endl;
 	}
 	std::cout << "-------------------------------body-------------------------------------" << std::endl;
-	std::cout << _body << std::endl;
-	std::cout << "-------------------------------left-------------------------------------" << std::endl;
-	std::cout << buf << std::endl;
+	std::cout << body << std::endl;
 	std::cout << "-------------------------------end--------------------------------------" << std::endl;
-	std::cout << "------------------------------------------------------------------------" << std::endl;
 }
 
 Request&	Request::operator=(std::string str)
 {
-	this->func_request(str);
-	if (_f_sl_status == 1 && _f_hd_status == 1 && buf.empty()) {
-		_f_sl_status = 0;
-		_f_hd_status = 0;
+	if (buf.length() != 0)
+	{
+		buf += str;
+		str = buf;
 	}
+
+	if (check_request(str) == 0)
+		func_request(str);
+	else
+		buf = str;
+	
 	// this->see_request();
 	return (*this);
 }
 
-Request::Request(std::string str) 
+Request::Request(std::string str):
+buf(""), type(""), version(""), resource(""), body("")
 {
 	this->request_init();
-	this->func_request(str);
-	// this->see_request();
+
+	if (check_request(str) == 0)
+		func_request(str);
+	else 
+		buf = str;
+	this->see_request();
+}
+
+Request&	Request::operator=(Request& tmp)
+{
+	if (this != &tmp)
+	{
+		this->buf = tmp.buf;
+		this->type = tmp.type;
+		this->resource = tmp.resource;
+		this->version = tmp.version;
+		this->body = tmp.body;
+		this->_f_sl_status = tmp._f_sl_status;
+		this->_f_hd_status = tmp._f_hd_status;
+		this->_f_bd_status = tmp._f_bd_status;
+		this->_request_done = tmp._request_done;
+		this->headers = tmp.headers;
+	}
+	return (*this);
 }
 
 
-// int main() {
-// 	Request request("");
-// 	request.request_init();
-// 	request.func_request("GET /images/corne");
-// 	request.func_request("r1.png HTTP/1.1\r\nHost: mail.example.com\r\n");
-// 	request.func_request("Referer: http://mail.example.com/send-message.html\r\n");
-// 	request.func_request("User-Agent: BrowserForDummies/4.67b\r\n");
-// 	request.func_request("Content-Type: multipart/form-data; boundary=\"Asrf456BGe4h\"\r\nConnection: keep-alive\r\n");
-// 	request.func_request("Transfer-Encoding: chunked\r\n");
-// 	request.func_request("Content-Length: 226\r\n");
-// 	request.func_request("Keep-Alive: 300\r\n");
-// 	request.func_request("\r\n64\r\nLinux семейство Unix-подобных операционных систем на базе ядр");
-// 	request.func_request("а Linux, включающих тот или иной  набор\r\n64\r\nLinux семейство Unix-подобных операционн");
-// 	request.func_request("ых систем на базе ядр а Linux, включающих тот или иной  набор\r\n0\r\n");
-// 	request.see_request();
-// 	return 0;
-// }
+Request::Request(Request& tmp)
+{
+	*this = tmp;
+}

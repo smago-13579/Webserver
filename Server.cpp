@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/10 20:24:52 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/11 22:08:32 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,13 @@ void	Server::server_run()
 			clients.clear();
 			message.clear();
 			continue;
+		}
+		for (size_t i = 0; i < message.size(); i++) 
+		{
+			if (FD_ISSET(message[i], &writefds)) {
+				int fd = message[i];
+				// clients[fd]->server_write(fd);
+			}
 		}
 		for (cls_iter it = clients.begin(); it != clients.end(); it++)
 		{

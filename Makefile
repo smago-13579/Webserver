@@ -6,13 +6,13 @@
 #    By: smago <smago@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/05/25 14:03:12 by smago             #+#    #+#              #
-#    Updated: 2021/06/10 19:34:22 by smago            ###   ########.fr        #
+#    Updated: 2021/06/11 22:20:07 by smago            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserver
 
-SRCS = main.cpp Server.cpp Request.cpp Socket.cpp kbatwoma/config/Config.cpp
+SRCS = main.cpp Server.cpp Socket.cpp Request.cpp kbatwoma/config/Config.cpp
 
 FLAGS = -Wall -Wextra -Werror
 

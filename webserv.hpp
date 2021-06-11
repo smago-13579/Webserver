@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/24 13:16:07 by smago             #+#    #+#             */
-/*   Updated: 2021/06/10 19:02:08 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/11 22:06:16 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,10 @@
 
 # include "Server.hpp"
 # include "Request.hpp"
-# include "Socket.hpp"
+// # include "Response.hpp"
 # include "kbatwoma/config/Config.hpp"
+# include "Socket.hpp"
+
 
 /*		Only for positive numbers		*/
 template <class T>

@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/10 20:18:15 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/11 22:19:30 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,8 @@ int		Socket::accept_client()
 	}
 	else {
 		std::cout << "\n----CONNECTION ACCEPTED----\n";
-		std::cout << "FD of the client's socket: " << new_fd << std::endl;
+		std::cout << "Client's FD: " << new_fd << "\tip: " << settings.ip << \
+				"\tport: " << settings.port << std::endl;
 		// ???			???			???
 		// fcntl(new_fd, F_SETFL, O_NONBLOCK);
 	}
@@ -69,7 +70,8 @@ int		Socket::create()
 	}
 	else {
 		std::cout << "\n----SOCKET CREATED----\n";
-		std::cout << "Socket fd: " << socket_fd << std::endl;
+		std::cout << "Socket fd: " << socket_fd << \
+			"\tip: " << settings.ip << "\tport: " << settings.port << std::endl;
 	}
 
 	/*		STICKING TCP PORT				*/
@@ -94,7 +96,7 @@ int		Socket::create()
 	fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 
 	/*		LISTEN MODE						*/
-	if (listen(socket_fd, 16) < 0) {
+	if (listen(socket_fd, 16) < 0) {		// the Queue could be much longer (about 1000)
 		std::string str = "LISTEN ERROR: ";
 		std::cout << str << strerror(errno);
 		return (1);
@@ -110,7 +112,8 @@ int 	Socket::getFD()
 int 	Socket::server_read(int fd)
 {
 	int res;
-	char buffer[32648];				
+	char buffer[32648];		
+	std::string str;		
 	res = recv(fd, buffer, 32647, 0);
 	
 	if (res > 0) {
@@ -118,16 +121,49 @@ int 	Socket::server_read(int fd)
 
 		std::cout << "\nREAD FROM CLIENT: " << fd << std::endl;
 		std::cout << buffer << std::endl;
-		std::string str(buffer);
+		str = buffer;
+		Request tmp(str);
+		// req.insert(std::make_pair(fd, tmp));
+		// if (req[fd]._request_done == 1)
+		// {
+			// Response tmp(req[fd], settings);
+			// resp.insert(std::make_pair(fd, tmp));
+			// std::cout << "REQUEST DONE\n";
+			// return (0);
+		// }
+		// req.insert(std::make_pair(fd, &tmp));
+		// if (tmp._request_done)
 
 		return 1;
 	}
 	else if (res < 0) {
-		std::string str = "ERROR WHEN READING FROM THE CLIENT'S SOCKET FD: ";
+		std::string str = "ERROR WHEN READING FROM THE CLIENT'S FD: ";
 		str += itoa(fd);
+		str += "\t";
 		str += strerror(errno);
 		std::cout <<  str << std::endl;
 	}
 	return 0;
 }
+
+// int 	Socket::server_write(int fd)
+// {
+// 	std::string response;
+
+// 	response = resp[fd].get_response();
+// 	if (response != "")
+// 	{
+// 		if (send(fd, response.c_str(), response.length(), 0) < 0) 
+// 		{
+// 			std::string str = "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";
+// 			str += itoa(fd);
+// 			str += ": ";
+// 			str += strerror(errno);
+// 			return (1);
+// 		}
+// 		return (0);
+// 	}
+	
+// 	return (1);
+// }
 
