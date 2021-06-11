@@ -1,5 +1,5 @@
-all: clear main.hpp
-	clang++ *.cpp cgi-bin/cpp/*.cpp
+all: clear main_test_cgi.hpp
+	clang++ *.cpp cgi-bin/cpp/hello.cpp
 
 clear:
 	rm -rf file.txt
