@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/11 22:19:53 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/12 21:55:35 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,23 +221,11 @@ Request&	Request::operator=(std::string str)
 	return (*this);
 }
 
-Request::Request(std::string str):
-buf(""), type(""), version(""), resource(""), body("")
-{
-	this->request_init();
-
-	if (check_request(str) == 0)
-		func_request(str);
-	else 
-		buf = str;
-	this->see_request();
-}
-
-Request&	Request::operator=(Request& tmp)
+Request&	Request::operator=(const Request& tmp)
 {
 	if (this != &tmp)
 	{
-		this->buf = tmp.buf;
+		this->buf += tmp.buf;
 		this->type = tmp.type;
 		this->resource = tmp.resource;
 		this->version = tmp.version;
@@ -251,8 +239,24 @@ Request&	Request::operator=(Request& tmp)
 	return (*this);
 }
 
+Request::Request(std::string str):
+buf(""), type(""), version(""), resource(""), body("")
+{
+	this->request_init();
 
-Request::Request(Request& tmp)
+	if (check_request(str) == 0)
+		func_request(str);
+	else 
+		buf = str;
+	// this->see_request();
+}
+
+Request::Request(const Request& tmp)
 {
 	*this = tmp;
 }
+
+Request::Request():
+buf(""), type(""), version(""), resource(""), body("")
+{}
+

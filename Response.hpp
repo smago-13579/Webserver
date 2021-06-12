@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/11 22:04:01 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/13 00:32:27 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define RESPONSE_HPP
 
 # include "webserv.hpp"
+# include "Request.hpp"
 
 # define GET 0
 # define POST 1
@@ -25,29 +26,31 @@
 class Response
 {
 public:
-	typedef std::vector<struct Socket::Location>::iterator loc_iter;
+	typedef std::vector<Location>::iterator loc_iter;
 
 	Response();
-	Response(struct Request req, struct Socket::Settings set);
+	Response(const Request& req, Settings set);
 	~Response();
+
+	Response&		operator=(const Response& tmp);
 
 	std::string			get_response();
 	
 private:
-	Request*			req;
-	Socket::Settings* 	settings;
-	std::stringstream 	response;
-	std::stringstream 	body;
-	std::stringstream 	file;
+	Request				req;
+	Settings* 			settings;
+	std::string			answer;
 	size_t				response_done;
-	
-	void			find_method();
-	int 			get_method();
-	int				create_response(Socket::Location& loc);
+
+	int				compare_prefix(std::string loc, std::string res);
+	int				create_response(const Location& loc);
 	int				check_method(std::vector<size_t>& methods, size_t cmd);
+	loc_iter		find_location();
+	void			find_method();
+	std::string		get_headers();
+	int 			method_GET();
+	
 };
 
-# include "Request.hpp"
-# include "Socket.hpp"
 
 #endif

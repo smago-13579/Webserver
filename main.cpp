@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/24 12:58:15 by smago             #+#    #+#             */
-/*   Updated: 2021/06/10 19:16:01 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/12 12:29:42 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
+#include "Server.hpp"
 
 int main(int ac, char** av)
 {

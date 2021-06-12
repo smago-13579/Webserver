@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 16:14:24 by monie             #+#    #+#             */
-/*   Updated: 2021/06/11 22:18:58 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/12 13:17:12 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,12 @@
 
 class Request {
 public:
+	Request();
 	Request(std::string str);
-	Request(Request& tmp);
+	Request(const Request& tmp);
 	
 	Request&		operator=(std::string str);
-	Request&		operator=(Request& tmp);
+	Request&		operator=(const Request& tmp);
 	
 	std::string 	buf;
 	std::string		type;

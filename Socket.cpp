@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/11 22:19:30 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/13 02:13:49 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,21 @@ Socket::Socket(Config::Server& server)
 	settings.server_name = server.server_name;
 	settings.error_page = server.error_page;
 	
-	std::vector<Socket::Location> vec;
+	std::vector<Location> vec;
 	for (config_iter it = server.locations.begin(); it != server.locations.end(); it++)
 	{
-		Socket::Location lock;
+		Location lock;
 		lock.location = it->location;
 		lock.index = it->index;
 		lock.methods = it->methods;
 		lock.root = it->root;
 		lock.autoindex = it->autoindex;
 		lock.max_body = it->max_body;
+		lock.CGI_extension = it->CGI_extension;
+		lock.CGI_path = it->CGI_path;
 		vec.push_back(lock);
-	}	
+	}
+	settings.locations = vec;
 }
 
 Socket::~Socket() {}
@@ -38,7 +41,6 @@ Socket::~Socket() {}
 int		Socket::accept_client()
 {
 	struct sockaddr_in new_addr;
-	// struct Request req("");
 	socklen_t new_addrlen = sizeof(sockaddr_in);
 	int new_fd;
 
@@ -109,7 +111,7 @@ int 	Socket::getFD()
 	return (this->socket_fd);
 }
 
-int 	Socket::server_read(int fd)
+int 	Socket::socket_read(int fd)
 {
 	int res;
 	char buffer[32648];		
@@ -122,17 +124,16 @@ int 	Socket::server_read(int fd)
 		std::cout << "\nREAD FROM CLIENT: " << fd << std::endl;
 		std::cout << buffer << std::endl;
 		str = buffer;
-		Request tmp(str);
-		// req.insert(std::make_pair(fd, tmp));
-		// if (req[fd]._request_done == 1)
-		// {
-			// Response tmp(req[fd], settings);
-			// resp.insert(std::make_pair(fd, tmp));
-			// std::cout << "REQUEST DONE\n";
-			// return (0);
-		// }
-		// req.insert(std::make_pair(fd, &tmp));
-		// if (tmp._request_done)
+		Request request(str);
+		req[fd] = request;
+		if (req[fd]._request_done == 1)
+		{
+			Response response(req[fd], settings);
+			resp[fd] = response;
+
+			/*			Delete request from client			*/
+			req.erase(fd);
+		}
 
 		return 1;
 	}
@@ -146,24 +147,25 @@ int 	Socket::server_read(int fd)
 	return 0;
 }
 
-// int 	Socket::server_write(int fd)
-// {
-// 	std::string response;
+int 	Socket::socket_write(int fd)
+{
+	std::string response;
 
-// 	response = resp[fd].get_response();
-// 	if (response != "")
-// 	{
-// 		if (send(fd, response.c_str(), response.length(), 0) < 0) 
-// 		{
-// 			std::string str = "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";
-// 			str += itoa(fd);
-// 			str += ": ";
-// 			str += strerror(errno);
-// 			return (1);
-// 		}
-// 		return (0);
-// 	}
+	response = resp[fd].get_response();
+	if (response != "")
+	{
+		if (send(fd, response.c_str(), response.length(), 0) < 0) 
+		{
+			std::string str = "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";
+			str += itoa(fd);
+			str += ": ";
+			str += strerror(errno);
+			return (1);
+		}
+		std::cout << "REQUEST DONE\n";
+		return (0);
+	}
 	
-// 	return (1);
-// }
+	return (1);
+}
 

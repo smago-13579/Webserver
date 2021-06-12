@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/11 22:08:32 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/12 20:30:26 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,17 +69,21 @@ void	Server::server_run()
 			message.clear();
 			continue;
 		}
-		for (size_t i = 0; i < message.size(); i++) 
+		for (std::vector<int>::iterator it = message.begin(); \
+				it != message.end(); it++) 
 		{
-			if (FD_ISSET(message[i], &writefds)) {
-				int fd = message[i];
-				// clients[fd]->server_write(fd);
+			if (FD_ISSET(*it, &writefds)) {
+				int fd = *it;
+				if (clients[fd]->socket_write(fd) != 0)
+					clients.erase(fd);
+				message.erase(it);
+				break;
 			}
 		}
 		for (cls_iter it = clients.begin(); it != clients.end(); it++)
 		{
 			if (FD_ISSET(it->first, &readfds)) {
-				if (it->second->server_read(it->first) == 0) {
+				if (it->second->socket_read(it->first) == 0) {
 					std::cout << "socket closed: " << it->first << std::endl;
 					clients.erase(it->first);
 				}

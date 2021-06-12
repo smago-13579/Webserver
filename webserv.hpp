@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/24 13:16:07 by smago             #+#    #+#             */
-/*   Updated: 2021/06/11 22:06:16 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/13 02:12:11 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,45 @@
 # include <map>
 # include <sstream>
 # include <string>
+# include <cstring>
+# include <utility>
+# include <ctime>
+# include <fstream>
 
-# include "Server.hpp"
-# include "Request.hpp"
-// # include "Response.hpp"
-# include "kbatwoma/config/Config.hpp"
-# include "Socket.hpp"
 
+struct Location
+{
+	std::string         	location;
+	std::string         	index;
+	std::vector<size_t> 	methods;
+	std::string         	root;
+	bool                	autoindex;
+	int			         	max_body;
+	std::string				CGI_extension;
+	std::string				CGI_path;
+};
+
+struct Settings
+{
+	std::string             ip;
+	int                     port;
+	std::string             server_name;
+	std::string             error_page;
+	std::vector<Location>   locations;
+
+	Settings&			operator=(Settings& set)
+	{
+		if (this != &set)
+		{
+			this->ip = set.ip;
+			this->port = set.port;
+			this->server_name = set.server_name;
+			this->error_page = set.error_page;
+			this->locations = set.locations;
+		}
+		return (*this);
+	}
+};
 
 /*		Only for positive numbers		*/
 template <class T>
