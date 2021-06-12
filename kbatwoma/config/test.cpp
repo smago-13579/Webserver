@@ -20,18 +20,24 @@ void    location(std::vector<Config::Location> &loc)
 
 int main()
 {
-    Config config("/home/venus/Desktop/Nastya/Webserver/kbatwoma/config/Den/conf/serv_easy.conf");
-    std::vector<Config::Server> servers = config.getServers();
-    for (std::vector<Config::Server>::iterator it = servers.begin(); it != servers.end(); it++)
+    try{
+        Config config("/home/venus/Desktop/Nastya/Webserver/kbatwoma/config/Den/conf/serv_easy.conf");
+        std::vector<Config::Server> servers = config.getServers();
+        for (std::vector<Config::Server>::iterator it = servers.begin(); it != servers.end(); it++)
+        {
+            std::cout << "IP: " << it->ip << std::endl;
+            std::cout << "Port: " << it->port << std::endl;
+            std::cout << "Server name: " << it->server_name << std::endl;
+            std::cout << "Error page: " << it->error_page << std::endl;
+            std::cout << "Locations: " << std::endl;
+            location(it->locations);
+            // std::cout << "Client body size: " << it->client_body_size << std::endl;
+            std::cout << std::endl;
+        }
+    }
+    catch(std::exception &e)
     {
-        std::cout << "IP: " << it->ip << std::endl;
-        std::cout << "Port: " << it->port << std::endl;
-        std::cout << "Server name: " << it->server_name << std::endl;
-        std::cout << "Error page: " << it->error_page << std::endl;
-        std::cout << "Locations: " << std::endl;
-        location(it->locations);
-        // std::cout << "Client body size: " << it->client_body_size << std::endl;
-        std::cout << std::endl;
+        std::cerr << e.what() << std::endl;
     }
     return (0);
 }

@@ -90,6 +90,7 @@ class Config
 
         Server      *parser_server();
         Location    *parser_location();
+        void        check_braces();
 };
 
 #endif

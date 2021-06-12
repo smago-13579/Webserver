@@ -50,8 +50,6 @@ Config::Config(std::string config_name) : _servers(std::vector<Server>()),
     else
         throw(Config::File_error());
     parser();
-
-    //checker();
 }
 
 Config::Config(Config const &a) : _servers(a._servers), _config_line(a._config_line),
@@ -107,6 +105,42 @@ std::vector<Config::Server> const   &Config::getServers()
 /*   Parser   */
 /*            */
 /**************/
+void    Config::check_braces()
+{
+    std::string help;
+    size_t flag = 0;
+    size_t i = 0;
+    size_t open;
+    size_t close;
+    while (i != _config_line.npos)
+    {
+        i = (flag == 0) ? 0 : i + 1;
+        if (((open = _config_line.find("{", i)) != _config_line.npos
+                && (close = _config_line.find("}", i)) != _config_line.npos) ||
+            ((open = _config_line.find("{", i)) != _config_line.npos
+                && (close = _config_line.find("}", i)) == _config_line.npos) ||
+            ((open = _config_line.find("{", i)) == _config_line.npos
+                && (close = _config_line.find("}", i)) != _config_line.npos))
+        {
+            i = open > close ? close : open;
+            help += _config_line[i];
+        }
+        else
+            i = _config_line.npos;
+        flag++;
+    }
+    while (help.find("}") != help.npos)
+        if ((i = help.find("}")) != help.npos)
+        {
+            if (help[i - 1])
+                help.erase(i - 1, 2);
+            else
+                throw(Config::Syntax_error());
+        }
+    if (!help.empty())
+        throw(Config::Syntax_error());
+}
+
 void    Config::parser()
 {
     size_t  pos_begin = 0;
@@ -114,20 +148,25 @@ void    Config::parser()
     size_t  flag = 0;
     Config::Server *serv;
 
+    check_braces();
     if ((pos_begin = _config_line.find("server{")) == _config_line.npos)
-        return;
+        throw(Config::Missing_field());
     pos_begin += 7;
     while (flag == 0)
-    {//проверить на }}
+    {
         if ((pos_end = _config_line.find("server{", pos_begin)) == _config_line.npos)
             flag = 1;
         _server_line = std::string(_config_line, pos_begin, pos_end - pos_begin);
         serv = parser_server();
-        _servers.push_back(*serv);
+        size_t i = 0;
+        for (; i < _servers.size(); i++)
+            if (_servers[i].ip == serv->ip && _servers[i].port == serv->port)
+                break;
+        if (i == _servers.size())
+            _servers.push_back(*serv);
         delete serv;
         pos_begin = pos_end + 7;
     }
-    //проверка на наличие сервера
 }
 
 Config::Server  *Config::parser_server()
@@ -140,9 +179,11 @@ Config::Server  *Config::parser_server()
     /**************/
     /*   listen   */ //обязательное поле
     /**************/
-    // добавить проверку на наличие такого же server
     if ((pos_begin = _server_line.find("listen")) != _server_line.npos)
     {
+        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+                                        && _server_line[pos_begin - 1] != '}'))
+            throw(Config::Syntax_error());
         pos_begin += 6;
         if ((pos_end = _server_line.find(":", pos_begin)) == _server_line.npos)
             throw(Config::Syntax_error());
@@ -164,6 +205,9 @@ Config::Server  *Config::parser_server()
     pos_begin = 0;
     if ((pos_begin = _server_line.find("server_name")) != _server_line.npos)
     {
+        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+                                        && _server_line[pos_begin - 1] != '}'))
+            throw(Config::Syntax_error());
         pos_begin += 11;
         if ((pos_end = _server_line.find(";", pos_begin)) == _server_line.npos)
             throw(Config::Syntax_error());
@@ -176,6 +220,9 @@ Config::Server  *Config::parser_server()
     pos_begin = 0;
     if ((pos_begin = _server_line.find("error_page")) != _server_line.npos)
     {
+        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+                                        && _server_line[pos_begin - 1] != '}'))
+            throw(Config::Syntax_error());
         pos_begin += 10;
         if ((pos_end = _server_line.find(";", pos_begin)) == _server_line.npos)
             throw(Config::Syntax_error());
@@ -195,6 +242,9 @@ Config::Server  *Config::parser_server()
         if ((pos_begin = _server_line.find("location", pos_begin)) == _server_line.npos)
             break;
         count_locations++;
+        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+                                        && _server_line[pos_begin - 1] != '}'))
+            throw(Config::Syntax_error());
         pos_begin += 8;
         if ((pos_end = _server_line.find("}", pos_begin)) == _server_line.npos)
             throw(Config::Syntax_error());
@@ -235,6 +285,9 @@ Config::Location  *Config::parser_location()
     /*************/
     if ((pos_begin = _location_line.find("index")) != _location_line.npos)
     {
+        if (_location_line[pos_begin - 1] && (_location_line[pos_begin - 1] != ';'
+                                        && _location_line[pos_begin - 1] != '}'))
+            throw(Config::Syntax_error());
         pos_begin += 5;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
             throw(Config::Syntax_error());
