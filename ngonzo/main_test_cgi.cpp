@@ -24,7 +24,6 @@ void		ft_wait()
 // 	std::string		file_path;
 
 // 	if(req.get_body().len() > _location.max_body)
-// 	{
 // 		resp.body = "";
 // 		resp.status_code_int_val = 433;
 // 		resp.reason_phrase = "Payload Too Large";

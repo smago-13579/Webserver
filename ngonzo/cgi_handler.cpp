@@ -5,12 +5,12 @@ cgi_handler::cgi_handler(str filename)
 	{ _filename = filename; }
 
 // default constructor
-cgi_handler::cgi_handler(Request request, t_client_addr client_addr)
-	{ _create_env(&request, &client_addr); _construct_filename(); }
+cgi_handler::cgi_handler()
+	{ }
 
 // filename constructor
-cgi_handler::cgi_handler(Request request, t_client_addr client_addr, str filename)
-	{ _create_env(&request, &client_addr); set_filename(filename); }
+cgi_handler::cgi_handler(Request request, str filename = "")
+	{ _create_env(&request); set_filename(filename); }
 
 // default destructor
 cgi_handler::~cgi_handler()
@@ -52,7 +52,7 @@ char *		cgi_handler::_ft_strjoin(std::string str1, std::string str2 = "", std::s
 	return ret;
 }
 
-void		cgi_handler::_create_env(Request * request, t_client_addr * client_addr)
+void		cgi_handler::_create_env(Request * request)
 {
 	// _env = new char *[18 + request->get_headers().size()];
 	_env = new char *[18 + 0];
@@ -154,7 +154,7 @@ std::string const		cgi_handler::get_filename() const
 void					cgi_handler::set_filename(str filename)
 {
 	_response_body = "";
-	if(filename[0] == '/' or (filename[0] == '.' and filename[1] == '/'))
+	if(filename[0] == '/' or filename.find("./") == 0)
 		_filename = filename;
 	else
 		_construct_filename();

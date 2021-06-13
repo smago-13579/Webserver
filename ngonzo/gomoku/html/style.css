@@ -1,0 +1,79 @@
+@font-face {
+    font-family: Ubuntu; /* Имя шрифта */
+    src: url(Playlist-Script.otf); /* Путь к файлу со шрифтом */
+}
+
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+body {
+	font-family: Ubuntu;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	background: url(images/back.jpg) no-repeat;
+	background-size: 100%;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;    
+}
+
+button {
+	height: 10rem;
+	width: 10rem;
+	margin: .5rem;
+	background: rgb(126, 200, 235);
+	border: 1px solid rgba(0, 0, 0, .2);;
+	border-radius: .4rem;
+}
+
+.window {
+	margin: 20vh 20vw;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	width: 35rem;
+	height: 41rem;
+	background: rgba(69, 143, 177, .7);
+	border-radius: .4rem;
+}
+
+.window_row {
+	margin: 0 1rem;
+	display: flex;
+	justify-content: space-between;
+}
+
+.header {
+	display: flex;
+	width: 15rem;
+	flex-direction: column;
+	justify-content: space-between;
+	background: rgba(126, 200, 235, .5);
+	font-size: 3rem;
+}
+
+.header_text {
+	
+}
+
+.header_head {
+	
+}
+
+.header_link {
+	height: 4rem;
+	width: 5rem;
+	background: rgba(69, 143, 177, .7);
+}
+
+.button_restart {
+	height: 5rem;
+	flex: 1 0 auto;
+}

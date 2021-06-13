@@ -9,7 +9,6 @@
 # define buffer_size 1024
 
 class Request {};		// test
-class t_client_addr {};	// test
 
 class cgi_handler
 {
@@ -27,7 +26,7 @@ private:
 
 	// private methods
 	char *	_ft_strjoin(str str1, str str2, str str3, str str4);
-	void	_create_env(Request * request, t_client_addr * client_addr);
+	void	_create_env(Request * request);
 	void	_construct_filename();// need ?
 	void	_free_env();
 	void	_parse_cgi();
@@ -35,17 +34,17 @@ private:
 	bool	_restore_fd_and_close(int pipe[2], int save[2]);
 
 public:
-	cgi_handler() {}
+	cgi_handler();
 	cgi_handler(str filename);
-	cgi_handler(Request request, t_client_addr client_addr);
-	cgi_handler(Request request, t_client_addr client_addr, str filename);
+	cgi_handler(Request request, str filename);
 	~cgi_handler();
 	cgi_handler(const cgi_handler & copy);
 	cgi_handler &	operator= (const cgi_handler & rhs);
 
 	// setters and getters
-	str const	get_filename() const;
+	void		set_request(Request request);
 	void		set_filename(str filename);
+	str const	get_filename() const;
 	str const	get_response_body() const;
 	int const	get_status_code() const;
 	str const	get_str_content_type() const;
