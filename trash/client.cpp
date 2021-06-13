@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/28 15:14:05 by smago             #+#    #+#             */
-/*   Updated: 2021/06/03 17:16:44 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/13 15:54:48 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,15 @@ int main()
 
 	/*		CREATE IP AND PORT				*/
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(7654);
+	addr.sin_port = htons(8080);
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	/*		CONNECT TO WEB_SERVER			*/
 	if (connect(socket_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)	{
 		std::cout << "CONNECT ERROR: " << strerror(errno) << std::endl;
 	}
-	char buffer[100];
-	int buf;
+	// char buffer[100000];
+	// int buf;
 
 	/*		SET NON_BLOCK TO CLIENT			*/
 	// int flags = fcntl(socket_fd, F_GETFL);
@@ -61,8 +61,14 @@ int main()
 		}
 		send(socket_fd, str.c_str(), str.length(), 0);
 
-		/* 			RECEIVE FROM BUFFER				*/
-		// buf = recv(socket_fd, buffer, 99, 0);
+		// std::getline(std::cin, str);
+		// if (str == "exit") {
+		// 	exit(0);
+		// }
+		// send(socket_fd, str.c_str(), str.length(), 0);
+
+		// /* 			RECEIVE FROM BUFFER				*/
+		// buf = recv(socket_fd, buffer, 99999, 0);
 		// buffer[buf] = '\0';
 		// std::cout << buffer << std::endl;
 	}

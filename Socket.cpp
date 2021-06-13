@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/13 02:13:49 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/13 16:24:59 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,9 +133,10 @@ int 	Socket::socket_read(int fd)
 
 			/*			Delete request from client			*/
 			req.erase(fd);
+			return 1;
 		}
 
-		return 1;
+		return 2;
 	}
 	else if (res < 0) {
 		std::string str = "ERROR WHEN READING FROM THE CLIENT'S FD: ";
@@ -154,6 +155,7 @@ int 	Socket::socket_write(int fd)
 	response = resp[fd].get_response();
 	if (response != "")
 	{
+		// std::cout << "RESPONSE: \n" << response << std::endl;
 		if (send(fd, response.c_str(), response.length(), 0) < 0) 
 		{
 			std::string str = "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";

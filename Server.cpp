@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/12 20:30:26 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/13 16:02:04 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ Server::Server(std::string str)
 		if (socket.create() == 0)
 			servers.insert(std::make_pair(socket.getFD(), socket));
 	}
-	if (servers.empty()) {
-		std::string str = "The Server Core couldn't be started\n";
-		throw str;
-	}
+	// if (servers.empty()) {
+	// 	std::string str = "The Server Core couldn't be started\n";
+	// 	throw str;
+	// }//эта проверка стоит в парсинге конфига
 };
 
 void	Server::server_run()
@@ -83,11 +83,12 @@ void	Server::server_run()
 		for (cls_iter it = clients.begin(); it != clients.end(); it++)
 		{
 			if (FD_ISSET(it->first, &readfds)) {
-				if (it->second->socket_read(it->first) == 0) {
+				int i = it->second->socket_read(it->first);
+				if (i == 0) {
 					std::cout << "socket closed: " << it->first << std::endl;
 					clients.erase(it->first);
 				}
-				else
+				else if (i == 1)
 					message.push_back(it->first);
 				break;
 			}
@@ -105,9 +106,7 @@ void	Server::server_run()
 	}
 }
 
-
 Server::~Server() 
 {
 	delete(config);
 };
-
