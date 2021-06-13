@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/13 02:19:29 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/13 12:20:52 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,8 @@ void		Response::find_method()
 {
 	if (req.type.compare("GET") == 0)
 		this->method_GET();
-	// else if (req.type == "PUT")
+	else if (req.type == "DELETE")
+		this->method_DELETE();
 	/*  		ADD ANOTHER METHODS				*/
 }
 
@@ -183,4 +184,15 @@ int			Response::method_GET()
 		return (-1);
 	}
 	return (-1);
+}
+
+int			Response::method_DELETE()
+{
+	//пока сможем удалять только из определенной папки
+	loc_iter it;
+
+	it = find_location();
+	
+	
+
 }
