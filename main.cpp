@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/24 12:58:15 by smago             #+#    #+#             */
-/*   Updated: 2021/06/12 12:29:42 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/13 13:17:11 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,12 @@ int main(int ac, char** av)
 			Server server(av[1]);
 			server.server_run();
 		}
-		catch (std::string str) {
-			std::cout << str << std::endl;
-			return 1;
+		// catch (std::string str) {
+		// 	std::cout << str << std::endl;
+		// 	return 1;
+		// }
+		catch (std::exception &e) {
+			std::cerr << e.what() << std::endl;
 		}
 	}
 	else

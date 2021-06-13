@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/13 11:01:34 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/13 15:25:44 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 /*********************************************/
 Config::Location::Location() : location(std::string()), index(std::string()),
                             methods(std::vector<size_t>()), root(std::string()),
-                            autoindex(OFF), max_body(std::numeric_limits<int>::max()),
+                            autoindex(OFF), max_body(std::numeric_limits<int>::max() - 1),
                             CGI_extension(std::string()), CGI_path(std::string())
 {}
 

@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/13 12:20:52 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/13 17:10:03 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,22 +76,24 @@ int			Response::create_response(const Location& loc)
 	std::cout << "FILE: " << file.str() << std::endl;
 	
 	if (file.str().find(".png") == std::string::npos && \
-		file.str().find(".PNG") == std::string::npos)
+		file.str().find(".PNG") == std::string::npos && \
+		file.str().find(".ico") == std::string::npos && \
+		file.str().find(".jpeg") == std::string::npos)
 	{
 		if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
 			std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
 			return (-1);
 		}
-		res = read(fd, buff, 99999);
+		res = read(fd, buff, 999999);
 		buff[res] = '\0';
 	}
 	else
 		image.open(file.str(), std::ifstream::binary);
 
 	if (image.is_open())
-		body << image.rdbuf() << "0\r\n\r\n";
+		body << image.rdbuf() << "\r\n\r\n";
 	else
-		body << buff << "0\r\n\r\n";
+		body << buff << "\r\n\r\n";
 	
 	response << req.version << " 200 OK\r\n"
 	<< "Version: " << req.version << "\r\n"
@@ -101,6 +103,10 @@ int			Response::create_response(const Location& loc)
 	this->answer = response.str();
 	
 	this->response_done	= 1;
+
+	body.clear();
+	image.clear();
+	image.close();
 	
 	return (0);
 }
@@ -192,6 +198,14 @@ int			Response::method_DELETE()
 	loc_iter it;
 
 	it = find_location();
+	if (check_method(it->methods, GET) == 1) {
+		create_response(*it);
+		return (0);
+	}
+	else {
+		std::cout << "\nCan't use get method\n";
+		return (-1);
+	}
 	
 	
 

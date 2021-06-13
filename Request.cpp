@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/12 21:55:35 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/13 15:40:18 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,6 +235,11 @@ Request&	Request::operator=(const Request& tmp)
 		this->_f_bd_status = tmp._f_bd_status;
 		this->_request_done = tmp._request_done;
 		this->headers = tmp.headers;
+		if (check_request(buf) == 0)
+		{
+			std::cout << "REQUEST COMPLETE\n";
+			func_request(buf);
+		}
 	}
 	return (*this);
 }
@@ -245,7 +250,10 @@ buf(""), type(""), version(""), resource(""), body("")
 	this->request_init();
 
 	if (check_request(str) == 0)
+	{
+		std::cout << "REQUEST COMPLETE\n";
 		func_request(str);
+	}
 	else 
 		buf = str;
 	// this->see_request();
