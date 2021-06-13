@@ -1,4 +1,5 @@
 # include "Config.hpp"
+# include <unistd.h>
 
 void    location(std::vector<Config::Location> &loc)
 {
@@ -21,7 +22,7 @@ void    location(std::vector<Config::Location> &loc)
 int main()
 {
     try{
-        Config config("/home/venus/Desktop/Nastya/Webserver/kbatwoma/config/Den/conf/serv_easy.conf");
+        Config config("/Users/kbatwoma/Desktop/Webserver_Team/kbatwoma/config/Den/conf/serv_easy.conf");
         std::vector<Config::Server> servers = config.getServers();
         for (std::vector<Config::Server>::iterator it = servers.begin(); it != servers.end(); it++)
         {
@@ -39,5 +40,7 @@ int main()
     {
         std::cerr << e.what() << std::endl;
     }
+
+    sleep(10000);
     return (0);
 }

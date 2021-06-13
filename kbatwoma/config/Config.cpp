@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/08 15:56:39 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/13 11:01:34 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,21 +183,36 @@ Config::Server  *Config::parser_server()
     {
         if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
+        {
+            delete point_to_serv;
             throw(Config::Syntax_error());
+        }
         pos_begin += 6;
         if ((pos_end = _server_line.find(":", pos_begin)) == _server_line.npos)
+        {
+            delete point_to_serv;
             throw(Config::Syntax_error());
+        }
         (*point_to_serv).ip = std::string(_server_line, pos_begin, pos_end - pos_begin);
         pos_begin = pos_end + 1;
         if ((pos_end = _server_line.find(";", pos_begin)) == _server_line.npos)
+        {
+            delete point_to_serv;
             throw(Config::Syntax_error());
+        }
         help_line = std::string(_server_line, pos_begin, pos_end - pos_begin);
         (*point_to_serv).port = atoi(help_line.c_str());
         if ((*point_to_serv).port < 0)
+        {
+            delete point_to_serv;
             throw(Config::Data_error());
+        }
     }
     else
+    {
+        delete point_to_serv;
         throw(Config::Missing_field());
+    }
 
     /*******************/
     /*   server_name   */ //не обязательный параметр 
@@ -207,10 +222,16 @@ Config::Server  *Config::parser_server()
     {
         if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
+        {
+            delete point_to_serv;
             throw(Config::Syntax_error());
+        }
         pos_begin += 11;
         if ((pos_end = _server_line.find(";", pos_begin)) == _server_line.npos)
+        {
+            delete point_to_serv;
             throw(Config::Syntax_error());
+        }
         (*point_to_serv).server_name = std::string(_server_line, pos_begin, pos_end - pos_begin);
     }
 
@@ -222,14 +243,23 @@ Config::Server  *Config::parser_server()
     {
         if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
+        {
+            delete point_to_serv;
             throw(Config::Syntax_error());
+        }
         pos_begin += 10;
         if ((pos_end = _server_line.find(";", pos_begin)) == _server_line.npos)
+        {
+            delete point_to_serv;
             throw(Config::Syntax_error());
+        }
         (*point_to_serv).error_page = std::string(_server_line, pos_begin, pos_end - pos_begin);
     }
     else
+    {
+        delete point_to_serv;
         throw(Config::Missing_field());
+    }
     
     /*****************/
     /*   locations   */ //обязательное поле
@@ -244,10 +274,16 @@ Config::Server  *Config::parser_server()
         count_locations++;
         if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
+        {
+            delete point_to_serv;
             throw(Config::Syntax_error());
+        }
         pos_begin += 8;
         if ((pos_end = _server_line.find("}", pos_begin)) == _server_line.npos)
+        {
+            delete point_to_serv;
             throw(Config::Syntax_error());
+        }
         _location_line = std::string(_server_line, pos_begin, pos_end - pos_begin);
         loc = parser_location();
         (*point_to_serv).locations.push_back(*loc);
@@ -255,7 +291,10 @@ Config::Server  *Config::parser_server()
         pos_begin = pos_end + 1;
     }
     if (count_locations == 0)
+    {
+        delete point_to_serv;
         throw(Config::Missing_field());
+    }
 
     return (point_to_serv);
 }
@@ -273,10 +312,16 @@ Config::Location  *Config::parser_location()
     /*   location   */ //обязательное поле
     /****************/
     if ((pos_end = _location_line.find("{")) == _location_line.npos)
+    {
+        delete point_to_location;
         throw(Config::Syntax_error());
+    }
     (*point_to_location).location = std::string(_location_line, pos_begin, pos_end - pos_begin);
     if ((*point_to_location).location.empty())
+    {
+        delete point_to_location;
         throw(Config::Missing_field());
+    }
     pos_begin = pos_end + 1;
     pos_start = pos_begin;
 
@@ -287,10 +332,16 @@ Config::Location  *Config::parser_location()
     {
         if (_location_line[pos_begin - 1] && (_location_line[pos_begin - 1] != ';'
                                         && _location_line[pos_begin - 1] != '}'))
+        {
+            delete point_to_location;
             throw(Config::Syntax_error());
+        }
         pos_begin += 5;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+        {
+            delete point_to_location;
             throw(Config::Syntax_error());
+        }
         (*point_to_location).index = std::string(_location_line, pos_begin, pos_end - pos_begin);
     }
 
@@ -302,7 +353,10 @@ Config::Location  *Config::parser_location()
     {
         pos_begin += 7;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+        {
+            delete point_to_location;
             throw(Config::Syntax_error());
+        }
         help_line = std::string(_location_line, pos_begin, pos_end - pos_begin);
         size_t flag = 0;
         std::string method;
@@ -319,7 +373,10 @@ Config::Location  *Config::parser_location()
             else if (method == "DELETE")
                 (*point_to_location).methods.push_back(DELETE);
             else
+            {
+                delete point_to_location;
                 throw(Config::Data_error());
+            }
             pos_begin = pos_end + 1;
         }
     }
@@ -332,11 +389,17 @@ Config::Location  *Config::parser_location()
     {
         pos_begin += 4;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+        {
+            delete point_to_location;
             throw(Config::Syntax_error());
+        }
         (*point_to_location).root = std::string(_location_line, pos_begin, pos_end - pos_begin);
     }
     else
+    {
+        delete point_to_location;
         throw(Config::Missing_field());
+    }
 
     /*****************/
     /*   autoindex   */ //не обязательное поле - по умолчанию на off
@@ -346,14 +409,20 @@ Config::Location  *Config::parser_location()
     {
         pos_begin += 4;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+        {
+            delete point_to_location;
             throw(Config::Syntax_error());
+        }
         help_line = std::string(_location_line, pos_begin, pos_end - pos_begin);
         if (help_line == "on")
             (*point_to_location).autoindex = ON;
         else if (help_line == "off")
             (*point_to_location).autoindex = OFF;
         else
+        {
+            delete point_to_location;
             throw(Config::Data_error());
+        }
     }
 
     /****************/
@@ -364,11 +433,17 @@ Config::Location  *Config::parser_location()
     {
         pos_begin += 8;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+        {
+            delete point_to_location;
             throw(Config::Syntax_error());
+        }
         help_line = std::string(_location_line, pos_begin, pos_end - pos_begin);
         (*point_to_location).max_body = atoi(help_line.c_str());
         if ((*point_to_location).max_body < 0)
+        {
+            delete point_to_location;
             throw(Config::Data_error());
+        }
     }
 
     /*********************/
@@ -379,7 +454,10 @@ Config::Location  *Config::parser_location()
     {
         pos_begin += 13;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+        {
+            delete point_to_location;
             throw(Config::Syntax_error());
+        }
         (*point_to_location).CGI_extension = std::string(_location_line, pos_begin, pos_end - pos_begin);
     }
 
@@ -391,12 +469,18 @@ Config::Location  *Config::parser_location()
     {
         pos_begin += 8;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+        {
+            delete point_to_location;
             throw(Config::Syntax_error());
+        }
         (*point_to_location).CGI_path = std::string(_location_line, pos_begin, pos_end - pos_begin);
     }
     if (((*point_to_location).CGI_extension.empty() && !((*point_to_location).CGI_path.empty()))
         || (!((*point_to_location).CGI_extension.empty()) && (*point_to_location).CGI_path.empty()))
+    {
+        delete point_to_location;
         throw(Config::Missing_field());
-
+    }
+    
     return (point_to_location);
 }
