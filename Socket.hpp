@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:20:44 by smago             #+#    #+#             */
-/*   Updated: 2021/06/12 19:33:58 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/14 20:55:10 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ public:
 
 	int		accept_client();
 	int		create();
+	void	erase_request(int fd);
 	int 	getFD();
 	int 	socket_read(int fd);
 	int 	socket_write(int fd);

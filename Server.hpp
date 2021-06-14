@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:40:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/10 19:29:56 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/14 12:29:57 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,12 @@ public:
 	~Server();
 
 	void 	server_run();
+
+	class Abort_server : public std::exception
+	{
+		const char* what() const throw();
+	};
+
 private:
 	fd_set	readfds, writefds;
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 11:12:03 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/14 20:56:47 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int		Socket::accept_client()
 		std::cout << "Client's FD: " << new_fd << "\tip: " << settings.ip << \
 				"\tport: " << settings.port << std::endl;
 		// ???			???			???
-		// fcntl(new_fd, F_SETFL, O_NONBLOCK);
+		fcntl(new_fd, F_SETFL, O_NONBLOCK);
 	}
 	return new_fd;
 }
@@ -83,7 +83,6 @@ int		Socket::create()
 	/*		CREATE IP AND PORT				*/
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(settings.port);
-	// addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	addr.sin_addr.s_addr = inet_addr(settings.ip.c_str());
 
 	/*		BIND ADDRESS					*/
@@ -109,6 +108,15 @@ int		Socket::create()
 int 	Socket::getFD()
 {
 	return (this->socket_fd);
+}
+
+void	Socket::erase_request(int fd)
+{
+	if (req.find(fd) != req.end())
+	{
+		req.erase(fd);
+		std::cout << "REQUEST DELETED\n";
+	}
 }
 
 int 	Socket::socket_read(int fd)
