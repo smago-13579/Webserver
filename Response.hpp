@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/13 12:13:05 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/14 21:50:06 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,9 @@ public:
 	Response(const Request& req, Settings set);
 	~Response();
 
-	Response&		operator=(const Response& tmp);
+	Response&			operator=(const Response& tmp);
 
+	void				erase_answer(int i);
 	std::string			get_response();
 	
 private:

@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 15:52:56 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/14 21:58:53 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,9 +87,13 @@ void	Server::server_run()
 		{
 			if (FD_ISSET(*it, &writefds)) {
 				int fd = *it;
-				if (clients[fd]->socket_write(fd) != 0)
-					clients.erase(fd);
-				message.erase(it);
+				int i = clients[fd]->socket_write(fd);
+				if (i != 2)
+				{
+					message.erase(it);
+					if (i == 1)
+						clients.erase(fd);
+				}
 				break;
 			}
 		}

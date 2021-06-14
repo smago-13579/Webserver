@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 14:03:00 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/14 21:50:22 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,11 @@ std::string			Response::get_response()
 	if (response_done)
 		return (this->answer); 
 	return ("");
+}
+
+void				Response::erase_answer(int i)
+{
+	this->answer.erase(0, i);
 }
 
 std::string			Response::get_headers()

@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 20:56:47 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/14 22:00:28 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int		Socket::accept_client()
 		std::cout << "\n----CONNECTION ACCEPTED----\n";
 		std::cout << "Client's FD: " << new_fd << "\tip: " << settings.ip << \
 				"\tport: " << settings.port << std::endl;
-		// ???			???			???
+		/*		SET NON_BLOCK TO CLIENT		*/
 		fcntl(new_fd, F_SETFL, O_NONBLOCK);
 	}
 	return new_fd;
@@ -160,12 +160,13 @@ int 	Socket::socket_read(int fd)
 int 	Socket::socket_write(int fd)
 {
 	std::string response;
+	int res;
 
 	response = resp[fd].get_response();
 	if (response != "")
 	{
 		// std::cout << "RESPONSE: \n" << response << std::endl;
-		if (send(fd, response.c_str(), response.length(), 0) < 0) 
+		if ((res = send(fd, response.c_str(), response.length(), 0)) < 0) 
 		{
 			std::string str = "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";
 			str += itoa(fd);
@@ -173,8 +174,13 @@ int 	Socket::socket_write(int fd)
 			str += strerror(errno);
 			return (1);
 		}
-		std::cout << "REQUEST DONE\n";
-		return (0);
+		resp[fd].erase_answer(res);
+		if (resp[fd].get_response().empty())
+		{
+			std::cout << "REQUEST DONE\n";
+			return (0);
+		}
+		return (2);
 	}
 	
 	return (1);
