@@ -3,15 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 12:22:52 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/14 15:52:56 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
+/******************/
+/*                */
+/*   Exceptions   */
+/*                */
+/******************/
+const char* Server::Abort_server::what() const throw()
+{ return ("The Server Core couldn't be started"); }
+
+
+/******************/
+/*                */
+/*     Server     */
+/*                */
+/******************/
 Server::Server(std::string str) 
 {
 	config = new Config(str);
@@ -25,8 +39,7 @@ Server::Server(std::string str)
 			servers.insert(std::make_pair(socket.getFD(), socket));
 	}
 	if (servers.empty()) {
-		std::string str = "The Server Core couldn't be started\n";
-		throw str;
+		throw Server::Abort_server();
 	}
 };
 
@@ -86,6 +99,7 @@ void	Server::server_run()
 				int i = it->second->socket_read(it->first);
 				if (i == 0) {
 					std::cout << "socket closed: " << it->first << std::endl;
+					it->second->erase_request(it->first);
 					clients.erase(it->first);
 				}
 				else if (i == 1)

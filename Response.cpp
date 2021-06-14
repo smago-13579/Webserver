@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/13 17:10:03 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/14 14:03:00 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,8 @@ std::string			Response::get_headers()
 	content_type = content_type.substr(0, content_type.find_first_of(" ,"));
 	
 	if (content_type.compare("text/html") == 0) {
-		content_type += "; charset=\"UTF-8\"";
+		content_type += ";";
+		// content_type += "; charset=\"UTF-8\"";
 	}
 	std::string encoding = req.headers["Accept-Encoding"];
 	encoding = encoding.substr(0, encoding.find_first_of(" ,"));
