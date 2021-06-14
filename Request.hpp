@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 16:14:24 by monie             #+#    #+#             */
-/*   Updated: 2021/06/12 13:17:12 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/14 16:40:17 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,38 +14,48 @@
 # define REQUEST_HPP
 
 # include "webserv.hpp"
+# include <sstream>
+
+# define OK 0
+# define WAITING 1 
+# define ERROR 2
+# define NEXT_STR "\r\n"
+# define END_OF_HEADERS "\r\n\r\n"
+# define END_OF_CHUNKED_BODY "\r\n0\r\n"
 
 class Request {
 public:
 	Request();
-	Request(std::string str);
-	Request(const Request& tmp);
+	// Request(std::string str);
+	Request(const Request&);
+	~Request();
+	// Request&		operator=(std::string str);
+	Request&		operator=(const Request&);
 	
-	Request&		operator=(std::string str);
-	Request&		operator=(const Request& tmp);
-	
-	std::string 	buf;
-	std::string		type;
-	std::string		resource;
-	std::string		version;
-	std::string 	body;
-	size_t			_f_sl_status;
-	size_t			_f_hd_status;
-	size_t			_f_bd_status;
-	size_t			_request_done;
+	std::string 						buf;
+	std::string							type;
+	std::string							resource;
+	std::string							version;
+	std::map<std::string, std::string>	headers;
+	std::string 						body;
 
-	std::map<std::string, std::string> headers;
+	size_t	_request_done;
 
-	int				check_request(std::string str);
-	size_t 			find_end(std::string str, std::string end);
-	void 			filling_start_line(std::string& str);
-	void 			filling_headers(std::string& str);
-	void 			filling_body(std::string& str);
-	void 			request_init();
-	void 			func_request(std::string str);
-	void 			see_request();
-	size_t			hex_to_size_t(std::string str);
-	size_t 			str_to_size_t(std::string str);
+	void	processRequest(std::string &);
+	void 	see_request();
+
+	private:
+		size_t	_status_st_line;
+		size_t	_status_headers;
+		int		_body_size;
+		
+		void	filling_start_line();
+		void	filling_headers();
+		void	filling_chunked_body();
+		bool	find_body();
+		void	check_request();
+
+		int		hex_to_int_conv(std::string &);
 };
 
 #endif
