@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/13 16:02:04 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/14 12:22:52 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ Server::Server(std::string str)
 		if (socket.create() == 0)
 			servers.insert(std::make_pair(socket.getFD(), socket));
 	}
-	// if (servers.empty()) {
-	// 	std::string str = "The Server Core couldn't be started\n";
-	// 	throw str;
-	// }//эта проверка стоит в парсинге конфига
+	if (servers.empty()) {
+		std::string str = "The Server Core couldn't be started\n";
+		throw str;
+	}
 };
 
 void	Server::server_run()

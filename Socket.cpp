@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/13 16:24:59 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/14 11:12:03 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,9 +124,10 @@ int 	Socket::socket_read(int fd)
 		std::cout << "\nREAD FROM CLIENT: " << fd << std::endl;
 		std::cout << buffer << std::endl;
 		str = buffer;
-		Request request(str);
-		req[fd] = request;
-		if (req[fd]._request_done == 1)
+		if (req.find(fd) == req.end()) //
+			req[fd] = Request();       // теперь класс запроса создается только, если его еще не существовало
+		req[fd].processRequest(str);   // иначе мы просто дозаполняем существующий
+		if (req[fd]._request_done == OK)
 		{
 			Response response(req[fd], settings);
 			resp[fd] = response;

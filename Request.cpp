@@ -6,183 +6,237 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/13 15:40:18 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/14 16:39:54 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-size_t		Request::str_to_size_t(std::string str) {
-	int ui = 0;
-	int len = str.length();
-	for(int i = 0; i < len; i++) {
-		if(i != 0) {
-			ui *= 10;
-		}
-		ui += str[i] - '0';
-	}
-	return ui;
+/**********************/
+/*                    */
+/*   Coplien's form   */
+/*                    */
+/**********************/
+Request::Request() : buf(std::string()), type(std::string()), resource(std::string()),
+				version(std::string()), headers(std::map<std::string, std::string>()), 
+				body(std::string()), _request_done(WAITING), _status_st_line(WAITING),
+				_status_headers(WAITING), _body_size(0)
+{}
+
+Request::Request(const Request &a) : buf(a.buf), type(a.type), resource(a.resource),
+				version(a.version), headers(a.headers), body(a.body),
+				_request_done(a._request_done), _status_st_line(a._status_st_line),
+				_status_headers(a._status_headers), _body_size(a._body_size)
+{
 }
 
-size_t		Request::hex_to_size_t(std::string st)
+Request::~Request()
 {
-    size_t i, k;
-    unsigned int s = 0;
-    for (i = 0; st[i] != '\0'; i++)
-    {
-        int c;
-        switch (c = toupper(st[i]))
+}
+
+Request	&Request::operator=(const Request &a)
+{
+	if (this != &a)
+	{
+		buf = a.buf;
+		type = a.type;
+		resource = a.resource;
+		version = a.version;
+		headers = a.headers;
+		body = a.body;
+		_request_done = a._request_done;
+		_status_st_line = a._status_st_line;
+		_status_headers = a._status_headers;
+		_body_size = a._body_size;
+	}
+	return(*this);
+}
+
+/**************/
+/*            */
+/*   Parser   */
+/*            */
+/**************/
+void 	Request::processRequest(std::string &str)
+{
+    size_t  pos_end = 0;
+    
+	buf += str;
+	/********************/
+	/*   request line   */
+	/********************/
+    if (_status_st_line == WAITING){
+        if ((pos_end = buf.find(NEXT_STR)) != buf.npos)
         {
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-            k = c - 'A' + 10;
-            break;
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case '0':
-            k = c - '0';
-            break;
-        }
-        s = (s << 4) + k;
-    }
-    return s;
+            _status_st_line = OK;
+            filling_start_line();
+            buf.erase(0, pos_end + 2);
+        }}
+	/***************/
+	/*   headers   */
+	/***************/
+    if (_status_headers == WAITING && _status_st_line == OK){
+        if ((pos_end = buf.find(END_OF_HEADERS)) != buf.npos)
+        {
+            _status_headers = OK;
+            filling_headers();
+            buf.erase(0, pos_end + 4);
+        }}
+	/************/
+	/*   body   */
+	/************/
+    if (find_body() == true && _status_headers == OK && _status_st_line == OK){
+		if (_body_size == 0 && (pos_end = buf.find(END_OF_CHUNKED_BODY)) != buf.npos)
+		{
+			filling_chunked_body();
+			buf.clear();
+			_body_size = 0;
+		}
+		else if (_body_size > 0 && buf.length() == _body_size)
+		{
+			body = buf;
+			buf.clear();
+			_body_size = 0;
+		}}
+	/*************/
+	/*   check   */
+	/*************/
+	if (_status_st_line == OK && _status_headers == OK && _body_size == 0)
+		check_request();
+	if (_request_done == OK)
+		see_request();
 }
 
-void	Request::request_init() 
+void    Request::filling_start_line()
 {
-	_f_sl_status = 0;
-	_f_hd_status = 0;
-	_f_bd_status = 0;
-	_request_done = 0;
-}
-
-size_t		Request::find_end(std::string str, std::string end) 
-{
-	size_t len = str.find(end);
-
-	if (len == std::string::npos)
-		return 1;
-
-	for (size_t i = 0; i < end.length(); i++)
+    size_t  pos_space = 0;
+    size_t  pos_begin = 0;
+    size_t  i = 0;
+    std::string new_str(buf, 0, buf.find(NEXT_STR));
+	if ((pos_space = new_str.find(' ', pos_begin)) != new_str.npos)
 	{
-		if (str[len + i] != end[i])
-			return 1;
+		type = std::string(new_str, pos_begin, pos_space - pos_begin);
+        pos_begin = pos_space + 1;
 	}
-	return 0;
-}
-
-void	Request::filling_start_line(std::string& str) 
-{
-	size_t i = str.find("\r\n");
-	size_t len = str.find_first_of(" \t\r\n");
-	size_t start = 0;
-
-	while (len < i)
+	if ((pos_space = new_str.find(' ', pos_begin)) != new_str.npos)
 	{
-		if (type.length() == 0)
-			type = str.substr(start, len - start);
-		else if (resource.length() == 0)
-			resource = str.substr(start, len - start);
-		start = str.find_first_not_of(" \t\r\n", len);
-		len = str.find_first_of(" \t\r\n", start);
+		resource = std::string(new_str, pos_begin, pos_space - pos_begin);
+        pos_begin = pos_space + 1;
 	}
-	version = str.substr(start, len - start);
-	str.erase(0, i + 2);
-	_f_sl_status = 1;
+	if (pos_begin != new_str.npos)
+	{
+		version = std::string(new_str, pos_begin, pos_space - pos_begin);
+        pos_begin = pos_space + 1;
+	}
+
+    if (type.empty() || resource.empty() || version.empty())
+		_request_done = ERROR; //в этом случае нужно сразу показывать ошибку
 }
 
-void	Request::filling_headers(std::string& str) 
+void    Request::filling_headers()
 {
+	size_t  pos_end = 0;
+    size_t  pos_begin = 0;
+	size_t	pos_points;
+    
+	std::string new_str(buf, 0, buf.find(END_OF_HEADERS));
+	std::string	key_val_str;
 	std::string key;
-	std::string word;
-	size_t i = str.find("\r\n\r\n");
-	size_t start = 0;
-	size_t len = str.find(":");
-	
-	while (len < i)
-	{
-		if (key.length() == 0)
-		{
-			key = str.substr(start, len - start);
-			start = str.find_first_not_of(" \t\r\n", len + 1);
-			len = str.find_first_of("\r\n", start);
-		}
-		else
-		{
-			word = str.substr(start, len - start);
-			headers.insert(make_pair(key, word));
-			key.clear();
-			word.clear();
-			start = str.find_first_not_of(" \t\r\n", len);
-			len = str.find_first_of(": ", start);
-		}
-	}
-	str.erase(0, i + 4);
-	_f_hd_status = 1;
-	if (str.empty())
-		_request_done = 1;
+	std::string val;
+
+    while ((pos_end = new_str.find(NEXT_STR, pos_begin)) != new_str.npos)
+    {
+		key_val_str = std::string(new_str, pos_begin, pos_end - pos_begin);
+		if ((pos_points = key_val_str.find(": ")) == key_val_str.npos)
+			_request_done = ERROR;
+		key = std::string(key_val_str, 0, pos_points);
+		pos_points += 2;
+		val = std::string(key_val_str, pos_points, key_val_str.npos - pos_points);
+		headers[key] = val;
+        pos_begin = pos_end + 2;
+    }
+	key_val_str = std::string(new_str, pos_begin, pos_end - pos_begin);
+	if ((pos_points = key_val_str.find(": ")) == key_val_str.npos)
+		_request_done = ERROR;
+	key = std::string(key_val_str, 0, pos_points);
+	pos_points += 2;
+	val = std::string(key_val_str, pos_points, key_val_str.npos - pos_points);
+	headers[key] = val;
 }
 
-void	Request::filling_body(std::string& str)
+void	Request::filling_chunked_body()
 {
-	body = str;
-	str.clear();
-	_request_done = 1;
+	size_t	pos_begin = 0;
+	size_t	pos_end = 0;
+	int		size_of_body = 0;
+
+	std::string new_str(buf, 0, buf.find(END_OF_CHUNKED_BODY));
+	std::string	hex_size_str;
+
+	while (!new_str.empty() && (pos_end = new_str.find(NEXT_STR, pos_begin)) != new_str.npos)
+    {
+		hex_size_str = std::string(new_str, pos_begin, pos_end - pos_begin);
+		size_of_body = hex_to_int_conv(hex_size_str);
+		_body_size += size_of_body;
+		pos_end += 2;
+		body += std::string(new_str, pos_end, size_of_body);
+		new_str.erase(0, pos_end + size_of_body);
+		if (new_str[0] == '\r' && new_str[1] == '\n')
+			new_str.erase(0, 2);
+    }
+	//проверить не больше ли размер тела, чем нам нужно
 }
 
-void	Request::func_request(std::string str) 
+/***************/
+/*             */
+/*   Checker   */
+/*             */
+/***************/
+void	Request::check_request()
 {
-	while (!str.empty())
-	{
-		if(_f_sl_status == 0)
-			filling_start_line(str);
-		else if (_f_hd_status == 0)
-			filling_headers(str);
-		else if (_f_bd_status == 0)
-			filling_body(str);
-	}
+	if (headers.find("Accept") != headers.end() && headers.find("Connection") != headers.end()
+		&& headers.find("Host") != headers.end())
+		_request_done = OK;
+	else
+		_request_done = ERROR;
 }
 
-int		Request::check_request(std::string str)
+/*************/
+/*           */
+/*   Utils   */
+/*           */
+/*************/
+int		Request::hex_to_int_conv(std::string &hex_size_str)
 {
-	size_t len;
+	int number;
+	std::stringstream str;
+	str << hex_size_str;
+	str >> std::hex >> number;
+	return (number);
+}
 
-	if ((len = str.find("\r\n\r\n")) != std::string::npos) 
+bool	Request::find_body()
+{
+	if (headers.find("Content-Length") != headers.end())
 	{
-		if (str.find("Content-Length: ") == std::string::npos)
-		{
-			if (str.find("Transfer-Encoding: chunked") != std::string::npos)
-			{
-				if (find_end(str, "0\r\n\r\n") == 0)
-					return (0);
-				else
-					return (1);
-			}
-			else
-				return (0);
+		_body_size = atoi((headers["Content-Length"]).c_str());
+		if (_body_size < 0 /* добавить сравнение с max_body*/)
+		{	
+			_request_done = ERROR;
+			_body_size = 0;
 		}
-		
-		std::string tmp = str.substr(str.find("Content-Length: ") + 16, 10);
-		if (std::atoi(tmp.c_str()) + 4 + len <= str.length())
-			return (0);
-		else
-			return (1);
+		return (true);
 	}
-
-	return (1);
+	if (headers.find("Transfer-Encoding: chunked") != headers.end())
+		return (true);
+	return (false);
 }
 
+/*********************/
+/*                   */
+/*   Visualization   */
+/*                   */
+/*********************/
 void	Request::see_request() {
 	std::cout << "------------------------------------------------------------------------" << std::endl;
 	std::cout << "-------------------------------start line-------------------------------" << std::endl;
@@ -203,68 +257,3 @@ void	Request::see_request() {
 	std::cout << body << std::endl;
 	std::cout << "-------------------------------end--------------------------------------" << std::endl;
 }
-
-Request&	Request::operator=(std::string str)
-{
-	if (buf.length() != 0)
-	{
-		buf += str;
-		str = buf;
-	}
-
-	if (check_request(str) == 0)
-		func_request(str);
-	else
-		buf = str;
-	
-	// this->see_request();
-	return (*this);
-}
-
-Request&	Request::operator=(const Request& tmp)
-{
-	if (this != &tmp)
-	{
-		this->buf += tmp.buf;
-		this->type = tmp.type;
-		this->resource = tmp.resource;
-		this->version = tmp.version;
-		this->body = tmp.body;
-		this->_f_sl_status = tmp._f_sl_status;
-		this->_f_hd_status = tmp._f_hd_status;
-		this->_f_bd_status = tmp._f_bd_status;
-		this->_request_done = tmp._request_done;
-		this->headers = tmp.headers;
-		if (check_request(buf) == 0)
-		{
-			std::cout << "REQUEST COMPLETE\n";
-			func_request(buf);
-		}
-	}
-	return (*this);
-}
-
-Request::Request(std::string str):
-buf(""), type(""), version(""), resource(""), body("")
-{
-	this->request_init();
-
-	if (check_request(str) == 0)
-	{
-		std::cout << "REQUEST COMPLETE\n";
-		func_request(str);
-	}
-	else 
-		buf = str;
-	// this->see_request();
-}
-
-Request::Request(const Request& tmp)
-{
-	*this = tmp;
-}
-
-Request::Request():
-buf(""), type(""), version(""), resource(""), body("")
-{}
-
