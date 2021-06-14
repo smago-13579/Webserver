@@ -5,6 +5,7 @@
 # include <unistd.h>	// pipe execve dup read close
 # include <fcntl.h>		// open
 # include <map>			// map
+# include "../webserv.hpp"
 
 # define buffer_size 1024
 
@@ -36,7 +37,7 @@ private:
 public:
 	cgi_handler();
 	cgi_handler(str filename);
-	cgi_handler(Request request, str filename);
+	cgi_handler(Request req, Settings * set, Location * loc); // // //
 	~cgi_handler();
 	cgi_handler(const cgi_handler & copy);
 	cgi_handler &	operator= (const cgi_handler & rhs);
@@ -45,6 +46,7 @@ public:
 	void		set_request(Request request);
 	void		set_filename(str filename);
 	str const	get_filename() const;
+	
 	str const	get_response_body() const;
 	int const	get_status_code() const;
 	str const	get_str_content_type() const;
