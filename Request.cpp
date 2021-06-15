@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/15 12:15:33 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/15 17:32:39 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,7 @@ void	Request::filling_chunked_body()
 /***************/
 void	Request::check_request()
 {
-	if (headers.find("Accept") != headers.end() && headers.find("Connection") != headers.end()
+	if (headers.find("Accept") != headers.end()
 		&& headers.find("Host") != headers.end())
 		_request_done = OK;
 	else
