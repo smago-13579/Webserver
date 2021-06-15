@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/13 15:25:44 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/15 10:45:49 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -346,7 +346,7 @@ Config::Location  *Config::parser_location()
     }
 
     /***************/
-    /*   methods   */ // не обязательное поле
+    /*   methods   */ // обязательное поле
     /***************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("methods")) != _location_line.npos)
@@ -380,6 +380,12 @@ Config::Location  *Config::parser_location()
             pos_begin = pos_end + 1;
         }
     }
+    else
+    {
+        delete point_to_location;
+        throw(Config::Missing_field());
+    }
+
 
     /************/
     /*   root   */ //обязательное поле

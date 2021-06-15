@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 14:03:00 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/15 11:23:22 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,11 @@ std::string			Response::get_response()
 	return ("");
 }
 
+void				Response::erase_answer(int i)
+{
+	this->answer.erase(0, i);
+}
+
 std::string			Response::get_headers()
 {
 	std::stringstream headers;
@@ -199,7 +204,7 @@ int			Response::method_DELETE()
 	loc_iter it;
 
 	it = find_location();
-	if (check_method(it->methods, GET) == 1) {
+	if (check_method(it->methods, DELETE) == 1) {
 		create_response(*it);
 		return (0);
 	}

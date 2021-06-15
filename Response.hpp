@@ -6,7 +6,7 @@
 /*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 18:44:06 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/15 13:02:18 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,9 @@ public:
 	Response(const Request& req, Settings set);
 	~Response();
 
-	Response&		operator=(const Response& tmp);
+	Response&			operator=(const Response& tmp);
 
+	void				erase_answer(int i);
 	std::string			get_response();
 	
 private:
