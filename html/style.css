@@ -1,92 +1,137 @@
+@font-face {
+    font-family: Ubuntu; /* Имя шрифта */
+    src: url(Playlist-Script.otf); /* Путь к файлу со шрифтом */
+}
+
 html, body {
 	margin: 0;
 	padding: 0;
+	height: 100%;
 }
 
 body {
-	-webkit-touch-callout: none; /* iOS Safari */
-	-webkit-user-select: none;   /* Chrome/Safari/Opera */
-	-khtml-user-select: none;    /* Konqueror */
-	-moz-user-select: none;      /* Firefox */
-	-ms-user-select: none;       /* Internet Explorer/Edge */
-	user-select: none;
-	display: flex;
-	flex-direction: column;
-	background-color: rgb(93, 138, 166);
-}
-
-header {
-	z-index: 10;
-	display: flex;
-	height: 7rem;
-	background: rgba(0, 0, 0, .4);
-	justify-content: space-between;
-	align-items:center;
-	padding: 0 1rem;
-}
-
-a {
-	text-decoration: none;
-	color: black;
-}
-
-ol {
-    display: flex;
-	flex-direction: row;
-}
-
-li {
-	list-style-type: none;
-}
-
-main {
-	display: flex;
-	margin: auto;
-}
-
-.logo {
-	display: flex;
-	color: rgb(0, 255, 175);
-}
-
-.logo_image {
-	height: 5rem;
-}
-
-.time {
+	font-family: Ubuntu;
+	width: 100%;
 	display: flex;
 	flex-direction: row;
+	background: url(images/back.jpg) no-repeat;
+	background-size: 100%;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;    
 }
 
-.name {
+button {
+	height: 10rem;
+	width: 10rem;
+	margin: .5rem;
+	background: rgb(126, 200, 235);
+	border: 1px solid rgba(0, 0, 0, .2);;
+	border-radius: .4rem;
+}
+
+.window {
+	margin: 20vh 20vw;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	justify-content: center;
+	width: 35rem;
+	height: 41rem;
+	background: rgba(69, 143, 177, .7);
+	border-radius: .4rem;
+}
+
+.window_row {
 	margin: 0 1rem;
+	display: flex;
+	justify-content: space-between;
 }
 
-.name_avatarka{
+.header {
+	display: flex;
+	width: 15rem;
+	flex-direction: column;
+	justify-content: space-between;
+	background: rgba(126, 200, 235, .5);
+	font-size: 3rem;
+}
+
+.header_text {
+	
+}
+
+.header_head {
+	
+}
+
+.header_link {
 	height: 4rem;
-	width: 4rem;
-	border-radius: 100%;
-	border: 1px solid white;
-	box-shadow: 0 0 2px white;
+	width: 5rem;
+	background: rgba(69, 143, 177, .7);
+}
+
+.button_restart {
+	height: 5rem;
+	flex: 1 0 auto;
+}
+
+.error {
+	display: flex;
+	flex-direction: column;
+	background: rgb(35, 101, 135);
+	margin-top: 10vh;
+}
+   
+.error_page {
+display: flex;
+flex-direction: column;
+font-size: 3rem;
+align-items: center;
+}
+
+.error_image {
+	border-radius:  13px;
+}
+.error_400 {
+	background: rgb(254, 148, 196);
+}
+.error_403 {
+	background: rgb(226, 187, 58);
+}
+.error_404 {
+	background: rgb(204, 163, 197);
+}
+.error_404 {
+	background: rgb(204, 163, 197);
+}
+.error_500 {
+	background: rgb(147, 201, 225);
+}
+
+.error_text_1{
+	font-size: 5rem;
+	font-weight: bold;
+	margin: 1rem 0 0 0;
 	padding: 0;
-	margin: 0;
 }
-
-.name_text {
-	color: rgb(239, 241, 243);
+.error_text_2{
+	margin: 0;
 	padding: 0;
-	margin: 0;
+	font-size: 2rem;
 }
 
-.link {
-	height: 3rem;
-	margin: 1rem;
+.color_400_text{
+	color:#fff;
 }
-
-.images {
-	height: 50rem;
-	width: 50rem;
+.color_403_text{
+	color:#c21f36;
+}
+.color_404_text{
+	color:#000273;
+}
+.color_500_text{
+	color:#272a4d;
 }
