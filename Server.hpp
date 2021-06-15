@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:40:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 12:29:57 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/15 17:14:45 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # include "webserv.hpp"
 # include "Socket.hpp"
-# include "kbatwoma/config/Config.hpp"
+# include "Config.hpp"
 
 
 class Server

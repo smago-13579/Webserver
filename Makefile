@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: smago <smago@student.21-school.ru>         +#+  +:+       +#+         #
+#    By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/05/25 14:03:12 by smago             #+#    #+#              #
-#    Updated: 2021/06/12 20:00:59 by smago            ###   ########.fr        #
+#    Updated: 2021/06/15 17:15:23 by kbatwoma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserver
 
-SRCS = main.cpp Server.cpp Socket.cpp Request.cpp Response.cpp kbatwoma/config/Config.cpp
+SRCS = main.cpp Server.cpp Socket.cpp Request.cpp Response.cpp Config.cpp
 
 FLAGS = -Wall -Wextra -Werror
 
