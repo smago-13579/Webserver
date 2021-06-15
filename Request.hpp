@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 16:14:24 by monie             #+#    #+#             */
-/*   Updated: 2021/06/14 16:40:17 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/15 10:59:36 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,25 +24,23 @@
 # define END_OF_CHUNKED_BODY "\r\n0\r\n"
 
 class Request {
-public:
-	Request();
-	// Request(std::string str);
-	Request(const Request&);
-	~Request();
-	// Request&		operator=(std::string str);
-	Request&		operator=(const Request&);
-	
-	std::string 						buf;
-	std::string							type;
-	std::string							resource;
-	std::string							version;
-	std::map<std::string, std::string>	headers;
-	std::string 						body;
+	public:
+		Request();
+		Request(const Request&);
+		~Request();
+		Request	&operator=(const Request&);
+		
+		std::string 						buf;
+		std::string							type;
+		std::string							resource;
+		std::string							version;
+		std::map<std::string, std::string>	headers;
+		std::string 						body;
 
-	size_t	_request_done;
+		size_t	_request_done;
 
-	void	processRequest(std::string &);
-	void 	see_request();
+		void	processRequest(std::string &);
+		void 	see_request();
 
 	private:
 		size_t	_status_st_line;
@@ -52,9 +50,10 @@ public:
 		void	filling_start_line();
 		void	filling_headers();
 		void	filling_chunked_body();
-		bool	find_body();
+
 		void	check_request();
 
+		bool	find_body();
 		int		hex_to_int_conv(std::string &);
 };
 
