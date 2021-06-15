@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/15 11:23:22 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/15 17:19:23 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ Response::Response(const Request& req, Settings set)
 	this->req = req;
 	this->response_done	= 0;
 	this->settings = &set;
+	content_type = this->req.headers["Accept"];
 	find_method();
 }
 
@@ -67,7 +68,7 @@ int			Response::create_response(const Location& loc)
 	std::ifstream image;
 	
 	int fd, res;
-	char buff[100000];
+	// char buff[100000];
 
 	if (req.resource == loc.location)
 		file << loc.root << "/" << loc.index;
@@ -75,26 +76,27 @@ int			Response::create_response(const Location& loc)
 		file << loc.root << req.resource;
 	std::cout << "FILE: " << file.str() << std::endl;
 	
-	if (file.str().find(".png") == std::string::npos && \
-		file.str().find(".PNG") == std::string::npos && \
-		file.str().find(".ico") == std::string::npos && \
-		file.str().find(".jpeg") == std::string::npos)
-	{
-		if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
-			std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
-			return (-1);
-		}
-		res = read(fd, buff, 999999);
-		buff[res] = '\0';
-	}
-	else
-		image.open(file.str(), std::ifstream::binary);
+	// if (file.str().find(".png") == std::string::npos && \
+	// 	file.str().find(".PNG") == std::string::npos && \
+	// 	file.str().find(".ico") == std::string::npos && \
+	// 	file.str().find(".jpeg") == std::string::npos)
+	// {
+	// 	if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
+	// 		std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
+	// 		return (-1);
+	// 	}
+	// 	res = read(fd, buff, 999999);
+	// 	buff[res] = '\0';
+	// }
+	// else
+		image.open(file.str(), std::ifstream::in);
 
 	if (image.is_open())
 		body << image.rdbuf() << "\r\n\r\n";
-	else
-		body << buff << "\r\n\r\n";
-	
+	else {
+		// body << buff << "\r\n\r\n";
+
+	}
 	response << req.version << " 200 OK\r\n"
 	<< "Version: " << req.version << "\r\n"
 	<< get_headers();
@@ -161,21 +163,14 @@ std::string			Response::get_headers()
 	time_t raw;
 	time(&raw);
 	
-	std::string content_type = req.headers["Accept"];
-	content_type = content_type.substr(0, content_type.find_first_of(" ,"));
+	content_type = req.headers["Accept"];
 	
-	if (content_type.compare("text/html") == 0) {
-		content_type += ";";
-		// content_type += "; charset=\"UTF-8\"";
-	}
-	std::string encoding = req.headers["Accept-Encoding"];
-	encoding = encoding.substr(0, encoding.find_first_of(" ,"));
+	// if (content_type.compare("text/html") == 0) 
+	content_type += ";";
 
 	headers << "Server: DreamTeam/1.0.1 (School 21)\r\n"
 	<< "Date: " << ctime(&raw)
-	<< "Content-Type: " << content_type << "\r\n"
-	<< "Connection: " << req.headers["Connection"] << "\r\n";
-	// << "Content-Encoding: " << encoding << "\r\n";
+	<< "Content-Type: " << content_type << "\r\n";
 
 	return (headers.str());
 }
