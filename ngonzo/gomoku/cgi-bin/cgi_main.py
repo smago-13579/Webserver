@@ -30,7 +30,7 @@ button6 = str[5]
 button7 = str[6]
 button8 = str[7]
 button9 = str[8]
-delete = "restart"
+delete = "Начать с начало"
 i = str[9]
 
 def new_str(str, char, pointer):
