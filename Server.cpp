@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 21:58:53 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/15 16:49:01 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,8 +91,10 @@ void	Server::server_run()
 				if (i != 2)
 				{
 					message.erase(it);
-					if (i == 1)
+					if (i == 1) {
 						clients.erase(fd);
+						close(fd);
+					}
 				}
 				break;
 			}
@@ -103,6 +105,7 @@ void	Server::server_run()
 				int i = it->second->socket_read(it->first);
 				if (i == 0) {
 					std::cout << "socket closed: " << it->first << std::endl;
+					close(it->first);
 					it->second->erase_request(it->first);
 					clients.erase(it->first);
 				}
