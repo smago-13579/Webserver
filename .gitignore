@@ -6,3 +6,6 @@ webserver
 ngonzo_cgi/a.out
 ngonzo_cgi/file.txt
 ngonzo/gomoku/cgi-bin/__pycache__/
+webserver.dSYM
+webserver.dSYM/Contents/Info.plist
+.idea

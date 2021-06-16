@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/15 19:12:31 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/16 14:22:14 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+#include "ngonzo/cgi_handler.hpp"
 
 Response::Response() {}
 
@@ -145,38 +146,57 @@ void		Response::find_method()
 		this->method_GET();
 	else if (req.type == "DELETE")
 		this->method_DELETE();
-	// else if (req.type == "POST")
-	// {
-		std::vector<std::string> vec;
-		vec.push_back("AUTH_TYPE=anonymous");
-		vec.push_back("CONTENT_LENGTH=" + itoa(req.body.size()));
-		vec.push_back("CONTENT_TYPE=" + content_type);
-		vec.push_back("GATEWAY_INTERFACE=CGI/1.1");
-		vec.push_back("PATH_INFO=" + req.resource);
-		vec.push_back("PATH_TRANSLATED=" + it->root + req.resource);
-		vec.push_back("QUERY_STRING=");
-		vec.push_back("REMOTE_ADDR=" + settings->ip);
-		vec.push_back("REMOTE_IDENT=." + req.headers["Host"]);
-		vec.push_back("REMOTE_USER=");
-		vec.push_back("REQUEST_METHOD=" + req.type);
-		vec.push_back("REQUEST_URI=" + req.resource);
-		vec.push_back("SCRIPT_NAME=");		//	
-		vec.push_back("SERVER_NAME=" + settings->server_name);
-		vec.push_back("SERVER_PORT=" + itoa(settings->port));
-		vec.push_back("SERVER_PROTOCOL=" + req.version);
-		vec.push_back("SERVER_SOFTWARE=webserver");
-
-		std::map<std::string, std::string>::iterator begin = req.headers.begin();
-		for (; begin != req.headers.end(); begin++) {
-			vec.push_back("HTTP_" + begin->first + "=" + begin->second);
-		}
-		for (std::vector<std::string>::iterator begin = vec.begin(); begin != vec.end(); begin++)
+	else if (req.type == "POST")
+	{
+		std::cout << "!!! POST" << std::endl; // for test
+		cgi_handler cgi(cgi_env(it));
+		// std::cout << "get_filename: " << cgi.get_filename() << std::endl;					// for test
+		// std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
+		// std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
+		// std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
+		// std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
+		bool check = cgi.execute();
+		if(check == true)
 		{
-			std::cout << *begin << std::endl;
+			req.body = cgi.get_response_body();
+			
 		}
-		
-	// }
+		else
+		{
+
+		}
+	}
 	/*  		ADD ANOTHER METHODS				*/
+}
+
+std::vector<std::string>		Response::cgi_env(loc_iter &it)
+{
+	std::vector<std::string>	tmp;
+	tmp.push_back("AUTH_TYPE=anonymous");
+	tmp.push_back("CONTENT_LENGTH=" + itoa(req.body.size()));
+	tmp.push_back("CONTENT_TYPE=" + content_type);
+	tmp.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	tmp.push_back("PATH_INFO=" + req.resource);
+	tmp.push_back("PATH_TRANSLATED=" + it->root + req.resource);
+	tmp.push_back("QUERY_STRING=");
+	tmp.push_back("REMOTE_ADDR=" + settings->ip);
+	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
+	tmp.push_back("REMOTE_USER=");
+	tmp.push_back("REQUEST_METHOD=" + req.type);
+	tmp.push_back("REQUEST_URI=" + req.resource);
+	tmp.push_back("SCRIPT_NAME=");		//
+	tmp.push_back("SERVER_NAME=" + settings->server_name);
+	tmp.push_back("SERVER_PORT=" + itoa(settings->port));
+	tmp.push_back("SERVER_PROTOCOL=" + req.version);
+	tmp.push_back("SERVER_SOFTWARE=webserver");
+	std::map<std::string, std::string>::iterator	begin = req.headers.begin(), end = req.headers.end();
+	for (; begin != end; ++begin)
+		tmp.push_back("HTTP_" + begin->first + "=" + begin->second);
+	// // print env
+	// for (std::vector<std::string>::iterator	begin = tmp.begin(), end = tmp.end(); begin != end; ++begin)
+	// 	std::cout << *begin << std::endl;
+	// // print env end
+	return tmp;
 }
 
 std::string			Response::get_response() 
