@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/15 19:12:31 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/16 12:45:02 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,17 +86,25 @@ int			Response::create_response(const Location& loc)
 			std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
 			return (-1);
 		}
-		res = read(fd, buff, 999999);
-		buff[res] = '\0';
+		while ((res = read(fd, buff, 99999)) > 0) {
+			buff[res] = '\0';
+			body << buff;
+		}
+		body << "\r\n\r\n";
+		if (res < 0) {
+			std::cout << "CAN'T READ FILE\n";		// correct to bad request
+			return (-1);
+		}
 	}
-	else
+	else 
+	{
 		image.open(file.str(), std::ifstream::binary);
-
-	if (image.is_open())
-		body << image.rdbuf() << "\r\n\r\n";
-	else {
-		body << buff << "\r\n\r\n";
+		if (image.is_open())
+			body << image.rdbuf() << "\r\n\r\n";
 	}
+	// else {
+	// 	body << buff << "\r\n\r\n";
+	// }
 	response << req.version << " 200 OK\r\n"
 	<< "Version: " << req.version << "\r\n"
 	<< get_headers();
@@ -170,10 +178,10 @@ void		Response::find_method()
 		for (; begin != req.headers.end(); begin++) {
 			vec.push_back("HTTP_" + begin->first + "=" + begin->second);
 		}
-		for (std::vector<std::string>::iterator begin = vec.begin(); begin != vec.end(); begin++)
-		{
-			std::cout << *begin << std::endl;
-		}
+		// for (std::vector<std::string>::iterator begin = vec.begin(); begin != vec.end(); begin++)
+		// {
+		// 	std::cout << *begin << std::endl;
+		// }
 		
 	// }
 	/*  		ADD ANOTHER METHODS				*/
