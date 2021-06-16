@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/16 12:45:02 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/16 12:51:17 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,9 +102,7 @@ int			Response::create_response(const Location& loc)
 		if (image.is_open())
 			body << image.rdbuf() << "\r\n\r\n";
 	}
-	// else {
-	// 	body << buff << "\r\n\r\n";
-	// }
+
 	response << req.version << " 200 OK\r\n"
 	<< "Version: " << req.version << "\r\n"
 	<< get_headers();
