@@ -5,3 +5,4 @@ a.out.dSYM
 webserver
 ngonzo_cgi/a.out
 ngonzo_cgi/file.txt
+ngonzo/gomoku/cgi-bin/__pycache__/

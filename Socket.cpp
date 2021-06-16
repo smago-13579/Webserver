@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 22:00:28 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/15 12:45:35 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int		Socket::accept_client()
 		std::cout << "\n----CONNECTION ACCEPTED----\n";
 		std::cout << "Client's FD: " << new_fd << "\tip: " << settings.ip << \
 				"\tport: " << settings.port << std::endl;
-		/*		SET NON_BLOCK TO CLIENT		*/
+	/*		SET NON_BLOCK TO CLIENT			*/
 		fcntl(new_fd, F_SETFL, O_NONBLOCK);
 	}
 	return new_fd;

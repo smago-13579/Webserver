@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/15 16:10:08 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/15 17:32:39 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,8 @@ void 	Request::processRequest(std::string &str)
 	/*************/
 	if (_status_st_line == OK && _status_headers == OK && _body_size == 0)
 		check_request();
-	if (_request_done == OK)
-		see_request();
+	// if (_request_done == OK)
+		// see_request();
 }
 
 void    Request::filling_start_line()
