@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/16 12:51:17 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/16 13:26:58 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ Response::loc_iter	Response::find_location()
 {
 	int i = 0;
 	int comp;
-	loc_iter itn;
+	loc_iter itn = settings->locations.begin();
 	
 	for (loc_iter it = settings->locations.begin(); it != settings->locations.end(); it++)
 	{
