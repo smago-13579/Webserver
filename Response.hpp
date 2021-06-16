@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/14 21:50:06 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/15 18:24:57 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ private:
 	Request				req;
 	Settings* 			settings;
 	std::string			answer;
+	std::string			content_type;
 	size_t				response_done;
 
 	int				compare_prefix(std::string loc, std::string res);
