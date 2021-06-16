@@ -26,7 +26,7 @@ private:
 	// private methods
 	char *	_string_to_char(str str1);
 	void	_parse_env(std::vector<str> env);
-	void	_construct_filename();// need ?
+	void	_construct_filename(std::vector<str> env);// need ?
 	void	_free_env();
 	void	_parse_cgi();
 	void	_test_write_to_file();
@@ -41,7 +41,7 @@ public:
 	cgi_handler &	operator= (const cgi_handler & rhs);
 
 	// setters and getters
-	void		set_filename(str filename);
+//	void		set_filename(str filename);
 	str const	get_filename() const;
 	
 	str const	get_response_body() const;

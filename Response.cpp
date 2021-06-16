@@ -146,26 +146,47 @@ void		Response::find_method()
 		this->method_GET();
 	else if (req.type == "DELETE")
 		this->method_DELETE();
-	else if (req.type == "POST")
-	{
-		std::cout << "!!! POST" << std::endl; // for test
-		cgi_handler cgi(cgi_env(it));
-		// std::cout << "get_filename: " << cgi.get_filename() << std::endl;					// for test
-		// std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
-		// std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
-		// std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
-		// std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
-		bool check = cgi.execute();
-		if(check == true)
-		{
-			req.body = cgi.get_response_body();
-			
-		}
-		else
-		{
-
-		}
-	}
+//	else if (req.type == "POST")
+//	{
+//	    if(req.body.size() > it->max_body)
+//        {
+//            req.body.clear();
+////            req.status_code_int_val = 413;
+////            req.reason_phrase = "Payload Too Large";
+////            req.headers.add_header("Content-Length", "0");
+//        }
+//	    else if(req.body.size() == it->max_body or req.body.empty()) // and req.get_query_string().empty() )
+//        {
+//            req.body.clear(); // r.body = req.get_body();
+////            req.status_code_int_val = 200;
+////            req.reason_phrase = "OK";
+////            req.headers.add_header("Content-Length", std::to_string(req.body.size()));
+//        }
+//	    else
+//	    {
+            std::cout << "!!! POST" << std::endl; // for test
+            cgi_handler cgi(cgi_env(it));
+            // std::cout << "get_filename: " << cgi.get_filename() << std::endl;					// for test
+            // std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
+            // std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
+            // std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
+            // std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
+            bool check = cgi.execute();
+            if (check == true)
+            {
+                req.body = cgi.get_response_body();
+//                req.status_code_int_val = cgi.get_status_code();
+//                req.reason_phrase = cgi.get_str_status_code();
+//                req.headers.add_header("Content-Type", cgi.get_str_content_type());
+//                req.headers.add_header("Content-Length", std::to_string(cgi.get_response_body().size()));
+            }
+            else
+            {
+                // ERROR
+            }
+//        } // end POST
+        // ERROR
+//	} end methods
 	/*  		ADD ANOTHER METHODS				*/
 }
 
