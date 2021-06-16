@@ -31,7 +31,7 @@ Config::Config(std::string config_name) : _servers(std::vector<Server>()),
                                         _config_line(std::string()),
                                         _server_line(std::string()),
                                         _location_line(std::string())
-{
+{ 
     std::string     line;
     std::ifstream   config(config_name);
     int             len;
@@ -49,6 +49,7 @@ Config::Config(std::string config_name) : _servers(std::vector<Server>()),
     }
     else
         throw(Config::File_error());
+
     parser();
 }
 
@@ -181,7 +182,7 @@ Config::Server  *Config::parser_server()
     /**************/
     if ((pos_begin = _server_line.find("listen")) != _server_line.npos)
     {
-        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+        if (pos_begin > 0 && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
         {
             delete point_to_serv;
@@ -400,6 +401,8 @@ Config::Location  *Config::parser_location()
             throw(Config::Syntax_error());
         }
         (*point_to_location).root = std::string(_location_line, pos_begin, pos_end - pos_begin);
+
+        std::cout << (*point_to_location).root << std::endl;
     }
     else
     {
