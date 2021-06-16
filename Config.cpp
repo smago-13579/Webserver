@@ -40,8 +40,6 @@ Config::Config(std::string config_name) : _servers(std::vector<Server>()),
     {
         while (getline(config, line))
         {
-            std::cout << line << std::endl;
-
             len = line.length();
             for (int i = 0; i < len; i++)
                 if (line[i] != ' ' && line[i] != '\t')
