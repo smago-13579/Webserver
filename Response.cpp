@@ -123,7 +123,7 @@ int			Response::check_method(std::vector<size_t>& methods, size_t cmd)
 int			Response::create_response(const Location& loc)
 {
 	std::stringstream	response, body, file;
-	std::ifstream 		image;
+    std::ifstream 		image;
 	
 	int fd, res;
 	char buff[100000];
@@ -142,10 +142,15 @@ int			Response::create_response(const Location& loc)
 					error_page(404);
 				return (-1);
 			}
-			while ((res = read(fd, buff, 99999)) > 0) {
-				buff[res] = '\0';
-				body << buff;
-			}
+			std::cout << "!!! " << loc.exec << std::endl;  // ngonzo
+			if(loc.exec != "")                             //
+                body << res_body;                          //
+			else {                                         // ngonzo
+                while ((res = read(fd, buff, 99999)) > 0) {
+                    buff[res] = '\0';
+                    body << buff;
+                }
+            }                                              // ngonzo
 			body << "\r\n\r\n";
 			close(fd);
 			if (res < 0) {
@@ -169,9 +174,9 @@ int			Response::create_response(const Location& loc)
 	response << req.version << " 200 OK\r\n"
 	<< "Version: " << req.version << "\r\n"
 	<< get_headers(file.str());
-	if (req.type != "DELETE") 
+    if (req.type != "DELETE")
 	{
-		response << "Content-Length: " << body.str().length()
+        response << "Content-Length: " << body.str().length()
 		<< "\r\n\r\n" << body.str();
 	}
 	this->answer = response.str();
@@ -244,14 +249,16 @@ std::string			Response::get_headers(std::string str)
 	
 	int i = str.rfind(".") + 1;
 	content_type = str.substr(i, str.size() - i);
-	std::cout << content_type << std::endl;
+    loc_iter it = find_location();                  // ngozno
+	if(content_type == "py" and it->exec != "")     //
+        content_type = "html";                      // ngozno
+ 	std::cout << content_type << std::endl;
 	if (get_format(str) == TEXT)
 		content_type = "text/" + content_type;
 	else if (get_format(str) == IMAGE)
 		content_type = "image/" + content_type;
 	else 
 		content_type = "font/" + content_type;
-
 	headers << "Server: DreamTeam/1.0.1 (School 21)\r\n"
 	<< "Date: " << ctime(&raw)
 	<< "Content-Type: " << content_type << "\r\n";
@@ -290,7 +297,10 @@ int			Response::method_GET()
 
 	it = find_location();
 	if (check_method(it->methods, GET) == 1) {
-		create_response(*it);
+        if(it->exec != "")       // ngonzo
+            method_POST(it); //
+        else                    // ngonzo
+		    create_response(*it);
 		return (0);
 	}
 	else 
@@ -353,22 +363,24 @@ int			Response::method_POST(loc_iter &it)
 	// }
 	// else
 	// {
-		std::cout << "!!! POST" << std::endl; // for test
-		cgi_handler cgi(cgi_env(it));
-		// std::cout << "get_filename: " << cgi.get_filename() << std::endl;					// for test
-		// std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
-		// std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
-		// std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
-		// std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
+		std::cout << "!!! POST - ";                                        // for test
+        std::vector<std::string>    env = cgi_env(it);
+		cgi_handler cgi(env, it->root);
 		cgi.req_body_to_fd(req.body);
 		bool check = cgi.execute();
+		std::cout << "get_filename: " << cgi.get_filename() << std::endl; // for test
+        // std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
+        // std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
+        // std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
+        // std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
 		if (check == true)
 		{
-			req.body = cgi.get_response_body();
-			// req.status_code_int_val = cgi.get_status_code();
-			// req.reason_phrase = cgi.get_str_status_code();
-			// req.headers.add_header("Content-Type", cgi.get_str_content_type());
-			// req.headers.add_header("Content-Length", std::to_string(cgi.get_response_body().size()));
+            res_body = cgi.get_response_body();
+            create_response(*it);
+//            req.status_code_int_val = cgi.get_status_code();
+//            req.reason_phrase = cgi.get_str_status_code();
+//            req.headers.add_header("Content-Type", cgi.get_str_content_type());
+//            req.headers.add_header("Content-Length", std::to_string(cgi.get_response_body().size()));
 			return (0);
 		}
 		else
@@ -389,7 +401,6 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	tmp.push_back("PATH_INFO=" + req.resource);
 	tmp.push_back("PATH_TRANSLATED=" + it->root + req.resource);
 	tmp.push_back("QUERY_STRING=");
-	tmp.push_back("ROOT=" + it->root);
 	tmp.push_back("REMOTE_ADDR=" + settings->ip);
 	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
 	tmp.push_back("REMOTE_USER=");

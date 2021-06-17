@@ -45,6 +45,7 @@ public:
 	std::string			get_response();
 	
 private:
+    std::string			res_body;
 	Request				req;
 	Settings* 			settings;
 	std::string			answer;
