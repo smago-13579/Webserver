@@ -1,6 +1,6 @@
 @font-face {
     font-family: Ubuntu; /* Имя шрифта */
-    src: url(font/Playlist-Script.otf); /* Путь к файлу со шрифтом */
+    src: url(font/Allura.ttf); /* Путь к файлу со шрифтом */
 }
 
 html, body {
