@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 18:14:55 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 18:55:18 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ Response::Response(const Request& req, Settings set)
 	this->req = req;
 	this->response_done	= 0;
 	this->settings = &set;
+	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">Error 500</h1><h2 style=\"font-size:160%;\">Internal Server Error</h2></body></html>";
 	find_method();
 }
 
@@ -32,6 +33,7 @@ Response&	Response::operator=(const Response& tmp)
 	settings = tmp.settings;
 	answer = tmp.answer;
 	response_done = tmp.response_done;
+	error_500 = tmp.error_500;
 
 	return (*this);
 }

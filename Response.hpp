@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 18:15:01 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 18:47:45 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ private:
 	std::string			answer;
 	std::string			content_type;
 	size_t				response_done;
+	std::string			error_500;
 
 	int				error_page(int i);
 	int				compare_prefix(std::string loc, std::string res);
