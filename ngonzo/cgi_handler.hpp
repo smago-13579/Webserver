@@ -9,8 +9,6 @@
 
 # define buffer_size 1024
 
-class Request {};		// test
-
 class cgi_handler
 {
 public:
@@ -26,9 +24,9 @@ private:
 
 
 	// private methods
-	char *	_ft_strjoin(str str1, str str2, str str3, str str4);
-	void	_create_env(Request * request);
-	void	_construct_filename();// need ?
+	char *	_string_to_char(str str1);
+	void	_parse_env(std::vector<str> env);
+	void	_construct_filename(std::vector<str> env);// need ?
 	void	_free_env();
 	void	_parse_cgi();
 	void	_test_write_to_file();
@@ -37,14 +35,13 @@ private:
 public:
 	cgi_handler();
 	cgi_handler(str filename);
-	cgi_handler(Request req, Settings * set, Location * loc); // // //
+	cgi_handler(std::vector<std::string> env);
 	~cgi_handler();
 	cgi_handler(const cgi_handler & copy);
 	cgi_handler &	operator= (const cgi_handler & rhs);
 
 	// setters and getters
-	void		set_request(Request request);
-	void		set_filename(str filename);
+//	void		set_filename(str filename);
 	str const	get_filename() const;
 	
 	str const	get_response_body() const;

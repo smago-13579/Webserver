@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/bin/python3
 
 import cgi
 import html
@@ -7,14 +7,14 @@ import os
 import cgi_content as cc
 
 try:
-    f = open("cgi-bin/info.txt")
+    f = open("info.txt")
     f.close()
 except FileNotFoundError:
-	f = open("cgi-bin/info.txt", "w")
+	f = open("info.txt", "w")
 	f.write("         X")
 	f.close()
 
-f = open("cgi-bin/info.txt")
+f = open("info.txt")
 str = f.read()
 f.close()
 
@@ -108,7 +108,7 @@ elif action == "delete":
 	button8 = " "
 	button9 = " "
 
-f = open("cgi-bin/info.txt", "w")
+f = open("info.txt", "w")
 f.write(str)
 f.close()
 
