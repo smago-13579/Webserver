@@ -6,3 +6,4 @@ webserver
 ngonzo_cgi/a.out
 ngonzo_cgi/file.txt
 ngonzo/gomoku/cgi-bin/__pycache__/
+html/autoindex.html

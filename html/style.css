@@ -86,10 +86,10 @@ button {
 }
    
 .error_page {
-display: flex;
-flex-direction: column;
-font-size: 3rem;
-align-items: center;
+	display: flex;
+	flex-direction: column;
+	font-size: 3rem;
+	align-items: center;
 }
 
 .error_image {
@@ -134,4 +134,12 @@ align-items: center;
 }
 .color_500_text{
 	color:#272a4d;
+}
+
+.autoindex{
+	background: rgba(69, 143, 177, .7);
+	font-size: 2rem;
+}
+.color_autoindex{
+	color:beige;
 }
