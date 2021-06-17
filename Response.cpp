@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 20:28:03 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/17 21:10:43 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,7 +258,9 @@ std::string			Response::get_headers(std::string str)
 	int i = str.rfind(".") + 1;
 	content_type = str.substr(i, str.size() - i);
 	std::cout << content_type << std::endl;
-	if (get_format(str) == TEXT)
+	if (str.rfind(".") == str.npos)
+		content_type = "text/html";
+	else if (get_format(str) == TEXT)
 		content_type = "text/" + content_type;
 	else if (get_format(str) == IMAGE)
 		content_type = "image/" + content_type;
