@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/17 18:31:12 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 20:17:13 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,7 +221,7 @@ Config::Server  *Config::parser_server()
     pos_begin = 0;
     if ((pos_begin = _server_line.find("server_name")) != _server_line.npos)
     {
-        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+        if (pos_begin > 0 && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
         {
             delete point_to_serv;
@@ -242,7 +242,7 @@ Config::Server  *Config::parser_server()
     pos_begin = 0;
     if ((pos_begin = _server_line.find("error_page")) != _server_line.npos)
     {
-        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+        if (pos_begin > 0 && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
         {
             delete point_to_serv;
@@ -273,7 +273,7 @@ Config::Server  *Config::parser_server()
         if ((pos_begin = _server_line.find("location", pos_begin)) == _server_line.npos)
             break;
         count_locations++;
-        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+        if (pos_begin > 0 && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
         {
             delete point_to_serv;
@@ -331,7 +331,7 @@ Config::Location  *Config::parser_location()
     /*************/
     if ((pos_begin = _location_line.find("index")) != _location_line.npos)
     {
-        if (_location_line[pos_begin - 1] && (_location_line[pos_begin - 1] != ';'
+        if (pos_begin > 0 && (_location_line[pos_begin - 1] != ';'
                                         && _location_line[pos_begin - 1] != '}'))
         {
             delete point_to_location;
@@ -418,7 +418,7 @@ Config::Location  *Config::parser_location()
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("autoindex")) != _location_line.npos)
     {
-        pos_begin += 4;
+        pos_begin += 9;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
         {
             delete point_to_location;
@@ -458,12 +458,12 @@ Config::Location  *Config::parser_location()
     }
 
     /************/
-    /*   Exec   */ //не обязательное поле
+    /*   exec   */ //не обязательное поле
     /************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("exec")) != _location_line.npos)
     {
-        pos_begin += 13;
+        pos_begin += 4;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
         {
             delete point_to_location;
