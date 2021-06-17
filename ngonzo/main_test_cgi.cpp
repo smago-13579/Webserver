@@ -60,6 +60,15 @@ void		ft_wait()
 // 	}
 // }
 
+void		test(cgi_handler cgi)
+{
+	char * test = cgi._ft_strjoin("TEST", "-1");
+	int i = 0;
+	for(; test[i] != '\0'; ++i)
+		std::cout << test[i];
+	std::cout << std::endl;
+	delete test;
+}
 
 int			main(int argc, char **argv, char **env)
 {
@@ -92,6 +101,8 @@ int			main(int argc, char **argv, char **env)
 	check = cgi.execute();
 	if(check == false) 
 		ft_error("cgi_tester not found!\n");
+
+	// test(cgi);
 
 	ft_wait();
 	return 0;

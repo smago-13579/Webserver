@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/16 22:57:58 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/17 12:24:58 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ private:
 	int 			method_GET();
 	int				method_DELETE();
 	std::string		status_codes(int i);
+
+	std::vector<std::string>	cgi_env(loc_iter &it);
 	
 };
 
