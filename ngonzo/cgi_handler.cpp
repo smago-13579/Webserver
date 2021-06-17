@@ -57,34 +57,35 @@ void		cgi_handler::_parse_env(std::vector<std::string> env)
 		_env = NULL;
 		return ;
 	}
-	 // print env
-	 std::cout << "!!! - print input env" << std::endl;
-	 for (std::vector<std::string>::iterator	begin = env.begin(), end = env.end(); begin != end; ++begin)
-	 	std::cout << "! " << *begin << std::endl;
-	 // print env end
+	//  // print env
+	//  std::cout << "!!! - print input env" << std::endl;
+	//  for (std::vector<std::string>::iterator	begin = env.begin(), end = env.end(); begin != end; ++begin)
+	//  	std::cout << "! " << *begin << std::endl;
+	//  // print env end
 	_env = new char * [env.size() + 1];
 	std::vector<std::string>::iterator	begin = env.begin(), end = env.end();
 	int									i = 0;
 	for (; begin != end; ++begin, ++i)\
 		_env[i] = _string_to_char(*begin);
 	_env[i] = NULL;
-	 // print new _env
-	 std::cout << "@@@ - print new _env" << std::endl;
-	 for (int i = 0; _env[i] != NULL; ++i)
-	 	std::cout << "@ " << _env[i] << std::endl;
-	 // print new _env end
+	//  // print new _env
+	//  std::cout << "@@@ - print new _env" << std::endl;
+	//  for (int i = 0; _env[i] != NULL; ++i)
+	//  	std::cout << "@ " << _env[i] << std::endl;
+	//  // print new _env end
 }
 
 void		cgi_handler::_construct_filename(std::vector<str> env)
 {
 	// _filename = "r.pwd + '/' + r.filename";
 	// _filename = "./ngonzo/cgi-bin/cgi_tester";
-//	_filename = "./ngonzo/cgi-bin/py/hello.py";
-    _filename = "/Users/ngonzo/Desktop/projects/webserv/html/cgi-bin/cgi_main.py";
-    int i = 0;
-    for(; env[i].find("PATH_TRANSLATED=") == true; ++i)
-        std::cout << env[i] << std::endl;
-    std::cout << env[5] << std::endl;
+	// _filename = "./ngonzo/cgi-bin/py/hello.py";
+	_filename = "/Users/ngonzo/Desktop/projects/webserv/html/cgi-bin/cgi_main.py";
+	// _filename = "./cgi-bin/cgi_main.py";
+    // int i = 0;
+    // for(; env[i].find("PATH_TRANSLATED=") == true; ++i)
+    //     std::cout << env[i] << std::endl;
+    // std::cout << env[5] << std::endl;
 //    _filename =
 }
 

@@ -6,7 +6,7 @@
 /*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 12:59:24 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/17 14:21:22 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 
 # define TEXT 0
 # define IMAGE 1
+# define FONT 2
 
 class Response
 {

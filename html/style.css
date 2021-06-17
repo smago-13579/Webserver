@@ -1,6 +1,6 @@
 @font-face {
     font-family: Ubuntu; /* Имя шрифта */
-    src: url(font/Allura.ttf); /* Путь к файлу со шрифтом */
+    src: url(font/Playlist-Script.otf); /* Путь к файлу со шрифтом */
 }
 
 html, body {
@@ -154,11 +154,6 @@ a {
 	font-size: 7rem;
 }
 
-.jeka {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	margin-left: 20vw;}
 .color_400_text{
 	color:#fff;
 }
@@ -178,4 +173,12 @@ a {
 }
 .color_autoindex{
 	color:beige;
+}
+
+.jeka {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-left: 2vw;
+	font-size: 13rem;
 }

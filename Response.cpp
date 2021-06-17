@@ -6,7 +6,7 @@
 /*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 14:02:12 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/17 15:24:20 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,22 +208,25 @@ void		Response::find_method()
 		this->method_DELETE();
 	else if (req.type == "PUT")
 		this->method_PUT();
-//	else if (req.type == "POST")
-//	{
+	else if (req.type == "POST")
 		this->method_POST(it);
-//	}
 }
 
 int					Response::get_format(std::string str)
 {
-	if (str.find(".png") == std::string::npos && \
-	str.find(".PNG") == std::string::npos && \
-	str.find(".ico") == std::string::npos && \
-	str.find(".jpeg") == std::string::npos && \
-	str.find(".jpg") == std::string::npos && 
-	str.find(".py") == std::string::npos)
-		return (TEXT);
-	return (IMAGE);
+	if (str.find(".png") != std::string::npos || \
+	str.find(".PNG") != std::string::npos || \
+	str.find(".ico") != std::string::npos || \
+	str.find(".jpeg") != std::string::npos || \
+	str.find(".jpg") != std::string::npos)
+	{
+		std::cout << "IMAGE\n";
+		return (IMAGE);
+	}
+	else if (str.find(".ttf") != std::string::npos ||
+			str.find(".otf") != std::string::npos)
+		return (FONT);
+	return (TEXT);
 }
 
 std::string			Response::get_headers(std::string str)
@@ -235,10 +238,12 @@ std::string			Response::get_headers(std::string str)
 	int i = str.rfind(".") + 1;
 	content_type = str.substr(i, str.size() - i);
 	std::cout << content_type << std::endl;
-	if (content_type == "html" || content_type == "css")
+	if (get_format(str) == TEXT)
 		content_type = "text/" + content_type;
-	else
+	else if (get_format(str) == IMAGE)
 		content_type = "image/" + content_type;
+	else 
+		content_type = "font/" + content_type;
 
 	headers << "Server: DreamTeam/1.0.1 (School 21)\r\n"
 	<< "Date: " << ctime(&raw)
@@ -308,27 +313,27 @@ int			Response::method_DELETE()
 
 int			Response::method_PUT()
 {
-	return (-1);
+	return 0;
 }
 
 int			Response::method_POST(loc_iter &it)
 {
-	if(req.body.size() > it->max_body)
-	{
-		req.body.clear();
-		// req.status_code_int_val = 413;
-		// req.reason_phrase = "Payload Too Large";
-		// req.headers.add_header("Content-Length", "0");
-	}
-	else if(req.body.size() == it->max_body or req.body.empty()) // and req.get_query_string().empty() )
-	{
-		req.body.clear(); // r.body = req.get_body();
-		// req.status_code_int_val = 200;
-		// req.reason_phrase = "OK";
-		// req.headers.add_header("Content-Length", std::to_string(req.body.size()));
-	}
-	else
-	{
+	// if(req.body.size() > it->max_body)
+	// {
+	// 	req.body.clear();
+	// 	// req.status_code_int_val = 413;
+	// 	// req.reason_phrase = "Payload Too Large";
+	// 	// req.headers.add_header("Content-Length", "0");
+	// }
+	// else if(req.body.size() == it->max_body or req.body.empty()) // and req.get_query_string().empty() )
+	// {
+	// 	req.body.clear(); // r.body = req.get_body();
+	// 	// req.status_code_int_val = 200;
+	// 	// req.reason_phrase = "OK";
+	// 	// req.headers.add_header("Content-Length", std::to_string(req.body.size()));
+	// }
+	// else
+	// {
 		std::cout << "!!! POST" << std::endl; // for test
 		cgi_handler cgi(cgi_env(it));
 		// std::cout << "get_filename: " << cgi.get_filename() << std::endl;					// for test
@@ -350,7 +355,7 @@ int			Response::method_POST(loc_iter &it)
 		{
 			return (-1);// ERROR
 		}
-	}
+	// }
 	return (-1);// ERROR
 }
 
@@ -379,7 +384,7 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 		tmp.push_back("HTTP_" + begin->first + "=" + begin->second);
 	// // print env
 	// for (std::vector<std::string>::iterator	begin = tmp.begin(), end = tmp.end(); begin != end; ++begin)
-	// 	std::cout << *begin << std::endl;
+	// 	std::cout << "! " << *begin << std::endl;
 	// // print env end
 	return tmp;
 }
