@@ -109,9 +109,6 @@ a {
 	flex: 1 0 auto;
 }
 
-<<<<<<< HEAD
-.simvol {
-=======
 .error {
 	display: flex;
 	flex-direction: column;
@@ -149,7 +146,6 @@ a {
 	font-size: 5rem;
 	font-weight: bold;
 	margin: 1rem 0 0 0;
->>>>>>> method_delete
 	padding: 0;
 	margin: 0;
 	display: flex;
@@ -158,13 +154,11 @@ a {
 	font-size: 7rem;
 }
 
-<<<<<<< HEAD
 .jeka {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	margin-left: 20vw;
-=======
+	margin-left: 20vw;}
 .color_400_text{
 	color:#fff;
 }
@@ -184,5 +178,4 @@ a {
 }
 .color_autoindex{
 	color:beige;
->>>>>>> method_delete
 }
