@@ -109,7 +109,47 @@ a {
 	flex: 1 0 auto;
 }
 
+<<<<<<< HEAD
 .simvol {
+=======
+.error {
+	display: flex;
+	flex-direction: column;
+	background: rgb(35, 101, 135);
+	margin-top: 10vh;
+}
+   
+.error_page {
+	display: flex;
+	flex-direction: column;
+	font-size: 3rem;
+	align-items: center;
+}
+
+.error_image {
+	border-radius:  13px;
+}
+.error_400 {
+	background: rgb(254, 148, 196);
+}
+.error_403 {
+	background: rgb(226, 187, 58);
+}
+.error_404 {
+	background: rgb(204, 163, 197);
+}
+.error_404 {
+	background: rgb(204, 163, 197);
+}
+.error_500 {
+	background: rgb(147, 201, 225);
+}
+
+.error_text_1{
+	font-size: 5rem;
+	font-weight: bold;
+	margin: 1rem 0 0 0;
+>>>>>>> method_delete
 	padding: 0;
 	margin: 0;
 	display: flex;
@@ -118,9 +158,31 @@ a {
 	font-size: 7rem;
 }
 
+<<<<<<< HEAD
 .jeka {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	margin-left: 20vw;
+=======
+.color_400_text{
+	color:#fff;
+}
+.color_403_text{
+	color:#c21f36;
+}
+.color_404_text{
+	color:#000273;
+}
+.color_500_text{
+	color:#272a4d;
+}
+
+.autoindex{
+	background: rgba(69, 143, 177, .7);
+	font-size: 2rem;
+}
+.color_autoindex{
+	color:beige;
+>>>>>>> method_delete
 }

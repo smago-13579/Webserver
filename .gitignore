@@ -7,6 +7,13 @@ ngonzo/gomoku/cgi-bin/__pycache__/
 ngonzo/a.out
 ngonzo/file.txt
 webserver
+<<<<<<< HEAD
 webserver.dSYM/
 .idea
 html/cgi-bin/__pycache__
+=======
+ngonzo_cgi/a.out
+ngonzo_cgi/file.txt
+ngonzo/gomoku/cgi-bin/__pycache__/
+html/autoindex.html
+>>>>>>> method_delete

@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/15 10:45:49 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 12:29:21 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -370,6 +370,8 @@ Config::Location  *Config::parser_location()
             if (method == "GET")
                 (*point_to_location).methods.push_back(GET);
             else if (method == "POST")
+                (*point_to_location).methods.push_back(POST);
+            else if (method == "PUT")
                 (*point_to_location).methods.push_back(POST);
             else if (method == "DELETE")
                 (*point_to_location).methods.push_back(DELETE);
