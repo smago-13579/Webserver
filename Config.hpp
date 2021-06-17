@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:07 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/08 15:26:39 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 18:28:19 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,7 @@ class Config
             std::string         root;
             bool                autoindex;
             int                 max_body;
-            std::string         CGI_extension;
-            std::string         CGI_path;
-            //...
+            std::string         exec;
         };
         struct Server
         {

@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 18:06:40 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 18:29:13 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,7 @@ Socket::Socket(Config::Server& server)
 		lock.root = it->root;
 		lock.autoindex = it->autoindex;
 		lock.max_body = it->max_body;
-		lock.CGI_extension = it->CGI_extension;
-		lock.CGI_path = it->CGI_path;
+		lock.exec = it->exec;
 		vec.push_back(lock);
 	}
 	settings.locations = vec;

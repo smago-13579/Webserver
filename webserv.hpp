@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/24 13:16:07 by smago             #+#    #+#             */
-/*   Updated: 2021/06/13 02:12:11 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/17 18:29:49 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,7 @@ struct Location
 	std::string         	root;
 	bool                	autoindex;
 	int			         	max_body;
-	std::string				CGI_extension;
-	std::string				CGI_path;
+	std::string				exec;
 };
 
 struct Settings

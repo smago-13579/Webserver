@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/17 12:29:21 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 18:31:12 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 Config::Location::Location() : location(std::string()), index(std::string()),
                             methods(std::vector<size_t>()), root(std::string()),
                             autoindex(OFF), max_body(std::numeric_limits<int>::max() - 1),
-                            CGI_extension(std::string()), CGI_path(std::string())
+                            exec(std::string())
 {}
 
 Config::Server::Server() : ip(std::string()), port(int()), server_name(std::string()),
@@ -457,11 +457,11 @@ Config::Location  *Config::parser_location()
         }
     }
 
-    /*********************/
-    /*   CGI_extension   */ //не обязательное поле
-    /*********************/
+    /************/
+    /*   Exec   */ //не обязательное поле
+    /************/
     pos_begin = pos_start;
-    if ((pos_begin = _location_line.find("CGI_extension")) != _location_line.npos)
+    if ((pos_begin = _location_line.find("exec")) != _location_line.npos)
     {
         pos_begin += 13;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
@@ -469,28 +469,7 @@ Config::Location  *Config::parser_location()
             delete point_to_location;
             throw(Config::Syntax_error());
         }
-        (*point_to_location).CGI_extension = std::string(_location_line, pos_begin, pos_end - pos_begin);
-    }
-
-    /****************/
-    /*   CGI_path   */ //не обязательное поле
-    /****************/
-    pos_begin = pos_start;
-    if ((pos_begin = _location_line.find("CGI_path")) != _location_line.npos)
-    {
-        pos_begin += 8;
-        if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
-        {
-            delete point_to_location;
-            throw(Config::Syntax_error());
-        }
-        (*point_to_location).CGI_path = std::string(_location_line, pos_begin, pos_end - pos_begin);
-    }
-    if (((*point_to_location).CGI_extension.empty() && !((*point_to_location).CGI_path.empty()))
-        || (!((*point_to_location).CGI_extension.empty()) && (*point_to_location).CGI_path.empty()))
-    {
-        delete point_to_location;
-        throw(Config::Missing_field());
+        (*point_to_location).exec = std::string(_location_line, pos_begin, pos_end - pos_begin);
     }
     
     return (point_to_location);
