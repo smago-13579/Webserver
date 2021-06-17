@@ -6,7 +6,7 @@
 /*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 12:25:49 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/17 13:50:44 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,84 +206,12 @@ void		Response::find_method()
 		this->method_GET();
 	else if (req.type == "DELETE")
 		this->method_DELETE();
+	else if (req.type == "PUT")
+		this->method_PUT();
 //	else if (req.type == "POST")
 //	{
-//	    if(req.body.size() > it->max_body)
-//        {
-//            req.body.clear();
-////            req.status_code_int_val = 413;
-////            req.reason_phrase = "Payload Too Large";
-////            req.headers.add_header("Content-Length", "0");
-//        }
-//	    else if(req.body.size() == it->max_body or req.body.empty()) // and req.get_query_string().empty() )
-//        {
-//            req.body.clear(); // r.body = req.get_body();
-////            req.status_code_int_val = 200;
-////            req.reason_phrase = "OK";
-////            req.headers.add_header("Content-Length", std::to_string(req.body.size()));
-//        }
-//	    else
-//	    {
-            std::cout << "!!! POST" << std::endl; // for test
-            cgi_handler cgi(cgi_env(it));
-            // std::cout << "get_filename: " << cgi.get_filename() << std::endl;					// for test
-            // std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
-            // std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
-            // std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
-            // std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
-            bool check = cgi.execute();
-            if (check == true)
-            {
-                req.body = cgi.get_response_body();
-//                req.status_code_int_val = cgi.get_status_code();
-//                req.reason_phrase = cgi.get_str_status_code();
-//                req.headers.add_header("Content-Type", cgi.get_str_content_type());
-//                req.headers.add_header("Content-Length", std::to_string(cgi.get_response_body().size()));
-            }
-            else
-            {
-                // ERROR
-            }
-//        } // end POST
-        // ERROR
-//	} end methods
-	/*  		ADD ANOTHER METHODS				*/
-}
-
-std::vector<std::string>		Response::cgi_env(loc_iter &it)
-{
-	std::vector<std::string>	tmp;
-	tmp.push_back("AUTH_TYPE=anonymous");
-	tmp.push_back("CONTENT_LENGTH=" + itoa(req.body.size()));
-	tmp.push_back("CONTENT_TYPE=" + content_type);
-	tmp.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	tmp.push_back("PATH_INFO=" + req.resource);
-	tmp.push_back("PATH_TRANSLATED=" + it->root + req.resource);
-	tmp.push_back("QUERY_STRING=");
-	tmp.push_back("REMOTE_ADDR=" + settings->ip);
-	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
-	tmp.push_back("REMOTE_USER=");
-	tmp.push_back("REQUEST_METHOD=" + req.type);
-	tmp.push_back("REQUEST_URI=" + req.resource);
-	tmp.push_back("SCRIPT_NAME=");		//
-	tmp.push_back("SERVER_NAME=" + settings->server_name);
-	tmp.push_back("SERVER_PORT=" + itoa(settings->port));
-	tmp.push_back("SERVER_PROTOCOL=" + req.version);
-	tmp.push_back("SERVER_SOFTWARE=webserver");
-	std::map<std::string, std::string>::iterator	begin = req.headers.begin(), end = req.headers.end();
-	for (; begin != end; ++begin)
-		tmp.push_back("HTTP_" + begin->first + "=" + begin->second);
-	// // print env
-	// for (std::vector<std::string>::iterator	begin = tmp.begin(), end = tmp.end(); begin != end; ++begin)
-	// 	std::cout << *begin << std::endl;
-	// // print env end
-	return tmp;
-}
-
-std::string			Response::get_response() 
-{
-	int i = 0;
-	this->answer.erase(0, i);
+		this->method_POST(it);
+//	}
 }
 
 int					Response::get_format(std::string str)
@@ -337,6 +265,11 @@ std::string			Response::get_response()
 	return ("");
 }
 
+void			Response::erase_answer(int i)
+{
+	this->answer.erase(0, i);
+}
+
 int			Response::method_GET()
 {
 	int i = 0;
@@ -371,7 +304,82 @@ int			Response::method_DELETE()
 		std::cout << "\nCan't use get method\n";
 		return (-1);
 	}
-	
-	
+}
 
+int			Response::method_PUT()
+{
+	return (-1);
+}
+
+int			Response::method_POST(loc_iter &it)
+{
+	if(req.body.size() > it->max_body)
+	{
+		req.body.clear();
+		// req.status_code_int_val = 413;
+		// req.reason_phrase = "Payload Too Large";
+		// req.headers.add_header("Content-Length", "0");
+	}
+	else if(req.body.size() == it->max_body or req.body.empty()) // and req.get_query_string().empty() )
+	{
+		req.body.clear(); // r.body = req.get_body();
+		// req.status_code_int_val = 200;
+		// req.reason_phrase = "OK";
+		// req.headers.add_header("Content-Length", std::to_string(req.body.size()));
+	}
+	else
+	{
+		std::cout << "!!! POST" << std::endl; // for test
+		cgi_handler cgi(cgi_env(it));
+		// std::cout << "get_filename: " << cgi.get_filename() << std::endl;					// for test
+		// std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
+		// std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
+		// std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
+		// std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
+		bool check = cgi.execute();
+		if (check == true)
+		{
+			req.body = cgi.get_response_body();
+			// req.status_code_int_val = cgi.get_status_code();
+			// req.reason_phrase = cgi.get_str_status_code();
+			// req.headers.add_header("Content-Type", cgi.get_str_content_type());
+			// req.headers.add_header("Content-Length", std::to_string(cgi.get_response_body().size()));
+			return (0);
+		}
+		else
+		{
+			return (-1);// ERROR
+		}
+	}
+	return (-1);// ERROR
+}
+
+std::vector<std::string>		Response::cgi_env(loc_iter &it)
+{
+	std::vector<std::string>	tmp;
+	tmp.push_back("AUTH_TYPE=anonymous");
+	tmp.push_back("CONTENT_LENGTH=" + itoa(req.body.size()));
+	tmp.push_back("CONTENT_TYPE=" + content_type);
+	tmp.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	tmp.push_back("PATH_INFO=" + req.resource);
+	tmp.push_back("PATH_TRANSLATED=" + it->root + req.resource);
+	tmp.push_back("QUERY_STRING=");
+	tmp.push_back("REMOTE_ADDR=" + settings->ip);
+	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
+	tmp.push_back("REMOTE_USER=");
+	tmp.push_back("REQUEST_METHOD=" + req.type);
+	tmp.push_back("REQUEST_URI=" + req.resource);
+	tmp.push_back("SCRIPT_NAME=");		//
+	tmp.push_back("SERVER_NAME=" + settings->server_name);
+	tmp.push_back("SERVER_PORT=" + itoa(settings->port));
+	tmp.push_back("SERVER_PROTOCOL=" + req.version);
+	tmp.push_back("SERVER_SOFTWARE=webserver");
+	std::map<std::string, std::string>::iterator	begin = req.headers.begin(), end = req.headers.end();
+	for (; begin != end; ++begin)
+		tmp.push_back("HTTP_" + begin->first + "=" + begin->second);
+	// // print env
+	// for (std::vector<std::string>::iterator	begin = tmp.begin(), end = tmp.end(); begin != end; ++begin)
+	// 	std::cout << *begin << std::endl;
+	// // print env end
+	return tmp;
 }

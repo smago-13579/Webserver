@@ -6,7 +6,7 @@
 /*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 12:24:58 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/17 12:59:24 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@
 class Response
 {
 public:
-	typedef std::vector<Location>::iterator loc_iter;
+	typedef std::vector<Location>::iterator	loc_iter;
+	typedef std::vector<std::string>		array;
 
 	Response();
 	Response(const Request& req, Settings set);
@@ -59,11 +60,11 @@ private:
 	std::string		get_path(const Location& loc);
 	int 			method_GET();
 	int				method_DELETE();
+	int				method_PUT();
+	int				method_POST(loc_iter &it);
+	array			cgi_env(loc_iter &it);
 	std::string		status_codes(int i);
 
-	std::vector<std::string>	cgi_env(loc_iter &it);
-	
 };
-
 
 #endif
