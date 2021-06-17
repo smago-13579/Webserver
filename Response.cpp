@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 15:24:20 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/17 18:14:55 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,44 +129,49 @@ int			Response::create_response(const Location& loc)
 	file << get_path(loc);
 	std::cout << "FILE: " << file.str() << std::endl;
 	
-	if (get_format(file.str()) == TEXT)
-	{
-		if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
-			std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
-			if (errno == EACCES)
-				error_page(403);
-			else if (errno == ENOENT)
-				error_page(404);
-			return (-1);
+	if (req.type != "DELETE") {
+		if (get_format(file.str()) == TEXT)
+		{
+			if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
+				std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
+				if (errno == EACCES)
+					error_page(403);
+				else if (errno == ENOENT)
+					error_page(404);
+				return (-1);
+			}
+			while ((res = read(fd, buff, 99999)) > 0) {
+				buff[res] = '\0';
+				body << buff;
+			}
+			body << "\r\n\r\n";
+			close(fd);
+			if (res < 0) {
+				std::cout << "CAN'T READ FILE\n";
+				return (-1);
+			}
 		}
-		while ((res = read(fd, buff, 99999)) > 0) {
-			buff[res] = '\0';
-			body << buff;
+		else
+		{
+			image.open(file.str(), std::ifstream::binary);
+			if (!image.is_open()) {
+				std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
+				return (-1);
+			}
+			body << image.rdbuf() << "\r\n\r\n";
+			image.clear();
+			image.close();
 		}
-		body << "\r\n\r\n";
-		close(fd);
-		if (res < 0) {
-			std::cout << "CAN'T READ FILE\n";
-			return (-1);
-		}
-	}
-	else
-	{
-		image.open(file.str(), std::ifstream::binary);
-		if (!image.is_open()) {
-			std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
-			return (-1);
-		}
-		body << image.rdbuf() << "\r\n\r\n";
-		image.clear();
-		image.close();
 	}
 
 	response << req.version << " 200 OK\r\n"
 	<< "Version: " << req.version << "\r\n"
 	<< get_headers(file.str());
-	response << "Content-Length: " << body.str().length()
-	<< "\r\n\r\n" << body.str();
+	if (req.type != "DELETE") 
+	{
+		response << "Content-Length: " << body.str().length()
+		<< "\r\n\r\n" << body.str();
+	}
 	this->answer = response.str();
 	
 	this->response_done	= 1;
@@ -256,7 +261,7 @@ std::string			Response::get_path(const Location& loc)
 {
 	std::stringstream str;
 
-	if (req.resource == loc.location)
+	if (req.resource == loc.location && req.type != "DELETE")
 		str << loc.root << "/" << loc.index;
 	else
 		str << loc.root << req.resource;
@@ -299,16 +304,28 @@ int			Response::method_DELETE()
 {
 	//пока сможем удалять только из определенной папки
 	loc_iter it;
+	std::string file;
 
 	it = find_location();
-	if (check_method(it->methods, DELETE) == 1) {
+	if (check_method(it->methods, DELETE) == 1 && it->location.find("/images_for_delete/") != it->location.npos)
+	{
+		file = get_path(*it);
+		if (remove(file.c_str()) != 0)
+		{
+			std::cout << "\nFILE NOT FOUND\n"; // Bad request
+			if (error_page(404) == 0)
+				return (0);
+		}
 		create_response(*it);
 		return (0);
 	}
-	else {
-		std::cout << "\nCan't use get method\n";
-		return (-1);
+	else
+	{
+		std::cout << "\nPERMISSION DENIED\n";
+		if (error_page(403) == 0)
+			return (0);
 	}
+	return (-1);
 }
 
 int			Response::method_PUT()

@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/17 11:06:09 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 17:55:49 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void 	Request::processRequest(std::string &str)
 	/***************/
 	/*   headers   */
 	/***************/
-    if (_status_headers == WAITING && _status_st_line == OK){
+    if (_status_headers == WAITING && _status_st_line == OK && _request_done != ERROR){
         if ((pos_end = buf.find(END_OF_HEADERS)) != buf.npos)
         {
             _status_headers = OK;
@@ -85,7 +85,7 @@ void 	Request::processRequest(std::string &str)
 	/************/
 	/*   body   */
 	/************/
-    if (find_body() == true && _status_headers == OK && _status_st_line == OK){
+    if (find_body() == true && _status_headers == OK && _status_st_line == OK && _request_done != ERROR){
 		if (_body_size == 0 && (pos_end = buf.find(END_OF_CHUNKED_BODY)) != buf.npos)
 		{
 			filling_chunked_body();
@@ -103,8 +103,6 @@ void 	Request::processRequest(std::string &str)
 	/*************/
 	if (_status_st_line == OK && _status_headers == OK && _body_size == 0)
 		check_request();
-	// if (_request_done == OK)
-		// see_request();
 }
 
 void    Request::filling_start_line()
