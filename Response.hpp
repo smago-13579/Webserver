@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/15 13:02:18 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/16 22:57:58 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,9 @@
 
 # define ON 1
 # define OFF 0
+
+# define TEXT 0
+# define IMAGE 1
 
 class Response
 {
@@ -42,16 +45,21 @@ private:
 	Request				req;
 	Settings* 			settings;
 	std::string			answer;
+	std::string			content_type;
 	size_t				response_done;
 
+	int				error_page(int i);
 	int				compare_prefix(std::string loc, std::string res);
 	int				create_response(const Location& loc);
 	int				check_method(std::vector<size_t>& methods, size_t cmd);
 	loc_iter		find_location();
 	void			find_method();
-	std::string		get_headers();
+	int				get_format(std::string str);
+	std::string		get_headers(std::string str);
+	std::string		get_path(const Location& loc);
 	int 			method_GET();
 	int				method_DELETE();
+	std::string		status_codes(int i);
 	
 };
 
