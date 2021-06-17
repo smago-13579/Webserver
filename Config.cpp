@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/17 12:29:21 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 19:59:59 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -418,7 +418,7 @@ Config::Location  *Config::parser_location()
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("autoindex")) != _location_line.npos)
     {
-        pos_begin += 4;
+        pos_begin += 9;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
         {
             delete point_to_location;

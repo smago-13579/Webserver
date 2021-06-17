@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Autoindex.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/17 11:04:47 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/17 13:44:52 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 20:05:06 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,5 +93,5 @@ void    Autoindex::_create_body()
         _body += "</a>\n";
     }
     _body += "</body>\n";
-    _body += "</html>\n";
+    _body += "</html>";
 }

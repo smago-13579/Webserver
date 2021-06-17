@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 15:24:20 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/17 20:05:42 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,11 +125,21 @@ int			Response::create_response(const Location& loc)
 	
 	int fd, res;
 	char buff[100000];
+	DIR* dir;
 
 	file << get_path(loc);
 	std::cout << "FILE: " << file.str() << std::endl;
-	
-	if (get_format(file.str()) == TEXT)
+
+	if ((dir = opendir(file.str().c_str())) != NULL) {
+		loc_iter it = find_location();
+		closedir(dir);
+		if (it->autoindex == ON) {
+			std::string str = file.str();
+			Autoindex autoi(str);
+			body << autoi.getBody() << "\r\n\r\n";
+		}
+	}
+	else
 	{
 		if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
 			std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
@@ -139,27 +149,32 @@ int			Response::create_response(const Location& loc)
 				error_page(404);
 			return (-1);
 		}
-		while ((res = read(fd, buff, 99999)) > 0) {
-			buff[res] = '\0';
-			body << buff;
+
+		if (get_format(file.str()) == TEXT)
+		{
+			while ((res = read(fd, buff, 99999)) > 0) {
+				buff[res] = '\0';
+				body << buff;
+			}
+			body << "\r\n\r\n";
+			close(fd);
+			if (res < 0) {
+				std::cout << "CAN'T READ FILE\n";
+				return (-1);
+			}
 		}
-		body << "\r\n\r\n";
-		close(fd);
-		if (res < 0) {
-			std::cout << "CAN'T READ FILE\n";
-			return (-1);
+		else
+		{
+			close(fd);
+			image.open(file.str(), std::ifstream::binary);
+			// if (!image.is_open()) {
+			// 	std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
+			// 	return (-1);
+			// }
+			body << image.rdbuf() << "\r\n\r\n";
+			image.clear();
+			image.close();
 		}
-	}
-	else
-	{
-		image.open(file.str(), std::ifstream::binary);
-		if (!image.is_open()) {
-			std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
-			return (-1);
-		}
-		body << image.rdbuf() << "\r\n\r\n";
-		image.clear();
-		image.close();
 	}
 
 	response << req.version << " 200 OK\r\n"
@@ -178,7 +193,7 @@ Response::loc_iter	Response::find_location()
 {
 	int i = 0;
 	int comp;
-	loc_iter itn = settings->locations.begin();
+	loc_iter itn = settings->locations.end();
 	
 	for (loc_iter it = settings->locations.begin(); it != settings->locations.end(); it++)
 	{
@@ -255,11 +270,15 @@ std::string			Response::get_headers(std::string str)
 std::string			Response::get_path(const Location& loc)
 {
 	std::stringstream str;
+	loc_iter it = find_location();
+	int pos = it->location.size();
+	int len = req.resource.size();
 
 	if (req.resource == loc.location)
 		str << loc.root << "/" << loc.index;
 	else
-		str << loc.root << req.resource;
+		str << loc.root << "/"
+		<< req.resource.substr(pos, len - pos);
 	return str.str();
 }
 
@@ -282,11 +301,11 @@ int			Response::method_GET()
 	loc_iter it;
 
 	it = find_location();
-	if (check_method(it->methods, GET) == 1) {
+	if (it != settings->locations.end() && check_method(it->methods, GET) == 1) {
 		create_response(*it);
 		return (0);
 	}
-	else 
+	else
 	{
 		std::cout << "\nBAD REQUEST\n"; // Bad request
 		if (error_page(400) == 0)

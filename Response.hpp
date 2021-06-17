@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 14:21:22 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/17 19:57:45 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "webserv.hpp"
 # include "Request.hpp"
+# include "Autoindex.hpp"
 # include <algorithm>
 
 # define GET 0

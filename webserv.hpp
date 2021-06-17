@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.21-school.ru>         +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/24 13:16:07 by smago             #+#    #+#             */
-/*   Updated: 2021/06/13 02:12:11 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/17 19:37:16 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 # include <utility>
 # include <ctime>
 # include <fstream>
-
+# include <dirent.h>
 
 struct Location
 {
