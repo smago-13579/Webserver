@@ -154,6 +154,15 @@ a {
 	font-size: 7rem;
 }
 
+<<<<<<< HEAD
+=======
+.jeka {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-left: 20vw;}
+
+>>>>>>> 6fa73322c8ea4daae08f4cc16069f2f3064ee6c8
 .color_400_text{
 	color:#fff;
 }
