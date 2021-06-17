@@ -21,6 +21,7 @@ private:
 	int		_status_code;
 	str		_str_status_code;
 	str		_str_content_type;
+	int     _fd_body;
 
 
 	// private methods
@@ -51,6 +52,7 @@ public:
 
 	// methods
 	bool	execute();
+    void    req_body_to_fd(str & request_body);
 
 };
 

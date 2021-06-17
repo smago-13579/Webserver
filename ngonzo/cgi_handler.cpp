@@ -80,13 +80,15 @@ void		cgi_handler::_construct_filename(std::vector<str> env)
 	// _filename = "r.pwd + '/' + r.filename";
 	// _filename = "./ngonzo/cgi-bin/cgi_tester";
 	// _filename = "./ngonzo/cgi-bin/py/hello.py";
-	_filename = "/Users/ngonzo/Desktop/projects/webserv/html/cgi-bin/cgi_main.py";
+	// _filename = "/Users/ngonzo/Desktop/projects/webserv/html/cgi-bin/cgi_main.py";
 	// _filename = "./cgi-bin/cgi_main.py";
     // int i = 0;
     // for(; env[i].find("PATH_TRANSLATED=") == true; ++i)
     //     std::cout << env[i] << std::endl;
     // std::cout << env[5] << std::endl;
-//    _filename =
+
+	_filename = env[7] + env[13];
+	std::cout << "!!! " << _filename << std::endl;
 }
 
 void		cgi_handler::_free_env()
@@ -202,4 +204,9 @@ bool		cgi_handler::execute()
 	// _test_write_to_file();						// for test
 	// std::cout << _response_body << std::endl;	// for test
 	return true;
+}
+
+void           cgi_handler::req_body_to_fd(std::string & request_body)
+{
+    int	_fd_body = open("file.txt", O_RDWR | O_CREAT | O_APPEND, S_IWRITE | S_IREAD, 0755);
 }

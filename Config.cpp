@@ -463,7 +463,7 @@ Config::Location  *Config::parser_location()
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("exec")) != _location_line.npos)
     {
-        pos_begin += 13;
+        pos_begin += 4;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
         {
             delete point_to_location;

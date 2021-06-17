@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 18:55:18 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 19:17:12 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -360,6 +360,7 @@ int			Response::method_POST(loc_iter &it)
 		// std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
 		// std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
 		// std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
+		cgi.req_body_to_fd(req.body);
 		bool check = cgi.execute();
 		if (check == true)
 		{
@@ -388,12 +389,13 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	tmp.push_back("PATH_INFO=" + req.resource);
 	tmp.push_back("PATH_TRANSLATED=" + it->root + req.resource);
 	tmp.push_back("QUERY_STRING=");
+	tmp.push_back("ROOT=" + it->root);
 	tmp.push_back("REMOTE_ADDR=" + settings->ip);
 	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
 	tmp.push_back("REMOTE_USER=");
 	tmp.push_back("REQUEST_METHOD=" + req.type);
 	tmp.push_back("REQUEST_URI=" + req.resource);
-	tmp.push_back("SCRIPT_NAME=");		//
+	tmp.push_back("SCRIPT_NAME=" + it->exec);
 	tmp.push_back("SERVER_NAME=" + settings->server_name);
 	tmp.push_back("SERVER_PORT=" + itoa(settings->port));
 	tmp.push_back("SERVER_PROTOCOL=" + req.version);
@@ -401,9 +403,9 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	std::map<std::string, std::string>::iterator	begin = req.headers.begin(), end = req.headers.end();
 	for (; begin != end; ++begin)
 		tmp.push_back("HTTP_" + begin->first + "=" + begin->second);
-	// // print env
-	// for (std::vector<std::string>::iterator	begin = tmp.begin(), end = tmp.end(); begin != end; ++begin)
-	// 	std::cout << "! " << *begin << std::endl;
-	// // print env end
+//	// print env
+//	for (std::vector<std::string>::iterator	begin = tmp.begin(), end = tmp.end(); begin != end; ++begin)
+//		std::cout << "! " << *begin << std::endl;
+//	// print env end
 	return tmp;
 }
