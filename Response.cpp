@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 16:02:51 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 17:48:05 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,16 +299,28 @@ int			Response::method_DELETE()
 {
 	//пока сможем удалять только из определенной папки
 	loc_iter it;
+	std::string file;
 
 	it = find_location();
-	if (check_method(it->methods, DELETE) == 1) {
+	if (check_method(it->methods, DELETE) == 1 && it->location.find("/images_for_delete/") != it->location.npos)
+	{
+		file = get_path(*it);
+		if (remove(file.c_str()) != 0)
+		{
+			std::cout << "\nFILE NOT FOUND\n"; // Bad request
+			if (error_page(404) == 0)
+				return (0);
+		}
 		create_response(*it);
 		return (0);
 	}
-	else {
-		std::cout << "\nCan't use get method\n";
-		return (-1);
+	else
+	{
+		std::cout << "\nPERMISSION DENIED\n";
+		if (error_page(403) == 0)
+			return (0);
 	}
+	return (-1);
 }
 
 int			Response::method_PUT()
