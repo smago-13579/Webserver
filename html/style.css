@@ -1,6 +1,6 @@
 @font-face {
     font-family: Ubuntu; /* Имя шрифта */
-    src: url(font/Playlist-Script.otf); /* Путь к файлу со шрифтом */
+    src: url(font/Allura.ttf); /* Путь к файлу со шрифтом */
 }
 
 html, body {
@@ -158,8 +158,8 @@ a {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	margin-left: 20vw;
-}
+	margin-left: 20vw;}
+
 .color_400_text{
 	color:#fff;
 }
