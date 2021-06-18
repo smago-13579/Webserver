@@ -13,9 +13,8 @@ cgi_handler::cgi_handler(std::vector<std::string> env, std::string & root)
 {
 	_parse_env(env);
 	_root = root;
-    _exec = env[12].substr(12);
-    _filename = _root + "/" + _exec;
-//    std::cout << "! _filename - " << _filename << std::endl;
+	_exec = env[12].substr(12);
+	_filename = _root + "/" + _exec;
 	_response_body = "EMPTY";
 	_status_code = -1;
 	_str_status_code = "EMPTY";
@@ -60,22 +59,22 @@ void		cgi_handler::_parse_env(std::vector<std::string> env)
 		_env = NULL;
 		return ;
 	}
-	//  // print env
-	//  std::cout << "!!! - print input env" << std::endl;
-	//  for (std::vector<std::string>::iterator	begin = env.begin(), end = env.end(); begin != end; ++begin)
-	//  	std::cout << "! " << *begin << std::endl;
-	//  // print env end
+	// // print env
+	// std::cout << "!!! - print input env" << std::endl;
+	// for (std::vector<std::string>::iterator	begin = env.begin(), end = env.end(); begin != end; ++begin)
+	// 	std::cout << "! " << *begin << std::endl;
+	// // print env end
 	_env = new char * [env.size() + 1];
 	std::vector<std::string>::iterator	begin = env.begin(), end = env.end();
 	int									i = 0;
 	for (; begin != end; ++begin, ++i)\
 		_env[i] = _string_to_char(*begin);
 	_env[i] = NULL;
-//	  // print new _env
-//	  std::cout << "@@@ - print new _env" << std::endl;
-//	  for (int i = 0; _env[i] != NULL; ++i)
-//	  	std::cout << "@ " << _env[i] << std::endl;
-//	  // print new _env end
+	// // print new _env
+	// std::cout << "@@@ - print new _env" << std::endl;
+	// for (int i = 0; _env[i] != NULL; ++i)
+	// std::cout << "@ " << _env[i] << std::endl;
+	// // print new _env end
 }
 
 void		cgi_handler::_free_env()
@@ -109,13 +108,13 @@ void		cgi_handler::_parse_cgi()
 //		_response_body.erase(0, end_of_headers + 4);
 //	}
 
-    _response_body.erase(0, end_of_headers + 4);
+	_response_body.erase(0, end_of_headers + 4);
 }
 
 void		cgi_handler::_test_write_to_file()
 {
 	int	save_out = dup(1);
-	int	file_fd = open("file.txt", O_RDWR | O_CREAT | O_APPEND, S_IWRITE | S_IREAD, 0755);
+	int	file_fd = open("html/file.txt", O_RDWR | O_CREAT | O_APPEND, S_IWRITE | S_IREAD, 0755);
 	if(file_fd == -1)
 		std::cout << "error: file.txt not create" << std::endl;
 	dup2(file_fd, 1);
@@ -159,9 +158,9 @@ std::string const	cgi_handler::get_str_status_code() const
 
 bool		cgi_handler::execute()
 {
-    if(_exec == "cgi_tester")
-        return execute_tester();
-    return execute_pipe();
+	if(_exec == "cgi_tester")
+		return execute_tester();
+	return execute_pipe();
 }
 
 bool		cgi_handler::execute_pipe()
@@ -196,45 +195,45 @@ bool		cgi_handler::execute_pipe()
 
 bool		cgi_handler::execute_tester()
 {
-    int		fd[2], fd_save[2], tmp;
-    char	buff[buffer_size];
+	int		fd[2], fd_save[2], tmp;
+	char	buff[buffer_size];
 
-    std::ofstream   temp(_root + "/temp");
-    temp.open(_root + "/temp");
+	std::ofstream   temp(_root + "/temp");
+	temp.open(_root + "/temp");
 
-    fd[0] = open(std::string(_root + "/_input_data").c_str(), O_RDONLY);
-    fd[1] = open(std::string(_root + "/temp").c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	fd[0] = open(std::string(_root + "/_input_data").c_str(), O_RDONLY);
+	fd[1] = open(std::string(_root + "/temp").c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
-    fd_save[0] = dup(0);	// для чтения
-    fd_save[1] = dup(1);	// для записи
-    if (fork() == 0)
-    {
-        dup2(fd[0], 0);
-        dup2(fd[1], 1);
-        if (execve(_filename.c_str(), NULL, _env) == -1)
-        {
-            _restore_fd_and_close(fd, fd_save);
-            exit(127);
-        }
-    }
-    wait(&tmp);
-    if(WEXITSTATUS(tmp) == 127)
-        return _restore_fd_and_close(fd, fd_save);
-    _response_body.clear();
-    for(tmp = buffer_size; tmp == buffer_size ; _response_body += std::string(buff, tmp))
-        if((tmp = read(fd[0], buff, buffer_size)) == -1)
-            return _restore_fd_and_close(fd, fd_save);
-    _parse_cgi();
-    _restore_fd_and_close(fd, fd_save);
-    // _test_write_to_file();						// for test
-    // std::cout << _response_body << std::endl;	// for test
-    return true;
+	fd_save[0] = dup(0);	// для чтения
+	fd_save[1] = dup(1);	// для записи
+	if (fork() == 0)
+	{
+		dup2(fd[0], 0);
+		dup2(fd[1], 1);
+		if (execve(_filename.c_str(), NULL, _env) == -1)
+		{
+			_restore_fd_and_close(fd, fd_save);
+			exit(127);
+		}
+	}
+	wait(&tmp);
+	if(WEXITSTATUS(tmp) == 127)
+		return _restore_fd_and_close(fd, fd_save);
+	_response_body.clear();
+	for(tmp = buffer_size; tmp == buffer_size ; _response_body += std::string(buff, tmp))
+		if((tmp = read(fd[0], buff, buffer_size)) == -1)
+			return _restore_fd_and_close(fd, fd_save);
+	_parse_cgi();
+	_restore_fd_and_close(fd, fd_save);
+	// _test_write_to_file();						// for test
+	// std::cout << _response_body << std::endl;	// for test
+	return true;
 }
 
-void           cgi_handler::req_body_to_fd(std::string & request_body)
+void			cgi_handler::req_body_to_fd(std::string & request_body)
 {
-    _root_req_body = _root + "/_input_data";
-    std::ofstream   req_body(_root_req_body);
-    req_body << request_body;
-//    this->_req_body << req_body;
+	_root_req_body = _root + "/_input_data";
+	std::ofstream	req_body(_root_req_body);
+	req_body << request_body;
+	// this->_req_body << req_body;
 }

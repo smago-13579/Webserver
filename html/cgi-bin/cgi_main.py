@@ -4,14 +4,14 @@ import cgi
 import cgi_content as cc
 
 try:
-    f = open("info.txt")
-    f.close()
+	f = open("html/for_game.tmp")
+	f.close()
 except FileNotFoundError:
-	f = open("info.txt", "w")
+	f = open("html/for_game.tmp", "w")
 	f.write("         X")
 	f.close()
 
-f = open("info.txt")
+f = open("html/for_game.tmp")
 str = f.read()
 f.close()
 
@@ -105,7 +105,7 @@ elif action == "delete":
 	button8 = " "
 	button9 = " "
 
-f = open("info.txt", "w")
+f = open("html/for_game.tmp", "w")
 f.write(str)
 f.close()
 
