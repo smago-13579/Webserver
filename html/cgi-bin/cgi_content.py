@@ -46,8 +46,22 @@ main = '''
 		<div class="window_row">
 			<button class="button_restart" name="action" value="delete">RESTART</button>
 		</div>
+		{end}
 	</form>
 </body>
 </html>
 '''
 
+end_x = '''
+<div class="end">
+	<p class="button_text">Winner X</p>
+	<button class="button_end" name="action" value="delete">RESTART</button>
+</div> 
+'''
+
+end_o = '''
+<div class="end">
+	<p class="button_text">Winner O</p>
+	<button class="button_end" name="action" value="delete">RESTART</button>
+</div> 
+'''
