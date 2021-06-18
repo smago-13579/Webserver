@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/18 15:52:19 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/18 20:00:52 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,19 @@ Response::Response(const Request& req, Settings set)
 	this->req = req;
 	this->response_done	= 0;
 	this->settings = &set;
-	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">Error 500</h1><h2 style=\"font-size:160%;\">Internal Server Error</h2></body></html>";
+	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
+	this->error_500 += "Error 500</h1><h2 style=\"font-size:160%;\">";
+	this->error_500 += "Internal Server Error</h2></body></html>";
+	
+	if ((it = find_location()) == settings->locations.end()) {
+		std::cout << "\nBAD REQUEST\n";
+		error_page(400);
+			return ;
+	}
+	this->autoindex = it->autoindex;
+	this->content_type = "";
 
-    loc_iter it = find_location();
+	/*				ngonzo						*/
     query_string.clear();
     std::cout << "! it->exec - " << it->exec << std::endl;
     std::cout << "! req.resource - " << this->req.resource << std::endl;
@@ -39,8 +49,19 @@ Response::Response(const Request& req, Settings set)
     }
     std::cout << "! req.resource - " << this->req.resource << std::endl;
     std::cout << "! query_string - " << query_string << std::endl;
+	/*				ngonzo						*/
 
 	find_method();
+}
+
+Response::Response(int error, Settings set)
+{
+	this->response_done	= 0;
+	this->settings = &set;
+	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
+	this->error_500 += "Error 500</h1><h2 style=\"font-size:160%;\">";
+	this->error_500 += "Internal Server Error</h2></body></html>";
+	this->error_page(error);
 }
 
 Response::~Response() {}
@@ -52,6 +73,9 @@ Response&	Response::operator=(const Response& tmp)
 	answer = tmp.answer;
 	response_done = tmp.response_done;
 	error_500 = tmp.error_500;
+	autoindex = tmp.autoindex;
+	content_type = tmp.content_type;
+	it = tmp.it;
 
 	return (*this);
 }
@@ -70,24 +94,33 @@ int			Response::error_page(int i)
 	file << settings->error_page << "/" << "error_" \
 	<< itoa(i) << ".html";
 	std::cout << "FILE: " << file.str() << std::endl;
+	get_format(file.str());
 
 	if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
 		std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
-		return (-1);
+		if (i != 500)
+			return (this->error_page(500));
+		else 
+			body << this->error_500 << "\r\n\r\n";
 	}
-	while ((res = read(fd, buff, 99999)) > 0) {
-		buff[res] = '\0';
-		body << buff;
-	}
-	body << "\r\n\r\n";
-	close(fd);
-	if (res < 0) {
-		std::cout << "CAN'T READ FILE: " << file.str() << std::endl;
-		return (-1);
+	else 
+	{
+		while ((res = read(fd, buff, 99999)) > 0) {
+			buff[res] = '\0';
+			body << buff;
+		}
+		body << "\r\n\r\n";
+		if (res < 0) {
+			std::cout << "CAN'T READ FILE: " << file.str() << std::endl;
+			body.ignore(9999999);
+			body << this->error_500 << "\r\n\r\n";
+		}
+		else
+			close(fd);
 	}
 
-	response << req.version << " " << itoa(i) << status_codes(i)
-	<< "Version: " << req.version << "\r\n"
+	response << "HTTP/1.1 " << itoa(i) << status_codes(i)
+	<< "Version: " << "HTTP/1.1\r\n"
 	<< get_headers(file.str());
 	response << "Content-Length: " << body.str().length()
 	<< "\r\n\r\n" << body.str();
@@ -140,60 +173,47 @@ int			Response::check_method(std::vector<size_t>& methods, size_t cmd)
 
 int			Response::create_response(const Location& loc)
 {
-	std::stringstream	response, body, file;
+	std::stringstream	response, body;
     std::ifstream 		image;
-	
-	int fd, res;
-	char buff[100000];
-	DIR* dir;
+	std::string			file;
+	int 				fd, res;
+	char 				buff[100000];
 
-	file << get_path(loc);
-	std::cout << "FILE: " << file.str() << std::endl;
+	file = get_path(loc);
+	std::cout << "FILE: " << file << std::endl;
 
-	if (req.type == "GET" && (dir = opendir(file.str().c_str())) != NULL) {
-		loc_iter it = find_location();
-		closedir(dir);
-		if (it->autoindex == ON) {
-			std::string str = file.str();
-			Autoindex autoi(str);
-			body << autoi.getBody() << "\r\n\r\n";
-		}
+	if (req.type == "GET" && format == DIRC && this->autoindex == ON) {
+			Autoindex autoIn(file);
+			body << autoIn.getBody() << "\r\n\r\n";
 	}
 	else if (req.type != "DELETE")
 	{
-		if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
-			std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
+		if ((fd = open(file.c_str(), O_RDONLY)) < 0) {
+			std::cout << "CAN'T OPEN FILE: " << file << std::endl;
 			if (errno == EACCES)
-				error_page(403);
+				return (error_page(403));
 			else if (errno == ENOENT)
-				error_page(404);
-			return (-1);
+				return (error_page(404));
 		}
-		if (get_format(file.str()) == TEXT)
+		if (format == TEXT && loc.exec != "")
+			body << res_body << "\r\n\r\n";
+		else if (format == TEXT)
 		{
-			if(loc.exec != "")                             // ngonzo
-				body << res_body;                          //
-			else {                                         // ngonzo
-				while ((res = read(fd, buff, 99999)) > 0) {
-					buff[res] = '\0';
-					body << buff;
-				}
-			}                                              // ngonzo
+			while ((res = read(fd, buff, 99999)) > 0) {
+				buff[res] = '\0';
+				body << buff;
+			}
 			body << "\r\n\r\n";
-			close(fd);
 			if (res < 0) {
 				std::cout << "CAN'T READ FILE\n";
-				return (-1);
+				return (error_page(500));
 			}
+			else
+				close(fd);
 		}
 		else
 		{
-			close(fd);
-			image.open(file.str(), std::ifstream::binary);
-			// if (!image.is_open()) {
-			// 	std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
-			// 	return (-1);
-			// }
+			image.open(file, std::ifstream::binary);
 			body << image.rdbuf() << "\r\n\r\n";
 			image.clear();
 			image.close();
@@ -202,7 +222,7 @@ int			Response::create_response(const Location& loc)
 
 	response << req.version << " 200 OK\r\n"
 	<< "Version: " << req.version << "\r\n"
-	<< get_headers(file.str());
+	<< get_headers(file);
     if (req.type != "DELETE")
 	{
         response << "Content-Length: " << body.str().length()
@@ -240,9 +260,6 @@ Response::loc_iter	Response::find_location()
 
 void		Response::find_method()
 {
-	loc_iter it;
-
-	it = find_location();
 	if (req.type == "GET")
 		this->method_GET();
 	else if (req.type == "DELETE")
@@ -255,19 +272,28 @@ void		Response::find_method()
 
 int					Response::get_format(std::string str)
 {
-	if (str.find(".png") != std::string::npos || \
-	str.find(".PNG") != std::string::npos || \
-	str.find(".ico") != std::string::npos || \
-	str.find(".jpeg") != std::string::npos || \
-	str.find(".jpg") != std::string::npos)
+	DIR* dir;
+
+	if ((dir = opendir(str.c_str())) != NULL) 
 	{
-		std::cout << "IMAGE\n";
-		return (IMAGE);
+		closedir(dir);
+		format = DIRC;
 	}
-	else if (str.find(".ttf") != std::string::npos ||
+	else if (str.find(".png") != std::string::npos || \
+		str.find(".PNG") != std::string::npos || \
+		str.find(".ico") != std::string::npos || \
+		str.find(".jpeg") != std::string::npos || \
+		str.find(".jpg") != std::string::npos) 
+	{
+		format = IMAGE;
+	}
+	else if (str.find(".ttf") != std::string::npos || \
 			str.find(".otf") != std::string::npos)
-		return (FONT);
-	return (TEXT);
+		format = FONT;
+	else
+		format = TEXT;
+	
+	return (format);
 }
 
 std::string			Response::get_headers(std::string str)
@@ -275,20 +301,19 @@ std::string			Response::get_headers(std::string str)
 	std::stringstream headers;
 	time_t raw;
 	time(&raw);
+	size_t i;
 	
-	int i = str.rfind(".") + 1;
-	content_type = str.substr(i, str.size() - i);
-	loc_iter it = find_location();                  // ngozno
-	if(content_type == "py" and it->exec != "")     //
-		content_type = "html";                      // ngozno
-	std::cout << content_type << std::endl;
-	if (str.rfind(".") == str.npos)
+	if ((i = str.rfind(".")) != str.npos)
+		content_type = str.substr(i + 1, str.size() - i + 1);
+	if((content_type == "py" || content_type == "php") && it->exec != "")
+		content_type = "html";
+	if (format == DIRC)
 		content_type = "text/html";
-	else if (get_format(str) == TEXT)
+	else if (format == TEXT)
 		content_type = "text/" + content_type;
-	else if (get_format(str) == IMAGE)
+	else if (format == IMAGE)
 		content_type = "image/" + content_type;
-	else 
+	else if (format == FONT)
 		content_type = "font/" + content_type;
 	headers << "Server: DreamTeam/1.0.1 (School 21)\r\n"
 	<< "Date: " << ctime(&raw)
@@ -300,15 +325,23 @@ std::string			Response::get_headers(std::string str)
 std::string			Response::get_path(const Location& loc)
 {
 	std::stringstream str;
-	loc_iter it = find_location();
 	int pos = it->location.size();
 	int len = req.resource.size();
 
-	if (req.resource == loc.location && req.type != "DELETE")
-		str << loc.root << "/" << loc.index;
-	else
+	if (it->location[pos - 1] != '/')
+		pos++;
+	
+	if (req.resource == loc.location && req.type != "DELETE") {
+		if (this->autoindex == OFF)
+			str << loc.root << "/" << loc.index;
+		else
+			str << loc.root;
+	}
+	else {
 		str << loc.root << "/"
 		<< req.resource.substr(pos, len - pos);
+	}
+	get_format(str.str());
 	return str.str();
 }
 
@@ -326,53 +359,41 @@ void			Response::erase_answer(int i)
 
 int			Response::method_GET()
 {
-	int i = 0;
-	int comp;
-	loc_iter it;
-
-	it = find_location();
-	if (it != settings->locations.end() && check_method(it->methods, GET) == 1) {
-		if(it->exec != "")       // ngonzo
-			method_POST(it);     //
-		else                     // ngonzo
+	if (check_method(it->methods, GET) == 1) {
+		if(it->exec != "")
+			method_POST(it);
+		else
 			create_response(*it);
-		return (0);
 	}
 	else
 	{
-		std::cout << "\nBAD REQUEST\n"; // Bad request
-		if (error_page(400) == 0)
-			return (0);
+		std::cout << "\nBAD REQUEST\n";
+		error_page(400);
 	}
-	return (-1);
+	return (0);
 }
 
 int			Response::method_DELETE()
 {
 	//пока сможем удалять только из определенной папки
-	loc_iter it;
 	std::string file;
 
-	it = find_location();
 	if (check_method(it->methods, DELETE) == 1 && it->location.find("/images_for_delete/") != it->location.npos)
 	{
 		file = get_path(*it);
 		if (remove(file.c_str()) != 0)
 		{
 			std::cout << "\nFILE NOT FOUND\n"; // Bad request
-			if (error_page(404) == 0)
-				return (0);
+			return (error_page(404));
 		}
 		create_response(*it);
-		return (0);
 	}
 	else
 	{
 		std::cout << "\nPERMISSION DENIED\n";
-		if (error_page(403) == 0)
-			return (0);
+		error_page(403);
 	}
-	return (-1);
+	return (0);
 }
 
 int			Response::method_PUT()
