@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 18:29:13 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/18 19:58:05 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,19 +134,22 @@ int 	Socket::socket_read(int fd)
 		if (req.find(fd) == req.end()) //
 			req[fd] = Request();       // теперь класс запроса создается только, если его еще не существовало
 		req[fd].processRequest(str);   // иначе мы просто дозаполняем существующий
-		if (req[fd]._request_done == OK)
+		if (req[fd]._request_done == WAITING)
+			return 2;
+		else if (req[fd]._request_done == OK) 
 		{
 			Response response(req[fd], settings);
 			resp[fd] = response;
-
-			/*			Delete request from client			*/
-			req.erase(fd);
-			return 1;
 		}
 		else if (req[fd]._request_done == ERROR)
-			return (0);
+		{
+			Response response(400, settings);
+			resp[fd] = response;
+		}
 
-		return 2;
+		/*			Delete request from client			*/
+		req.erase(fd);
+		return 1;
 	}
 	else if (res < 0) {
 		std::string str = "ERROR WHEN READING FROM THE CLIENT'S FD: ";

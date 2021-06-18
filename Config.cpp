@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/17 20:17:13 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 20:57:10 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -326,26 +326,6 @@ Config::Location  *Config::parser_location()
     pos_begin = pos_end + 1;
     pos_start = pos_begin;
 
-    /*************/
-    /*   index   */ // не обязательное поле
-    /*************/
-    if ((pos_begin = _location_line.find("index")) != _location_line.npos)
-    {
-        if (pos_begin > 0 && (_location_line[pos_begin - 1] != ';'
-                                        && _location_line[pos_begin - 1] != '}'))
-        {
-            delete point_to_location;
-            throw(Config::Syntax_error());
-        }
-        pos_begin += 5;
-        if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
-        {
-            delete point_to_location;
-            throw(Config::Syntax_error());
-        }
-        (*point_to_location).index = std::string(_location_line, pos_begin, pos_end - pos_begin);
-    }
-
     /***************/
     /*   methods   */ // обязательное поле
     /***************/
@@ -434,6 +414,29 @@ Config::Location  *Config::parser_location()
             delete point_to_location;
             throw(Config::Data_error());
         }
+        pos_begin -= 9;
+        _location_line.erase(pos_begin, 9);
+        std::cout << _location_line << std::endl;
+    }
+
+    /*************/
+    /*   index   */ // не обязательное поле
+    /*************/    
+    if ((pos_begin = _location_line.find("index")) != _location_line.npos)
+    {
+        if (pos_begin > 0 && (_location_line[pos_begin - 1] != ';'
+                                        && _location_line[pos_begin - 1] != '}'))
+        {
+            delete point_to_location;
+            throw(Config::Syntax_error());
+        }
+        pos_begin += 5;
+        if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
+        {
+            delete point_to_location;
+            throw(Config::Syntax_error());
+        }
+        (*point_to_location).index = std::string(_location_line, pos_begin, pos_end - pos_begin);
     }
 
     /****************/

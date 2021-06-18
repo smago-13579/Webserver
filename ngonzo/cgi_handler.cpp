@@ -9,10 +9,13 @@ cgi_handler::cgi_handler(str filename)
 	{ _filename = filename; }
 
 // env constructor
-cgi_handler::cgi_handler(std::vector<std::string> env)
+cgi_handler::cgi_handler(std::vector<std::string> env, std::string & root)
 {
 	_parse_env(env);
-	_construct_filename(env);
+	_root = root;
+    _exec = env[12].substr(12);
+    _filename = _root + "/" + _exec;
+//    std::cout << "! _filename - " << _filename << std::endl;
 	_response_body = "EMPTY";
 	_status_code = -1;
 	_str_status_code = "EMPTY";
@@ -68,25 +71,11 @@ void		cgi_handler::_parse_env(std::vector<std::string> env)
 	for (; begin != end; ++begin, ++i)\
 		_env[i] = _string_to_char(*begin);
 	_env[i] = NULL;
-	//  // print new _env
-	//  std::cout << "@@@ - print new _env" << std::endl;
-	//  for (int i = 0; _env[i] != NULL; ++i)
-	//  	std::cout << "@ " << _env[i] << std::endl;
-	//  // print new _env end
-}
-
-void		cgi_handler::_construct_filename(std::vector<str> env)
-{
-	// _filename = "r.pwd + '/' + r.filename";
-	// _filename = "./ngonzo/cgi-bin/cgi_tester";
-	// _filename = "./ngonzo/cgi-bin/py/hello.py";
-	_filename = "/Users/ngonzo/Desktop/projects/webserv/html/cgi-bin/cgi_main.py";
-	// _filename = "./cgi-bin/cgi_main.py";
-    // int i = 0;
-    // for(; env[i].find("PATH_TRANSLATED=") == true; ++i)
-    //     std::cout << env[i] << std::endl;
-    // std::cout << env[5] << std::endl;
-//    _filename =
+//	  // print new _env
+//	  std::cout << "@@@ - print new _env" << std::endl;
+//	  for (int i = 0; _env[i] != NULL; ++i)
+//	  	std::cout << "@ " << _env[i] << std::endl;
+//	  // print new _env end
 }
 
 void		cgi_handler::_free_env()
@@ -106,18 +95,21 @@ void		cgi_handler::_parse_cgi()
 	std::string	header;
 
 	end_of_headers = _response_body.find("\r\n\r\n");
-	header = _response_body.substr(0, end_of_headers);
-	i = header.find("Status: ") + 8;
-	if(header[i] >= '0' and header[i] <= '9')
-	{
-		for(; header[i] >= '0' and header[i] <= '9'; ++i)
-			_status_code = _status_code * 10 + (header[i] - '0');
-		++i;
-		j = header.find("\r\n", i) - i;
-		_str_status_code = header.substr(i, j);
-		_str_content_type = header.substr(j + i + 2, header.size() - 2);
-		_response_body.erase(0, end_of_headers + 4);
-	}
+
+//	header = _response_body.substr(0, end_of_headers);
+//	i = header.find("Status: ") + 8;
+//	if(header[i] >= '0' and header[i] <= '9')
+//	{
+//		for(; header[i] >= '0' and header[i] <= '9'; ++i)
+//			_status_code = _status_code * 10 + (header[i] - '0');
+//		++i;
+//		j = header.find("\r\n", i) - i;
+//		_str_status_code = header.substr(i, j);
+//		_str_content_type = header.substr(j + i + 2, header.size() - 2);
+//		_response_body.erase(0, end_of_headers + 4);
+//	}
+
+    _response_body.erase(0, end_of_headers + 4);
 }
 
 void		cgi_handler::_test_write_to_file()
@@ -151,16 +143,7 @@ bool		cgi_handler::_restore_fd_and_close(int pipe[2], int save[2])
 std::string const		cgi_handler::get_filename() const
 	{ return _filename; }
 
-//void					cgi_handler::set_filename(str filename)
-//{
-//	_response_body.clear();
-//	if(filename[0] == '/' or filename.find("./") == 0)
-//		_filename = filename;
-//	else
-//		_construct_filename();
-//}
-
-std::string const	cgi_handler::get_response_body() const
+ std::string const	cgi_handler::get_response_body() const
 	{ return _response_body; }
 
 int const			cgi_handler::get_status_code() const
@@ -175,6 +158,13 @@ std::string const	cgi_handler::get_str_status_code() const
 // // // --- --- --- --- --- methods --- --- --- --- --- // // //
 
 bool		cgi_handler::execute()
+{
+    if(_exec == "cgi_tester")
+        return execute_tester();
+    return execute_pipe();
+}
+
+bool		cgi_handler::execute_pipe()
 {
 	int		fd_pipe[2], fd_save[2], tmp;
 	char	buff[buffer_size];
@@ -202,4 +192,49 @@ bool		cgi_handler::execute()
 	// _test_write_to_file();						// for test
 	// std::cout << _response_body << std::endl;	// for test
 	return true;
+}
+
+bool		cgi_handler::execute_tester()
+{
+    int		fd[2], fd_save[2], tmp;
+    char	buff[buffer_size];
+
+    std::ofstream   temp(_root + "/temp");
+    temp.open(_root + "/temp");
+
+    fd[0] = open(std::string(_root + "/_input_data").c_str(), O_RDONLY);
+    fd[1] = open(std::string(_root + "/temp").c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
+
+    fd_save[0] = dup(0);	// для чтения
+    fd_save[1] = dup(1);	// для записи
+    if (fork() == 0)
+    {
+        dup2(fd[0], 0);
+        dup2(fd[1], 1);
+        if (execve(_filename.c_str(), NULL, _env) == -1)
+        {
+            _restore_fd_and_close(fd, fd_save);
+            exit(127);
+        }
+    }
+    wait(&tmp);
+    if(WEXITSTATUS(tmp) == 127)
+        return _restore_fd_and_close(fd, fd_save);
+    _response_body.clear();
+    for(tmp = buffer_size; tmp == buffer_size ; _response_body += std::string(buff, tmp))
+        if((tmp = read(fd[0], buff, buffer_size)) == -1)
+            return _restore_fd_and_close(fd, fd_save);
+    _parse_cgi();
+    _restore_fd_and_close(fd, fd_save);
+    // _test_write_to_file();						// for test
+    // std::cout << _response_body << std::endl;	// for test
+    return true;
+}
+
+void           cgi_handler::req_body_to_fd(std::string & request_body)
+{
+    _root_req_body = _root + "/_input_data";
+    std::ofstream   req_body(_root_req_body);
+    req_body << request_body;
+//    this->_req_body << req_body;
 }

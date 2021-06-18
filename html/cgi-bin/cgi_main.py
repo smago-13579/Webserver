@@ -1,9 +1,6 @@
 #!/usr/local/bin/python3
 
 import cgi
-import html
-import http.cookies
-import os
 import cgi_content as cc
 
 try:
@@ -112,9 +109,29 @@ f = open("info.txt", "w")
 f.write(str)
 f.close()
 
-
-print('Content-type: text/html\n')
-print(cc.main.format(button1=button1, button2=button2, button3=button3,
+if	str[0] == str[1] == str[2] and str[0] != " "\
+	or str[3] == str[4] == str[5] and str[3] != " "\
+	or str[6] == str[7] == str[8] and str[6] != " "\
+	or str[0] == str[3] == str[6] and str[0] != " "\
+	or str[1] == str[4] == str[7] and str[1] != " "\
+	or str[2] == str[5] == str[8] and str[2] != " "\
+	or str[0] == str[4] == str[8] and str[0] != " "\
+	or str[2] == str[4] == str[6] and str[2] != " ":
+	print('Content-type: text/html\r\n\r\n')
+	if(str[9] == "O"):
+		print(cc.main.format(button1=button1, button2=button2, button3=button3,
+			button4=button4, button5=button5, button6=button6,
+			button7=button7, button8=button8, button9=button9,
+			delete="New game", end=cc.end_x))
+	else:
+		print(cc.main.format(button1=button1, button2=button2, button3=button3,
 		button4=button4, button5=button5, button6=button6,
 		button7=button7, button8=button8, button9=button9,
-		delete="New game"))
+		delete="New game", end=cc.end_o))
+
+else:
+	print('Content-type: text/html\r\n\r\n')
+	print(cc.main.format(button1=button1, button2=button2, button3=button3,
+		button4=button4, button5=button5, button6=button6,
+		button7=button7, button8=button8, button9=button9,
+		delete="New game", end=""))

@@ -5,7 +5,7 @@ main = '''
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="../html/style.css">
+	<link rel="stylesheet" href="../style.css">
 	<title>Document</title>
 </head>
 <body>
@@ -15,8 +15,10 @@ main = '''
 			<p class="header_text header_text_2">webserv</p>
 		</div>
 		<div class="header_body">
-			<a class="header_btext header_body_link" href="../html/index.html">Home</a>
-			<a class="header_text header_body_link" href="../html/index.html">tictactoe</a>
+			<a class="header_btext header_body_link" href="../index.html">Index</a>
+			<a class="header_btext header_body_link" href="Home.html">Home</a>
+			<a class="header_text header_body_link" href="cgi-bin">Game</a>
+			<a class="header_text header_body_link" href="trash_page">Error</a>
 		</div>
 		<div class="header_footer">
 			<p class="header_text header_text_1">made by</p>
@@ -25,7 +27,7 @@ main = '''
 			<a class="header_text header_text_2" href="https://profile.intra.42.fr/users/ngonzo">ngonzo</a>
 		</div>
 	</header>
-	<form class="window" action="/cgi-bin/cgi_main.py">
+	<form class="window" action="cgi-bin">
 		<div class="window_row">
 			<button name="action" value="button1"><p class="simvol">{button1}</p></button>
 			<button name="action" value="button2"><p class="simvol">{button2}</p></button>
@@ -44,8 +46,22 @@ main = '''
 		<div class="window_row">
 			<button class="button_restart" name="action" value="delete">RESTART</button>
 		</div>
+		{end}
 	</form>
 </body>
 </html>
 '''
 
+end_x = '''
+<div class="end">
+	<p class="button_text">Winner X</p>
+	<button class="button_end" name="action" value="delete">RESTART</button>
+</div> 
+'''
+
+end_o = '''
+<div class="end">
+	<p class="button_text">Winner O</p>
+	<button class="button_end" name="action" value="delete">RESTART</button>
+</div> 
+'''

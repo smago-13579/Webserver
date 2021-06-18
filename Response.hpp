@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 18:47:45 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/18 19:43:16 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "webserv.hpp"
 # include "Request.hpp"
+# include "Autoindex.hpp"
 # include <algorithm>
 # include <cstdio>
 
@@ -22,12 +23,13 @@
 # define POST 1
 # define DELETE 2
 
-# define ON 1
 # define OFF 0
+# define ON 1
 
 # define TEXT 0
 # define IMAGE 1
 # define FONT 2
+# define DIRC 3
 
 class Response
 {
@@ -37,6 +39,7 @@ public:
 
 	Response();
 	Response(const Request& req, Settings set);
+	Response(int error, Settings set);
 	~Response();
 
 	Response&			operator=(const Response& tmp);
@@ -45,12 +48,17 @@ public:
 	std::string			get_response();
 	
 private:
+	int					autoindex;
+	int					format;
+    std::string			res_body;
 	Request				req;
 	Settings* 			settings;
 	std::string			answer;
 	std::string			content_type;
 	size_t				response_done;
 	std::string			error_500;
+    std::string         query_string;
+	loc_iter			it;
 
 	int				error_page(int i);
 	int				compare_prefix(std::string loc, std::string res);
