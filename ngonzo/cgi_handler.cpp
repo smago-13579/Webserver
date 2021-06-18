@@ -1,16 +1,23 @@
 #include "cgi_handler.hpp"
 
+// default constructor
+cgi_handler::cgi_handler()
+{ }
+
 // test constructor
 cgi_handler::cgi_handler(str filename)
 	{ _filename = filename; }
 
-// default constructor
-cgi_handler::cgi_handler()
-	{ }
-
-// filename constructor
-cgi_handler::cgi_handler(Request request, str filename = "")
-	{ _create_env(&request); set_filename(filename); }
+// env constructor
+cgi_handler::cgi_handler(std::vector<std::string> env)
+{
+	_parse_env(env);
+	_construct_filename(env);
+	_response_body = "EMPTY";
+	_status_code = -1;
+	_str_status_code = "EMPTY";
+	_str_content_type = "EMPTY";
+}
 
 // default destructor
 cgi_handler::~cgi_handler()
@@ -32,72 +39,65 @@ cgi_handler &	cgi_handler::operator=(const cgi_handler & rhs)
 
 // // // --- --- --- --- private methods --- --- --- --- // // //
 
-char *		cgi_handler::_ft_strjoin(std::string str1, std::string str2 = "", std::string str3 = "", std::string str4 = "")
+char *		cgi_handler::_string_to_char(std::string str)
 {
-	const char *	tmp;
-	char *			ret;
-	std::string		new_str = "";
-
-	new_str += str1;
-	new_str += str2;
-	new_str += str3;
-	new_str += str4;
-	tmp = new_str.c_str();
-
+	const char *	tmp = str.c_str();
+	char *			ret = new char [str.size() + 1];
 	int i = 0;
 	for(; tmp[i] != '\0'; ++i)
 		ret[i] = tmp[i];
 	ret[i] = '\0';
-	
 	return ret;
 }
 
-void		cgi_handler::_create_env(Request * request)
+void		cgi_handler::_parse_env(std::vector<std::string> env)
 {
-	// _env = new char *[18 + request->get_headers().size()];
-	_env = new char *[18 + 0];
-
-	_env[0] = _ft_strjoin("AUTH_TYPE=","anonymous");	// по умолчанию анонимус
-	_env[1] = _ft_strjoin("CONTENT_LENGTH=","");	// req.body.size(); - длина бади запроса, по умолчанию 0
-	_env[2] = _ft_strjoin("CONTENT_TYPE=","");		// req.headers["Accept"] - Accept: text/html
-	_env[3] = _ft_strjoin("GATEWAY_INTERFACE=CGI/1.1"); // 
-	_env[4] = _ft_strjoin("PATH_INFO=","");			// req.resource
-	_env[5] = _ft_strjoin("PATH_TRANSLATED=","");	// location.root + req.resource
-	_env[6] = _ft_strjoin("QUERY_STRING=","");		// 
-	_env[7] = _ft_strjoin("REMOTE_ADDR=","");		// settings->ip
-	_env[8] = _ft_strjoin("REMOTE_IDENT=","");		// req.headers["User-Agent"] + "." + req.headers["Host"]
-	_env[9] = _ft_strjoin("REMOTE_USER=","");		// req.headers["User-Agent"]
-	_env[10] = _ft_strjoin("REQUEST_METHOD=","");	// req.type
-	_env[11] = _ft_strjoin("REQUEST_URI=","");		// req.resource
-	_env[12] = _ft_strjoin("SCRIPT_NAME=","");		//
-	_env[13] = _ft_strjoin("SERVER_NAME=","");		// settings->server_name
-	_env[14] = _ft_strjoin("SERVER_PORT=","");		// settings->port
-	_env[15] = _ft_strjoin("SERVER_PROTACOL=","");	// req.version
-	_env[16] = _ft_strjoin("SERVER_SOFTWARE=webserver");
-
-	int	i = 17;
-	std::map<std::string, std::string>::const_iterator	begin, end;
-	// begin = request->get_headers().cbegin();
-	// end = request->get_headers().cend();
-	begin = end;
-	for(; begin != end; ++begin, ++i)
-		_env[i] = _ft_strjoin("HTTP_", begin->first, "=", begin->second);
+	if(env.empty())
+	{
+		_env = NULL;
+		return ;
+	}
+	//  // print env
+	//  std::cout << "!!! - print input env" << std::endl;
+	//  for (std::vector<std::string>::iterator	begin = env.begin(), end = env.end(); begin != end; ++begin)
+	//  	std::cout << "! " << *begin << std::endl;
+	//  // print env end
+	_env = new char * [env.size() + 1];
+	std::vector<std::string>::iterator	begin = env.begin(), end = env.end();
+	int									i = 0;
+	for (; begin != end; ++begin, ++i)\
+		_env[i] = _string_to_char(*begin);
 	_env[i] = NULL;
+	//  // print new _env
+	//  std::cout << "@@@ - print new _env" << std::endl;
+	//  for (int i = 0; _env[i] != NULL; ++i)
+	//  	std::cout << "@ " << _env[i] << std::endl;
+	//  // print new _env end
 }
 
-void		cgi_handler::_construct_filename()
+void		cgi_handler::_construct_filename(std::vector<str> env)
 {
-	_filename = "r.pwd + '/' + r.filename";
+	// _filename = "r.pwd + '/' + r.filename";
+	// _filename = "./ngonzo/cgi-bin/cgi_tester";
+	// _filename = "./ngonzo/cgi-bin/py/hello.py";
+	_filename = "/Users/ngonzo/Desktop/projects/webserv/html/cgi-bin/cgi_main.py";
+	// _filename = "./cgi-bin/cgi_main.py";
+    // int i = 0;
+    // for(; env[i].find("PATH_TRANSLATED=") == true; ++i)
+    //     std::cout << env[i] << std::endl;
+    // std::cout << env[5] << std::endl;
+//    _filename =
 }
 
 void		cgi_handler::_free_env()
 {
-	if(!_env)
+	if(_env == NULL)
 		return ;
 	int	i = 0;
 	for(; _env[i] != NULL; ++i)
 		delete _env[i];
 	delete _env;
+	_env = NULL;
 }
 
 void		cgi_handler::_parse_cgi()
@@ -151,14 +151,14 @@ bool		cgi_handler::_restore_fd_and_close(int pipe[2], int save[2])
 std::string const		cgi_handler::get_filename() const
 	{ return _filename; }
 
-void					cgi_handler::set_filename(str filename)
-{
-	_response_body = "";
-	if(filename[0] == '/' or filename.find("./") == 0)
-		_filename = filename;
-	else
-		_construct_filename();
-}
+//void					cgi_handler::set_filename(str filename)
+//{
+//	_response_body.clear();
+//	if(filename[0] == '/' or filename.find("./") == 0)
+//		_filename = filename;
+//	else
+//		_construct_filename();
+//}
 
 std::string const	cgi_handler::get_response_body() const
 	{ return _response_body; }
@@ -185,7 +185,7 @@ bool		cgi_handler::execute()
 	dup2(fd_pipe[0], 0);
 	dup2(fd_pipe[1], 1);
 	if (fork() == 0)
-		if(execve(_filename.c_str(), NULL, NULL) == -1) // 3 argument = _env
+		if(execve(_filename.c_str(), NULL, _env) == -1)
 		{
 			_restore_fd_and_close(fd_pipe, fd_save);
 			exit(127);
@@ -193,12 +193,13 @@ bool		cgi_handler::execute()
 	wait(&tmp);
 	if(WEXITSTATUS(tmp) == 127)
 		return _restore_fd_and_close(fd_pipe, fd_save);
+	_response_body.clear();
 	for(tmp = buffer_size; tmp == buffer_size ; _response_body += std::string(buff, tmp))
 		if((tmp = read(fd_pipe[0], buff, buffer_size)) == -1)
 			return _restore_fd_and_close(fd_pipe, fd_save);
 	_parse_cgi();
 	_restore_fd_and_close(fd_pipe, fd_save);
-	_test_write_to_file();						// for test
-	std::cout << _response_body << std::endl;	// for test
+	// _test_write_to_file();						// for test
+	// std::cout << _response_body << std::endl;	// for test
 	return true;
 }

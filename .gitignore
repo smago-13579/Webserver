@@ -1,8 +1,12 @@
 .DS_Store
+*.DS_Store
 .vscode
 a.out
 a.out.dSYM
-webserver
-ngonzo_cgi/a.out
-ngonzo_cgi/file.txt
 ngonzo/gomoku/cgi-bin/__pycache__/
+ngonzo/a.out
+ngonzo/file.txt
+webserver
+webserver.dSYM/
+.idea
+html/cgi-bin/__pycache__

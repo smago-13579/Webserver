@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/15 10:45:49 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/17 20:17:13 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 Config::Location::Location() : location(std::string()), index(std::string()),
                             methods(std::vector<size_t>()), root(std::string()),
                             autoindex(OFF), max_body(std::numeric_limits<int>::max() - 1),
-                            CGI_extension(std::string()), CGI_path(std::string())
+                            exec(std::string())
 {}
 
 Config::Server::Server() : ip(std::string()), port(int()), server_name(std::string()),
@@ -221,7 +221,7 @@ Config::Server  *Config::parser_server()
     pos_begin = 0;
     if ((pos_begin = _server_line.find("server_name")) != _server_line.npos)
     {
-        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+        if (pos_begin > 0 && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
         {
             delete point_to_serv;
@@ -242,7 +242,7 @@ Config::Server  *Config::parser_server()
     pos_begin = 0;
     if ((pos_begin = _server_line.find("error_page")) != _server_line.npos)
     {
-        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+        if (pos_begin > 0 && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
         {
             delete point_to_serv;
@@ -273,7 +273,7 @@ Config::Server  *Config::parser_server()
         if ((pos_begin = _server_line.find("location", pos_begin)) == _server_line.npos)
             break;
         count_locations++;
-        if (_server_line[pos_begin - 1] && (_server_line[pos_begin - 1] != ';'
+        if (pos_begin > 0 && (_server_line[pos_begin - 1] != ';'
                                         && _server_line[pos_begin - 1] != '}'))
         {
             delete point_to_serv;
@@ -331,7 +331,7 @@ Config::Location  *Config::parser_location()
     /*************/
     if ((pos_begin = _location_line.find("index")) != _location_line.npos)
     {
-        if (_location_line[pos_begin - 1] && (_location_line[pos_begin - 1] != ';'
+        if (pos_begin > 0 && (_location_line[pos_begin - 1] != ';'
                                         && _location_line[pos_begin - 1] != '}'))
         {
             delete point_to_location;
@@ -370,6 +370,8 @@ Config::Location  *Config::parser_location()
             if (method == "GET")
                 (*point_to_location).methods.push_back(GET);
             else if (method == "POST")
+                (*point_to_location).methods.push_back(POST);
+            else if (method == "PUT")
                 (*point_to_location).methods.push_back(POST);
             else if (method == "DELETE")
                 (*point_to_location).methods.push_back(DELETE);
@@ -416,7 +418,7 @@ Config::Location  *Config::parser_location()
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("autoindex")) != _location_line.npos)
     {
-        pos_begin += 4;
+        pos_begin += 9;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
         {
             delete point_to_location;
@@ -455,40 +457,19 @@ Config::Location  *Config::parser_location()
         }
     }
 
-    /*********************/
-    /*   CGI_extension   */ //не обязательное поле
-    /*********************/
+    /************/
+    /*   exec   */ //не обязательное поле
+    /************/
     pos_begin = pos_start;
-    if ((pos_begin = _location_line.find("CGI_extension")) != _location_line.npos)
+    if ((pos_begin = _location_line.find("exec")) != _location_line.npos)
     {
-        pos_begin += 13;
+        pos_begin += 4;
         if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
         {
             delete point_to_location;
             throw(Config::Syntax_error());
         }
-        (*point_to_location).CGI_extension = std::string(_location_line, pos_begin, pos_end - pos_begin);
-    }
-
-    /****************/
-    /*   CGI_path   */ //не обязательное поле
-    /****************/
-    pos_begin = pos_start;
-    if ((pos_begin = _location_line.find("CGI_path")) != _location_line.npos)
-    {
-        pos_begin += 8;
-        if ((pos_end = _location_line.find(";", pos_begin)) == _location_line.npos)
-        {
-            delete point_to_location;
-            throw(Config::Syntax_error());
-        }
-        (*point_to_location).CGI_path = std::string(_location_line, pos_begin, pos_end - pos_begin);
-    }
-    if (((*point_to_location).CGI_extension.empty() && !((*point_to_location).CGI_path.empty()))
-        || (!((*point_to_location).CGI_extension.empty()) && (*point_to_location).CGI_path.empty()))
-    {
-        delete point_to_location;
-        throw(Config::Missing_field());
+        (*point_to_location).exec = std::string(_location_line, pos_begin, pos_end - pos_begin);
     }
     
     return (point_to_location);
