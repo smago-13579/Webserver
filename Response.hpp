@@ -52,6 +52,7 @@ private:
 	std::string			content_type;
 	size_t				response_done;
 	std::string			error_500;
+    std::string         query_string;
 
 	int				error_page(int i);
 	int				compare_prefix(std::string loc, std::string res);

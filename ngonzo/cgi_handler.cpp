@@ -15,6 +15,7 @@ cgi_handler::cgi_handler(std::vector<std::string> env, std::string & root)
 	_root = root;
     _exec = env[12].substr(12);
     _filename = _root + "/" + _exec;
+//    std::cout << "! _filename - " << _filename << std::endl;
 	_response_body = "EMPTY";
 	_status_code = -1;
 	_str_status_code = "EMPTY";
@@ -70,11 +71,11 @@ void		cgi_handler::_parse_env(std::vector<std::string> env)
 	for (; begin != end; ++begin, ++i)\
 		_env[i] = _string_to_char(*begin);
 	_env[i] = NULL;
-	//  // print new _env
-	//  std::cout << "@@@ - print new _env" << std::endl;
-	//  for (int i = 0; _env[i] != NULL; ++i)
-	//  	std::cout << "@ " << _env[i] << std::endl;
-	//  // print new _env end
+//	  // print new _env
+//	  std::cout << "@@@ - print new _env" << std::endl;
+//	  for (int i = 0; _env[i] != NULL; ++i)
+//	  	std::cout << "@ " << _env[i] << std::endl;
+//	  // print new _env end
 }
 
 void		cgi_handler::_free_env()

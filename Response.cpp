@@ -22,6 +22,24 @@ Response::Response(const Request& req, Settings set)
 	this->response_done	= 0;
 	this->settings = &set;
 	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">Error 500</h1><h2 style=\"font-size:160%;\">Internal Server Error</h2></body></html>";
+
+    loc_iter it = find_location();
+    query_string.clear();
+    std::cout << "! it->exec - " << it->exec << std::endl;
+    std::cout << "! req.resource - " << this->req.resource << std::endl;
+    if(it->exec != "")
+    {
+         if(this->req.resource.find("?") != std::string::npos)
+        {
+            int    ind = this->req.resource.find("?");
+            query_string = this->req.resource.substr(ind + 1);
+            ind = this->req.resource.size() - query_string.size();
+            this->req.resource = this->req.resource.substr(0, ind - 1);
+        }
+    }
+    std::cout << "! req.resource - " << this->req.resource << std::endl;
+    std::cout << "! query_string - " << query_string << std::endl;
+
 	find_method();
 }
 
@@ -142,8 +160,7 @@ int			Response::create_response(const Location& loc)
 					error_page(404);
 				return (-1);
 			}
-			std::cout << "!!! " << loc.exec << std::endl;  // ngonzo
-			if(loc.exec != "")                             //
+			if(loc.exec != "")                             // ngonzo
                 body << res_body;                          //
 			else {                                         // ngonzo
                 while ((res = read(fd, buff, 99999)) > 0) {
@@ -363,12 +380,12 @@ int			Response::method_POST(loc_iter &it)
 	// }
 	// else
 	// {
-		std::cout << "!!! POST - ";                                        // for test
+//		std::cout << "!!! POST - ";                                        // for test
         std::vector<std::string>    env = cgi_env(it);
 		cgi_handler cgi(env, it->root);
 		cgi.req_body_to_fd(req.body);
 		bool check = cgi.execute();
-		std::cout << "get_filename: " << cgi.get_filename() << std::endl; // for test
+//		std::cout << "get_filename: " << cgi.get_filename() << std::endl; // for test
         // std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
         // std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
         // std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
@@ -387,20 +404,32 @@ int			Response::method_POST(loc_iter &it)
 		{
 			return (-1);// ERROR
 		}
-	// }
+//	 }
 	return (-1);// ERROR
 }
 
 std::vector<std::string>		Response::cgi_env(loc_iter &it)
 {
-	std::vector<std::string>	tmp;
+//    int             ind;
+//    std::string     query_string = "";
+//    if(it->exec != "" and (ind = req.resource.find(it->exec)) != std::string::npos)
+//    {
+//            ind += it->exec.size();
+//            query_string = req.resource.substr(ind);
+//            ind = req.resource.size() - query_string.size();
+//            req.resource = req.resource.substr(0, ind);
+//    }
+//    std::cout << "! req.resource - " << req.resource << std::endl;
+//    std::cout << "! tmp_query_string - " << query_string << std::endl;
+
+    std::vector<std::string>	tmp;
 	tmp.push_back("AUTH_TYPE=anonymous");
 	tmp.push_back("CONTENT_LENGTH=" + itoa(req.body.size()));
 	tmp.push_back("CONTENT_TYPE=" + content_type);
 	tmp.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	tmp.push_back("PATH_INFO=" + req.resource);
 	tmp.push_back("PATH_TRANSLATED=" + it->root + req.resource);
-	tmp.push_back("QUERY_STRING=");
+	tmp.push_back("QUERY_STRING=" + query_string);
 	tmp.push_back("REMOTE_ADDR=" + settings->ip);
 	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
 	tmp.push_back("REMOTE_USER=");

@@ -17,7 +17,7 @@ main = '''
 		<div class="header_body">
 			<a class="header_btext header_body_link" href="../index.html">Index</a>
 			<a class="header_btext header_body_link" href="Home.html">Home</a>
-			<a class="header_text header_body_link" href="cgi-bin/cgi_main.py">Game</a>
+			<a class="header_text header_body_link" href="cgi-bin">Game</a>
 			<a class="header_text header_body_link" href="trash_page">Error</a>
 		</div>
 		<div class="header_footer">
@@ -27,7 +27,7 @@ main = '''
 			<a class="header_text header_text_2" href="https://profile.intra.42.fr/users/ngonzo">ngonzo</a>
 		</div>
 	</header>
-	<form class="window" action="/cgi-bin/cgi_main.py">
+	<form class="window" action="cgi-bin">
 		<div class="window_row">
 			<button name="action" value="button1"><p class="simvol">{button1}</p></button>
 			<button name="action" value="button2"><p class="simvol">{button2}</p></button>
