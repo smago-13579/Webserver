@@ -175,11 +175,15 @@ bool		cgi_handler::execute_pipe()
 	dup2(fd_pipe[0], 0);
 	dup2(fd_pipe[1], 1);
 	if (fork() == 0)
-		if(execve(_filename.c_str(), NULL, _env) == -1)
+	{
+		char **args;
+		strcpy(args[0], _filename.c_str());
+		if(execve(_filename.c_str(), args, _env) == -1)
 		{
 			_restore_fd_and_close(fd_pipe, fd_save);
 			exit(127);
 		}
+	}
 	wait(&tmp);
 	if(WEXITSTATUS(tmp) == 127)
 		return _restore_fd_and_close(fd_pipe, fd_save);
@@ -211,7 +215,10 @@ bool		cgi_handler::execute_tester()
     {
         dup2(fd[0], 0);
         dup2(fd[1], 1);
-        if (execve(_filename.c_str(), NULL, _env) == -1)
+
+		char **args;
+		strcpy(args[0], _filename.c_str());
+        if (execve(_filename.c_str(), args, _env) == -1)
         {
             _restore_fd_and_close(fd, fd_save);
             exit(127);
