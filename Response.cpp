@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/17 21:10:43 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/18 15:52:19 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,24 @@ Response::Response(const Request& req, Settings set)
 	this->response_done	= 0;
 	this->settings = &set;
 	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">Error 500</h1><h2 style=\"font-size:160%;\">Internal Server Error</h2></body></html>";
+
+    loc_iter it = find_location();
+    query_string.clear();
+    std::cout << "! it->exec - " << it->exec << std::endl;
+    std::cout << "! req.resource - " << this->req.resource << std::endl;
+    if(it->exec != "")
+    {
+         if(this->req.resource.find("?") != std::string::npos)
+        {
+            int    ind = this->req.resource.find("?");
+            query_string = this->req.resource.substr(ind + 1);
+            ind = this->req.resource.size() - query_string.size();
+            this->req.resource = this->req.resource.substr(0, ind - 1);
+        }
+    }
+    std::cout << "! req.resource - " << this->req.resource << std::endl;
+    std::cout << "! query_string - " << query_string << std::endl;
+
 	find_method();
 }
 
@@ -123,7 +141,7 @@ int			Response::check_method(std::vector<size_t>& methods, size_t cmd)
 int			Response::create_response(const Location& loc)
 {
 	std::stringstream	response, body, file;
-	std::ifstream 		image;
+    std::ifstream 		image;
 	
 	int fd, res;
 	char buff[100000];
@@ -151,13 +169,16 @@ int			Response::create_response(const Location& loc)
 				error_page(404);
 			return (-1);
 		}
-
 		if (get_format(file.str()) == TEXT)
 		{
-			while ((res = read(fd, buff, 99999)) > 0) {
-				buff[res] = '\0';
-				body << buff;
-			}
+			if(loc.exec != "")                             // ngonzo
+				body << res_body;                          //
+			else {                                         // ngonzo
+				while ((res = read(fd, buff, 99999)) > 0) {
+					buff[res] = '\0';
+					body << buff;
+				}
+			}                                              // ngonzo
 			body << "\r\n\r\n";
 			close(fd);
 			if (res < 0) {
@@ -182,9 +203,9 @@ int			Response::create_response(const Location& loc)
 	response << req.version << " 200 OK\r\n"
 	<< "Version: " << req.version << "\r\n"
 	<< get_headers(file.str());
-	if (req.type != "DELETE") 
+    if (req.type != "DELETE")
 	{
-		response << "Content-Length: " << body.str().length()
+        response << "Content-Length: " << body.str().length()
 		<< "\r\n\r\n" << body.str();
 	}
 	this->answer = response.str();
@@ -257,6 +278,9 @@ std::string			Response::get_headers(std::string str)
 	
 	int i = str.rfind(".") + 1;
 	content_type = str.substr(i, str.size() - i);
+	loc_iter it = find_location();                  // ngozno
+	if(content_type == "py" and it->exec != "")     //
+		content_type = "html";                      // ngozno
 	std::cout << content_type << std::endl;
 	if (str.rfind(".") == str.npos)
 		content_type = "text/html";
@@ -266,7 +290,6 @@ std::string			Response::get_headers(std::string str)
 		content_type = "image/" + content_type;
 	else 
 		content_type = "font/" + content_type;
-
 	headers << "Server: DreamTeam/1.0.1 (School 21)\r\n"
 	<< "Date: " << ctime(&raw)
 	<< "Content-Type: " << content_type << "\r\n";
@@ -309,7 +332,10 @@ int			Response::method_GET()
 
 	it = find_location();
 	if (it != settings->locations.end() && check_method(it->methods, GET) == 1) {
-		create_response(*it);
+		if(it->exec != "")       // ngonzo
+			method_POST(it);     //
+		else                     // ngonzo
+			create_response(*it);
 		return (0);
 	}
 	else
@@ -372,43 +398,56 @@ int			Response::method_POST(loc_iter &it)
 	// }
 	// else
 	// {
-		std::cout << "!!! POST" << std::endl; // for test
-		cgi_handler cgi(cgi_env(it));
-		// std::cout << "get_filename: " << cgi.get_filename() << std::endl;					// for test
-		// std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
-		// std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
-		// std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
-		// std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
+//		std::cout << "!!! POST - ";                                        // for test
+        std::vector<std::string>    env = cgi_env(it);
+		cgi_handler cgi(env, it->root);
 		cgi.req_body_to_fd(req.body);
 		bool check = cgi.execute();
+//		std::cout << "get_filename: " << cgi.get_filename() << std::endl; // for test
+        // std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
+        // std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
+        // std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
+        // std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
 		if (check == true)
 		{
-			req.body = cgi.get_response_body();
-			// req.status_code_int_val = cgi.get_status_code();
-			// req.reason_phrase = cgi.get_str_status_code();
-			// req.headers.add_header("Content-Type", cgi.get_str_content_type());
-			// req.headers.add_header("Content-Length", std::to_string(cgi.get_response_body().size()));
+            res_body = cgi.get_response_body();
+            create_response(*it);
+//            req.status_code_int_val = cgi.get_status_code();
+//            req.reason_phrase = cgi.get_str_status_code();
+//            req.headers.add_header("Content-Type", cgi.get_str_content_type());
+//            req.headers.add_header("Content-Length", std::to_string(cgi.get_response_body().size()));
 			return (0);
 		}
 		else
 		{
 			return (-1);// ERROR
 		}
-	// }
+//	 }
 	return (-1);// ERROR
 }
 
 std::vector<std::string>		Response::cgi_env(loc_iter &it)
 {
-	std::vector<std::string>	tmp;
+//    int             ind;
+//    std::string     query_string = "";
+//    if(it->exec != "" and (ind = req.resource.find(it->exec)) != std::string::npos)
+//    {
+//            ind += it->exec.size();
+//            query_string = req.resource.substr(ind);
+//            ind = req.resource.size() - query_string.size();
+//            req.resource = req.resource.substr(0, ind);
+//    }
+//    std::cout << "! req.resource - " << req.resource << std::endl;
+//    std::cout << "! tmp_query_string - " << query_string << std::endl;
+
+    std::vector<std::string>	tmp;
 	tmp.push_back("AUTH_TYPE=anonymous");
 	tmp.push_back("CONTENT_LENGTH=" + itoa(req.body.size()));
 	tmp.push_back("CONTENT_TYPE=" + content_type);
 	tmp.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	tmp.push_back("PATH_INFO=" + req.resource);
 	tmp.push_back("PATH_TRANSLATED=" + it->root + req.resource);
-	tmp.push_back("QUERY_STRING=");
-	tmp.push_back("ROOT=" + it->root);
+	tmp.push_back("QUERY_STRING=" + query_string);
 	tmp.push_back("REMOTE_ADDR=" + settings->ip);
 	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
 	tmp.push_back("REMOTE_USER=");

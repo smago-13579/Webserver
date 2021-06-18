@@ -46,12 +46,14 @@ public:
 	std::string			get_response();
 	
 private:
+    std::string			res_body;
 	Request				req;
 	Settings* 			settings;
 	std::string			answer;
 	std::string			content_type;
 	size_t				response_done;
 	std::string			error_500;
+    std::string         query_string;
 
 	int				error_page(int i);
 	int				compare_prefix(std::string loc, std::string res);

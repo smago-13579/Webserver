@@ -112,8 +112,7 @@ f = open("info.txt", "w")
 f.write(str)
 f.close()
 
-
-print('Content-type: text/html\n')
+print('Content-type: text/html\r\n\r\n')
 print(cc.main.format(button1=button1, button2=button2, button3=button3,
 		button4=button4, button5=button5, button6=button6,
 		button7=button7, button8=button8, button9=button9,
