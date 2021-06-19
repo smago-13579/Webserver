@@ -399,11 +399,10 @@ int			Response::method_DELETE()
 int			Response::method_PUT(const Request& req)
 {
 	std::string file_path = get_path(*it);
-	std::string file_name = std::string(file_path, file_path.rfind("/") + 1, file_path.npos - file_path.rfind("/") - 1);
-	if (check_method(it->methods, PUT) == 1 && it->location.find("/images_for_delete/") != it->location.npos)
+	if (check_method(it->methods, PUT) == 1 && file_path.find("/images_for_delete/") != file_path.npos)
 	{
 		std::ofstream file;
-		file.open(file_name);
+		file.open(file_path);
 		if (file.is_open())
 		{
 			file << req.body;

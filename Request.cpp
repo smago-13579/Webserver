@@ -92,12 +92,14 @@ void 	Request::processRequest(std::string &str)
 			buf.clear();
 			_body_size = 0;
 		}
-		else if (_body_size > 0 && buf.length() == _body_size)
+		else if (_body_size > 0 && buf.length() >= _body_size)
 		{
-			body = buf;
+			body = std::string(buf, 0, _body_size);
 			buf.clear();
 			_body_size = 0;
-		}}
+		}
+		std::cout << buf << std::endl;
+		}
 	/*************/
 	/*   check   */
 	/*************/
@@ -217,10 +219,11 @@ bool	Request::find_body()
 	if (headers.find("Content-Length") != headers.end())
 	{
 		_body_size = atoi((headers["Content-Length"]).c_str());
-		if (_body_size < 0 /* добавить сравнение с max_body*/)
+		if (_body_size < 0)
 		{	
 			_request_done = ERROR;
 			_body_size = 0;
+			// std::cout << "here" << std::endl;
 		}
 		return (true);
 	}

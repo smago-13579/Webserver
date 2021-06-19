@@ -214,7 +214,10 @@ bool		cgi_handler::execute_tester()
 	{
 		dup2(fd[0], 0);
 		dup2(fd[1], 1);
-		if (execve(_filename.c_str(), NULL, _env) == -1)
+		char **args;
+		std::string file(_filename.c_str());
+		strcpy(args[0], file.c_str());
+		if (execve(_filename.c_str(), args, _env) == -1)
 		{
 			_restore_fd_and_close(fd, fd_save);
 			exit(127);
