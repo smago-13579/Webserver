@@ -2,23 +2,23 @@
 # include "../Autoindex.hpp"
 # include <unistd.h>
 
-void    location(std::vector<Config::Location> &loc)
-{
-    for (std::vector<Config::Location>::iterator it = loc.begin(); it != loc.end(); it++)
-    {
-        std::cout << "  location: " << it->location << std::endl;
-        std::cout << "  index: " << it->index << std::endl;
-        std::cout << "  methods: " << std::endl;
-        for (std::vector<size_t>::iterator it_m = (it->methods).begin(); it_m != (it->methods).end(); it_m++)
-            std::cout << "    " << *it_m << std::endl;
-        std::cout << "  root: " << it->root << std::endl;
-        std::cout << "  autoindex: " << it->autoindex << std::endl;
-        std::cout << "  max body: " << it->max_body << std::endl;
-        std::cout << "  CGI_extension: " << it->CGI_extension << std::endl;
-        std::cout << "  CGI_path: " << it->CGI_path << std::endl;
-        std::cout << std::endl;
-    }
-}
+// void    location(std::vector<Config::Location> &loc)
+// {
+//     for (std::vector<Config::Location>::iterator it = loc.begin(); it != loc.end(); it++)
+//     {
+//         std::cout << "  location: " << it->location << std::endl;
+//         std::cout << "  index: " << it->index << std::endl;
+//         std::cout << "  methods: " << std::endl;
+//         for (std::vector<size_t>::iterator it_m = (it->methods).begin(); it_m != (it->methods).end(); it_m++)
+//             std::cout << "    " << *it_m << std::endl;
+//         std::cout << "  root: " << it->root << std::endl;
+//         std::cout << "  autoindex: " << it->autoindex << std::endl;
+//         std::cout << "  max body: " << it->max_body << std::endl;
+//         std::cout << "  CGI_extension: " << it->CGI_extension << std::endl;
+//         std::cout << "  CGI_path: " << it->CGI_path << std::endl;
+//         std::cout << std::endl;
+//     }
+// }
 
 int main(int argc, char **argv)
 {
