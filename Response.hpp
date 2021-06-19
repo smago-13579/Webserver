@@ -22,6 +22,7 @@
 # define GET 0
 # define POST 1
 # define DELETE 2
+# define PUT 3
 
 # define OFF 0
 # define ON 1

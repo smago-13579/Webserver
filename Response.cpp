@@ -398,6 +398,49 @@ int			Response::method_DELETE()
 
 int			Response::method_PUT()
 {
+	//в location будет указан файл, который нужно обновить или создать,
+	//соответственно, мне нужно его имя и место нахождения
+	std::string file_path = get_path(*it);
+	std::string file_name = std::string(file_path, file_path.rfind("/") + 1, file_path.npos - file_path.rfind("/") - 1);
+	if (check_method(it->methods, PUT) == 1 && it->location.find("/images_for_delete/") != it->location.npos)
+	{
+		std::ifstream exist_file(file_path);
+		if (exist_file.is_open())
+		{
+			exist_file.close();
+			std::ofstream file(file_path, std::ofstream::out);
+			if (file.is_open())
+			{
+				file << "lorem ipsum";
+				file.close();
+			}
+			else
+			{
+				//ошибочка
+
+			}
+		}
+		else
+		{
+			std::ofstream file;
+			if (file.is_open())
+			{
+				file << "lorem ipsum";
+				file.close();
+			}
+			else
+			{
+				//ошибочка
+			}
+		}
+		create_response(*it);//нужен свой ответ
+	}
+	else
+	{
+		std::cout << "\nPERMISSION DENIED\n";
+		error_page(403);
+	}
+	return (0);
 	return 0;
 }
 
