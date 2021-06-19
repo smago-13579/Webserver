@@ -352,7 +352,7 @@ Config::Location  *Config::parser_location()
             else if (method == "POST")
                 (*point_to_location).methods.push_back(POST);
             else if (method == "PUT")
-                (*point_to_location).methods.push_back(POST);
+                (*point_to_location).methods.push_back(PUT);
             else if (method == "DELETE")
                 (*point_to_location).methods.push_back(DELETE);
             else

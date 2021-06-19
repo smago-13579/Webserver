@@ -8,6 +8,9 @@
 # include <fstream>
 # include <string>
 # include <vector>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <cstring>
 
 # define buffer_size 1024
 
