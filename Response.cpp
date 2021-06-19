@@ -171,7 +171,7 @@ int			Response::check_method(std::vector<size_t>& methods, size_t cmd)
 	return (0);
 }
 
-int			Response::create_response(const Location& loc)
+int			Response::create_response(const Location& loc, std::string status)
 {
 	std::stringstream	response, body;
     std::ifstream 		image;
@@ -186,7 +186,7 @@ int			Response::create_response(const Location& loc)
 			Autoindex autoIn(file);
 			body << autoIn.getBody() << "\r\n\r\n";
 	}
-	else if (req.type != "DELETE")
+	else if (req.type != "DELETE" && req.type != "PUT")
 	{
 		if ((fd = open(file.c_str(), O_RDONLY)) < 0) {
 			std::cout << "CAN'T OPEN FILE: " << file << std::endl;
@@ -220,10 +220,10 @@ int			Response::create_response(const Location& loc)
 		}
 	}
 
-	response << req.version << " 200 OK\r\n"
+	response << req.version << status
 	<< "Version: " << req.version << "\r\n"
-	<< get_headers(file);
-    if (req.type != "DELETE")
+	<< get_headers(file, req.type, req.resource);
+    if (req.type != "DELETE" && req.type != "PUT")
 	{
         response << "Content-Length: " << body.str().length()
 		<< "\r\n\r\n" << body.str();
@@ -296,7 +296,7 @@ int					Response::get_format(std::string str)
 	return (format);
 }
 
-std::string			Response::get_headers(std::string str)
+std::string			Response::get_headers(std::string str, std::string type, std::string location)
 {
 	std::stringstream headers;
 	time_t raw;
@@ -316,8 +316,11 @@ std::string			Response::get_headers(std::string str)
 	else if (format == FONT)
 		content_type = "font/" + content_type;
 	headers << "Server: DreamTeam/1.0.1 (School 21)\r\n"
-	<< "Date: " << ctime(&raw)
-	<< "Content-Type: " << content_type << "\r\n";
+	<< "Date: " << ctime(&raw);
+	if (req.type != "PUT")
+		headers << "Content-Type: " << content_type << "\r\n";
+	else
+		headers << "Content-Location: " << location << "\r\n";
 
 	return (headers.str());
 }
@@ -375,7 +378,6 @@ int			Response::method_GET()
 
 int			Response::method_DELETE()
 {
-	//пока сможем удалять только из определенной папки
 	std::string file;
 
 	if (check_method(it->methods, DELETE) == 1 && it->location.find("/images_for_delete/") != it->location.npos)
@@ -383,7 +385,7 @@ int			Response::method_DELETE()
 		file = get_path(*it);
 		if (remove(file.c_str()) != 0)
 		{
-			std::cout << "\nFILE NOT FOUND\n"; // Bad request
+			std::cout << "\nFILE NOT FOUND\n";
 			return (error_page(404));
 		}
 		create_response(*it);
@@ -398,21 +400,33 @@ int			Response::method_DELETE()
 
 int			Response::method_PUT(const Request& req)
 {
+	std::string status = " 200 OK\r\n";
+
 	std::string file_path = get_path(*it);
 	if (check_method(it->methods, PUT) == 1 && file_path.find("/images_for_delete/") != file_path.npos)
 	{
+		std::ifstream exist_file(file_path);
+		if (exist_file.is_open())
+		{
+			status = " 204 No Content\r\n";
+			exist_file.close();
+		}
+		else
+			status = " 201 Created\r\n";
+		
 		std::ofstream file;
 		file.open(file_path);
 		if (file.is_open())
 		{
 			file << req.body;
 			file.close();
+			create_response(*it, status);
 		}
 		else
 		{
-			//ошибочка
+			std::cout << "\nFILE NOT OPENED\n";
+			error_page(500);
 		}
-		create_response(*it);//нужен свой ответ
 	}
 	else
 	{
