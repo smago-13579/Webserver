@@ -51,7 +51,7 @@ Response::Response(const Request& req, Settings set)
     std::cout << "! query_string - " << query_string << std::endl;
 	/*				ngonzo						*/
 
-	find_method();
+	find_method(req);
 }
 
 Response::Response(int error, Settings set)
@@ -258,14 +258,14 @@ Response::loc_iter	Response::find_location()
 	return (itn);
 }
 
-void		Response::find_method()
+void		Response::find_method(const Request& req)
 {
 	if (req.type == "GET")
 		this->method_GET();
 	else if (req.type == "DELETE")
 		this->method_DELETE();
 	else if (req.type == "PUT")
-		this->method_PUT();
+		this->method_PUT(req);
 	else if (req.type == "POST")
 		this->method_POST(it);
 }
@@ -396,42 +396,22 @@ int			Response::method_DELETE()
 	return (0);
 }
 
-int			Response::method_PUT()
+int			Response::method_PUT(const Request& req)
 {
-	//в location будет указан файл, который нужно обновить или создать,
-	//соответственно, мне нужно его имя и место нахождения
 	std::string file_path = get_path(*it);
 	std::string file_name = std::string(file_path, file_path.rfind("/") + 1, file_path.npos - file_path.rfind("/") - 1);
 	if (check_method(it->methods, PUT) == 1 && it->location.find("/images_for_delete/") != it->location.npos)
 	{
-		std::ifstream exist_file(file_path);
-		if (exist_file.is_open())
+		std::ofstream file;
+		file.open(file_name);
+		if (file.is_open())
 		{
-			exist_file.close();
-			std::ofstream file(file_path, std::ofstream::out);
-			if (file.is_open())
-			{
-				file << "lorem ipsum";
-				file.close();
-			}
-			else
-			{
-				//ошибочка
-
-			}
+			file << req.body;
+			file.close();
 		}
 		else
 		{
-			std::ofstream file;
-			if (file.is_open())
-			{
-				file << "lorem ipsum";
-				file.close();
-			}
-			else
-			{
-				//ошибочка
-			}
+			//ошибочка
 		}
 		create_response(*it);//нужен свой ответ
 	}
@@ -441,7 +421,6 @@ int			Response::method_PUT()
 		error_page(403);
 	}
 	return (0);
-	return 0;
 }
 
 int			Response::method_POST(loc_iter &it)
