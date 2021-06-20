@@ -130,7 +130,7 @@ void    Request::filling_start_line()
 	}
 
     if (type.empty() || resource.empty() || version.empty())
-		_request_done = ERROR; //в этом случае нужно сразу показывать ошибку
+		_request_done = ERROR;
 }
 
 void    Request::filling_headers()
@@ -148,7 +148,10 @@ void    Request::filling_headers()
     {
 		key_val_str = std::string(new_str, pos_begin, pos_end - pos_begin);
 		if ((pos_points = key_val_str.find(": ")) == key_val_str.npos)
+		{
 			_request_done = ERROR;
+			return ;
+		}
 		key = std::string(key_val_str, 0, pos_points);
 		pos_points += 2;
 		val = std::string(key_val_str, pos_points, key_val_str.npos - pos_points);
@@ -157,7 +160,10 @@ void    Request::filling_headers()
     }
 	key_val_str = std::string(new_str, pos_begin, pos_end - pos_begin);
 	if ((pos_points = key_val_str.find(": ")) == key_val_str.npos)
+	{
 		_request_done = ERROR;
+		return ;
+	}
 	key = std::string(key_val_str, 0, pos_points);
 	pos_points += 2;
 	val = std::string(key_val_str, pos_points, key_val_str.npos - pos_points);
@@ -223,7 +229,6 @@ bool	Request::find_body()
 		{	
 			_request_done = ERROR;
 			_body_size = 0;
-			// std::cout << "here" << std::endl;
 		}
 		return (true);
 	}
