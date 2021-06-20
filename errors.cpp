@@ -1,6 +1,6 @@
 #include "errors.hpp"
 
-std::string &error_page(int error_num)
+std::string error_page(int error_num)
 {
     if (error_num == 400)
         return(error_400());
@@ -14,9 +14,10 @@ std::string &error_page(int error_num)
         return(error_413());
     if (error_num == 500)
         return(error_500());
+    return("");
 }
 
-std::string &error_400()
+std::string error_400()
 {
     std::string str;
     str = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
@@ -25,7 +26,7 @@ std::string &error_400()
     return (str);
 }
 
-std::string &error_403()
+std::string error_403()
 {
     std::string str;
     str = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
@@ -34,7 +35,7 @@ std::string &error_403()
     return (str);
 }
 
-std::string &error_404()
+std::string error_404()
 {
     std::string str;
     str = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
@@ -43,7 +44,7 @@ std::string &error_404()
     return (str);
 }
 
-std::string &error_405()
+std::string error_405()
 {
     std::string str;
     str = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
@@ -52,7 +53,7 @@ std::string &error_405()
     return (str);
 }
 
-std::string &error_413()
+std::string error_413()
 {
     std::string str;
     str = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
@@ -61,7 +62,7 @@ std::string &error_413()
     return (str);
 }
 
-std::string &error_500()
+std::string error_500()
 {
     std::string str;
     str = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";

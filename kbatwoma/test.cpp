@@ -1,5 +1,6 @@
 # include "../Config.hpp"
 # include "../Autoindex.hpp"
+# include "../errors.hpp"
 # include <unistd.h>
 
 // void    location(std::vector<Config::Location> &loc)
@@ -20,24 +21,24 @@
 //     }
 // }
 
-void    put(std::string &str)
-{
-    std::string file_path = str;
-	std::string file_name = std::string(file_path, file_path.rfind("/") + 1, file_path.npos - file_path.rfind("/") - 1);
+// void    put(std::string &str)
+// {
+//     std::string file_path = str;
+// 	std::string file_name = std::string(file_path, file_path.rfind("/") + 1, file_path.npos - file_path.rfind("/") - 1);
 	
-			std::ofstream file;
-            file.open(file_name);
-			if (file.is_open())
-			{
-				file << "hello";
-				file.close();
-			}
-			else
-			{
-                std::cout << "file not opened" << std::endl;
-				return ;
-			}
-}
+// 			std::ofstream file;
+//             file.open(file_name);
+// 			if (file.is_open())
+// 			{
+// 				file << "hello";
+// 				file.close();
+// 			}
+// 			else
+// 			{
+//                 std::cout << "file not opened" << std::endl;
+// 				return ;
+// 			}
+// }
 
 int main(int argc, char **argv)
 {
@@ -73,9 +74,15 @@ int main(int argc, char **argv)
 
 
     //put
+    // (void)argc;
+    // std::string str(argv[1]);
+    // put(str);
+
+    //errors
     (void)argc;
-    std::string str(argv[1]);
-    put(str);
+    int i = atoi(argv[1]);
+
+    std::cout << error_page(i) << std::endl;
     
     return (0);
 }
