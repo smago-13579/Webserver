@@ -24,7 +24,8 @@ Config::Location::Location() : location(std::string()), index(std::string()),
 {}
 
 Config::Server::Server() : ip(std::string()), port(int()), server_name(std::string()),
-                        error_page(std::string()), locations(std::vector<Location>())
+                        error_page(std::string()), locations(std::vector<Location>()),
+                        redirect(std::string())
 {}
 
 Config::Config(std::string config_name) : _servers(std::vector<Server>()),
@@ -234,6 +235,27 @@ Config::Server  *Config::parser_server()
             throw(Config::Syntax_error());
         }
         (*point_to_serv).server_name = std::string(_server_line, pos_begin, pos_end - pos_begin);
+    }
+
+    /****************/
+    /*   redirect   */ //не обязательный параметр 
+    /****************/
+    pos_begin = 0;
+    if ((pos_begin = _server_line.find("return301")) != _server_line.npos)
+    {
+        if (pos_begin > 0 && (_server_line[pos_begin - 1] != ';'
+                                        && _server_line[pos_begin - 1] != '}'))
+        {
+            delete point_to_serv;
+            throw(Config::Syntax_error());
+        }
+        pos_begin += 9;
+        if ((pos_end = _server_line.find(";", pos_begin)) == _server_line.npos)
+        {
+            delete point_to_serv;
+            throw(Config::Syntax_error());
+        }
+        (*point_to_serv).redirect = std::string(_server_line, pos_begin, pos_end - pos_begin);
     }
 
     /******************/
