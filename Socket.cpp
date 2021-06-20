@@ -6,7 +6,7 @@
 /*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/20 15:24:27 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/20 18:30:30 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,7 +169,7 @@ int 	Socket::socket_write(int fd)
 	response = resp[fd].get_response();
 	if (response != "")
 	{
-		std::cout << "RESPONSE: \n" << response << std::endl;
+		// std::cout << "RESPONSE: \n" << response << std::endl;
 		if ((res = send(fd, response.c_str(), response.length(), 0)) < 0) 
 		{
 			std::string str = "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";

@@ -193,6 +193,24 @@ a {
 	font-size: 13rem;
 }
 
+.jeka_php {
+	/* display: flex; */
+	justify-content: center;
+	align-items: center;
+	margin-left: 2vw;
+	font-size: 4rem;
+}
+.jeka_php_b {
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-left: 0vw;
+	font-size: 3rem;
+	border-radius: .4rem;
+}
+
 .end {
 	position: absolute;
 	margin: 0;

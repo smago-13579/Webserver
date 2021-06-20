@@ -158,6 +158,7 @@ std::string const	cgi_handler::get_str_status_code() const
 
 bool		cgi_handler::execute()
 {
+
 	if(_exec == "cgi_tester")
 		return execute_tester();
 	return execute_pipe();
@@ -186,6 +187,7 @@ bool		cgi_handler::execute_pipe()
 	for(tmp = buffer_size; tmp == buffer_size ; _response_body += std::string(buff, tmp))
 		if((tmp = read(fd_pipe[0], buff, buffer_size)) == -1)
 			return _restore_fd_and_close(fd_pipe, fd_save);
+
 	_parse_cgi();
 	_restore_fd_and_close(fd_pipe, fd_save);
 	// _test_write_to_file();						// for test
@@ -229,7 +231,7 @@ bool		cgi_handler::execute_tester()
 	_parse_cgi();
 	_restore_fd_and_close(fd, fd_save);
 	// _test_write_to_file();						// for test
-	std::cout << _response_body << std::endl;	// for test
+	// std::cout << _response_body << std::endl;	// for test
 	return true;
 }
 

@@ -6,7 +6,7 @@
 /*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/20 15:32:20 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/20 18:53:00 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,10 +174,10 @@ int			Response::check_method(std::vector<size_t>& methods, size_t cmd)
 int			Response::create_response(const Location& loc)
 {
 	std::stringstream	response, body;
-    std::ifstream 		image;
+	std::ifstream 		image;
 	std::string			file;
-	int 				fd, res;
-	char 				buff[100000];
+	int					fd, res;
+	char				buff[100000];
 
 	file = get_path(loc);
 	std::cout << "FILE: " << file << std::endl;
@@ -412,11 +412,11 @@ int			Response::method_POST(loc_iter &it)
 		std::cout << "\n! body.size > max_body\n";                    // for test
 		error_page(413);
 	}
-	else if(req.body.empty() and query_string.empty())
-	{
-		std::cout << "\n! body.size == max_body\n";                   // for test
-		create_response(*it);
-	}
+	// else if(req.body.empty() and query_string.empty())
+	// {
+	// 	std::cout << "\n! body.size == max_body\n";                   // for test
+	// 	create_response(*it);
+	// }
 	else
 	{
 		std::cout << "\n! POST \n";                                        // for test
@@ -432,7 +432,8 @@ int			Response::method_POST(loc_iter &it)
 		}
 		else
 		{
-			error_page(500);
+			std::cout << "\n! WHAT? \n";                                        // for test
+			error_page(400);
 			return -1;
 		}
 	}
