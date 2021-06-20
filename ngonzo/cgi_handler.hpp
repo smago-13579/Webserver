@@ -23,10 +23,10 @@ private:
 	int		_status_code;
 	str		_str_status_code;
 	str		_str_content_type;
-    str		_root;
-    str     _exec;
-    std::ofstream   _req_body;
-    str		_root_req_body;
+	str		_root;
+	str		_exec;
+	std::ofstream	_req_body;
+	str		_root_req_body;
 
 
 	// private methods
@@ -55,9 +55,9 @@ public:
 
 	// methods
 	bool	execute();
-    bool	execute_pipe();
-    bool	execute_tester();
-    void    req_body_to_fd(str & request_body);
+	bool	execute_pipe();
+	bool	execute_tester();
+	void	req_body_to_fd(str & request_body);
 
 };
 

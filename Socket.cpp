@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/18 19:58:05 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/20 15:24:27 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ int		Socket::create()
 	fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 
 	/*		LISTEN MODE						*/
-	if (listen(socket_fd, 16) < 0) {		// the Queue could be much longer (about 1000)
+	if (listen(socket_fd, 1000) < 0) {		// the Queue could be much longer (about 1000)
 		std::string str = "LISTEN ERROR: ";
 		std::cout << str << strerror(errno);
 		return (1);
@@ -169,7 +169,7 @@ int 	Socket::socket_write(int fd)
 	response = resp[fd].get_response();
 	if (response != "")
 	{
-		// std::cout << "RESPONSE: \n" << response << std::endl;
+		std::cout << "RESPONSE: \n" << response << std::endl;
 		if ((res = send(fd, response.c_str(), response.length(), 0)) < 0) 
 		{
 			std::string str = "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";

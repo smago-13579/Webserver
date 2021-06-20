@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/18 20:00:52 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/20 15:32:20 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,21 +34,17 @@ Response::Response(const Request& req, Settings set)
 	this->content_type = "";
 
 	/*				ngonzo						*/
-    query_string.clear();
-    std::cout << "! it->exec - " << it->exec << std::endl;
-    std::cout << "! req.resource - " << this->req.resource << std::endl;
-    if(it->exec != "")
-    {
-         if(this->req.resource.find("?") != std::string::npos)
-        {
-            int    ind = this->req.resource.find("?");
-            query_string = this->req.resource.substr(ind + 1);
-            ind = this->req.resource.size() - query_string.size();
-            this->req.resource = this->req.resource.substr(0, ind - 1);
-        }
-    }
-    std::cout << "! req.resource - " << this->req.resource << std::endl;
-    std::cout << "! query_string - " << query_string << std::endl;
+	query_string.clear();
+	if(it->exec != "")
+	{
+		int ind = this->req.resource.find("?");
+		if(ind != std::string::npos)
+		{
+			query_string = this->req.resource.substr(ind + 1);
+			ind = this->req.resource.size() - query_string.size();
+			this->req.resource = this->req.resource.substr(0, ind - 1);
+		}
+	}
 	/*				ngonzo						*/
 
 	find_method();
@@ -141,6 +137,10 @@ std::string			Response::status_codes(int i)
 		str = " Forbidden\r\n";
 	else if (i == 404)
 		str = " Not Found\r\n";
+	else if (i == 405)							// ngonzo
+		str = " Method Not Allowed\r\n";		// ngonzo
+	else if (i == 413)							// ngonzo
+		str = " Payload Too Large\r\n";			// ngonzo
 	else if (i == 500)
 		str = " Internal Server Error\r\n";
 
@@ -208,8 +208,6 @@ int			Response::create_response(const Location& loc)
 				std::cout << "CAN'T READ FILE\n";
 				return (error_page(500));
 			}
-			else
-				close(fd);
 		}
 		else
 		{
@@ -218,6 +216,7 @@ int			Response::create_response(const Location& loc)
 			image.clear();
 			image.close();
 		}
+		close(fd);			// ngonzo
 	}
 
 	response << req.version << " 200 OK\r\n"
@@ -268,6 +267,8 @@ void		Response::find_method()
 		this->method_PUT();
 	else if (req.type == "POST")
 		this->method_POST(it);
+	else
+		this->error_page(405);
 }
 
 int					Response::get_format(std::string str)
@@ -403,65 +404,44 @@ int			Response::method_PUT()
 
 int			Response::method_POST(loc_iter &it)
 {
-	// if(req.body.size() > it->max_body)
-	// {
-	// 	req.body.clear();
-	// 	// req.status_code_int_val = 413;
-	// 	// req.reason_phrase = "Payload Too Large";
-	// 	// req.headers.add_header("Content-Length", "0");
-	// }
-	// else if(req.body.size() == it->max_body or req.body.empty()) // and req.get_query_string().empty() )
-	// {
-	// 	req.body.clear(); // r.body = req.get_body();
-	// 	// req.status_code_int_val = 200;
-	// 	// req.reason_phrase = "OK";
-	// 	// req.headers.add_header("Content-Length", std::to_string(req.body.size()));
-	// }
-	// else
-	// {
-//		std::cout << "!!! POST - ";                                        // for test
-        std::vector<std::string>    env = cgi_env(it);
+	if (check_method(it->methods, POST) != 1) {
+		error_page(405);			// ?
+	}
+	else if(req.body.size() > it->max_body)
+	{
+		std::cout << "\n! body.size > max_body\n";                    // for test
+		error_page(413);
+	}
+	else if(req.body.empty() and query_string.empty())
+	{
+		std::cout << "\n! body.size == max_body\n";                   // for test
+		create_response(*it);
+	}
+	else
+	{
+		std::cout << "\n! POST \n";                                        // for test
+		std::vector<std::string>	env = cgi_env(it);
 		cgi_handler cgi(env, it->root);
 		cgi.req_body_to_fd(req.body);
 		bool check = cgi.execute();
-//		std::cout << "get_filename: " << cgi.get_filename() << std::endl; // for test
-        // std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
-        // std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
-        // std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
-        // std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
 		if (check == true)
 		{
-            res_body = cgi.get_response_body();
-            create_response(*it);
-//            req.status_code_int_val = cgi.get_status_code();
-//            req.reason_phrase = cgi.get_str_status_code();
-//            req.headers.add_header("Content-Type", cgi.get_str_content_type());
-//            req.headers.add_header("Content-Length", std::to_string(cgi.get_response_body().size()));
+			res_body = cgi.get_response_body();
+			create_response(*it);
 			return (0);
 		}
 		else
 		{
-			return (-1);// ERROR
+			error_page(500);
+			return -1;
 		}
-//	 }
-	return (-1);// ERROR
+	}
+	return 0;
 }
 
 std::vector<std::string>		Response::cgi_env(loc_iter &it)
 {
-//    int             ind;
-//    std::string     query_string = "";
-//    if(it->exec != "" and (ind = req.resource.find(it->exec)) != std::string::npos)
-//    {
-//            ind += it->exec.size();
-//            query_string = req.resource.substr(ind);
-//            ind = req.resource.size() - query_string.size();
-//            req.resource = req.resource.substr(0, ind);
-//    }
-//    std::cout << "! req.resource - " << req.resource << std::endl;
-//    std::cout << "! tmp_query_string - " << query_string << std::endl;
-
-    std::vector<std::string>	tmp;
+	std::vector<std::string>	tmp;
 	tmp.push_back("AUTH_TYPE=anonymous");
 	tmp.push_back("CONTENT_LENGTH=" + itoa(req.body.size()));
 	tmp.push_back("CONTENT_TYPE=" + content_type);

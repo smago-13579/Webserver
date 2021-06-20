@@ -60,15 +60,15 @@ void		ft_wait()
 // 	}
 // }
 
-void		test(cgi_handler cgi)
-{
-	char * test = cgi._ft_strjoin("TEST", "-1");
-	int i = 0;
-	for(; test[i] != '\0'; ++i)
-		std::cout << test[i];
-	std::cout << std::endl;
-	delete test;
-}
+// void		test(cgi_handler cgi)
+// {
+// 	char * test = cgi._ft_strjoin("TEST", "-1");
+// 	int i = 0;
+// 	for(; test[i] != '\0'; ++i)
+// 		std::cout << test[i];
+// 	std::cout << std::endl;
+// 	delete test;
+// }
 
 int			main(int argc, char **argv, char **env)
 {
@@ -78,29 +78,28 @@ int			main(int argc, char **argv, char **env)
 	std::string		file_cpp = "./cgi-bin/cpp/hello";
 	std::string		file_py = "./cgi-bin/py/hello.py";
 	std::string		cgi_tester = "./cgi-bin/cgi_tester";
-	cgi_handler		cgi;
 	bool			check;
 
 	PRINT_TITLE("cpp")
 	ft_hello();
 
-	PRINT_TITLE("execve")
-	cgi.set_filename(file_cpp);
+	{PRINT_TITLE("execve")
+	cgi_handler cgi(file_cpp);
 	check = cgi.execute();
 	if(check == false)
-		ft_error("file_cpp not found!\n");
+		ft_error("file_cpp not found!\n");}
 	
-	PRINT_TITLE("python")
-	cgi.set_filename(file_py);
+	{PRINT_TITLE("python")
+	cgi_handler cgi(file_py);
 	check = cgi.execute();
 	if(check == false)
-		ft_error("file_py not found!\n");
+		ft_error("file_py not found!\n");}
 
-	PRINT_TITLE("cgi_tester")
-	cgi.set_filename(cgi_tester);
+	{PRINT_TITLE("cgi_tester")
+	cgi_handler cgi(cgi_tester);
 	check = cgi.execute();
 	if(check == false) 
-		ft_error("cgi_tester not found!\n");
+		ft_error("cgi_tester not found!\n");}
 
 	// test(cgi);
 

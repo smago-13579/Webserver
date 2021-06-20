@@ -107,11 +107,11 @@ void		cgi_handler::_parse_cgi()
 //		_str_content_type = header.substr(j + i + 2, header.size() - 2);
 //		_response_body.erase(0, end_of_headers + 4);
 //	}
-
-	_response_body.erase(0, end_of_headers + 4);
+	if(end_of_headers != std::string::npos)
+		_response_body.erase(0, end_of_headers + 4);
 }
 
-void		cgi_handler::_test_write_to_file()
+void		cgi_handler::_test_write_to_file()		// for test print
 {
 	int	save_out = dup(1);
 	int	file_fd = open("html/file.txt", O_RDWR | O_CREAT | O_APPEND, S_IWRITE | S_IREAD, 0755);
@@ -123,7 +123,7 @@ void		cgi_handler::_test_write_to_file()
 	dup2(save_out, 1);
 	close(file_fd);
 	close(save_out);
-}
+}													// for test print
 
 bool		cgi_handler::_restore_fd_and_close(int pipe[2], int save[2])
 {
@@ -220,13 +220,16 @@ bool		cgi_handler::execute_tester()
 	if(WEXITSTATUS(tmp) == 127)
 		return _restore_fd_and_close(fd, fd_save);
 	_response_body.clear();
+	close(fd[0]);
+	fd[0] = open(std::string(_root + "/temp").c_str(), O_RDONLY);
+	dup2(fd[0], 0);
 	for(tmp = buffer_size; tmp == buffer_size ; _response_body += std::string(buff, tmp))
 		if((tmp = read(fd[0], buff, buffer_size)) == -1)
 			return _restore_fd_and_close(fd, fd_save);
 	_parse_cgi();
 	_restore_fd_and_close(fd, fd_save);
 	// _test_write_to_file();						// for test
-	// std::cout << _response_body << std::endl;	// for test
+	std::cout << _response_body << std::endl;	// for test
 	return true;
 }
 

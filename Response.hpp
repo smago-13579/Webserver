@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/18 19:43:16 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/20 15:07:06 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,14 +50,14 @@ public:
 private:
 	int					autoindex;
 	int					format;
-    std::string			res_body;
+	std::string			res_body;
 	Request				req;
 	Settings* 			settings;
 	std::string			answer;
 	std::string			content_type;
 	size_t				response_done;
 	std::string			error_500;
-    std::string         query_string;
+	std::string			query_string;
 	loc_iter			it;
 
 	int				error_page(int i);
