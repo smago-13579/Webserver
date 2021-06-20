@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/17 17:55:49 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/20 19:03:28 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,8 +156,10 @@ void    Request::filling_headers()
         pos_begin = pos_end + 2;
     }
 	key_val_str = std::string(new_str, pos_begin, pos_end - pos_begin);
-	if ((pos_points = key_val_str.find(": ")) == key_val_str.npos)
+	if ((pos_points = key_val_str.find(": ")) == key_val_str.npos) {
 		_request_done = ERROR;
+		return ;
+	}
 	key = std::string(key_val_str, 0, pos_points);
 	pos_points += 2;
 	val = std::string(key_val_str, pos_points, key_val_str.npos - pos_points);
