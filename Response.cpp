@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/20 20:46:19 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/21 14:36:54 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,10 @@ Response::Response(const Request& req, Settings set)
 	this->req = req;
 	this->response_done	= 0;
 	this->settings = &set;
-	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
-	this->error_500 += "Error 500</h1><h2 style=\"font-size:160%;\">";
-	this->error_500 += "Internal Server Error</h2></body></html>";
 	
 	if ((it = find_location()) == settings->locations.end()) {
 		std::cout << "\nBAD REQUEST\n";
-		error_page(400);
+		this->error_page(400);
 			return ;
 	}
 	this->autoindex = it->autoindex;
@@ -58,9 +55,6 @@ Response::Response(int error, Settings set)
 {
 	this->response_done	= 0;
 	this->settings = &set;
-	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
-	this->error_500 += "Error 500</h1><h2 style=\"font-size:160%;\">";
-	this->error_500 += "Internal Server Error</h2></body></html>";
 	this->error_page(error);
 }
 
@@ -72,7 +66,6 @@ Response&	Response::operator=(const Response& tmp)
 	settings = tmp.settings;
 	answer = tmp.answer;
 	response_done = tmp.response_done;
-	error_500 = tmp.error_500;
 	autoindex = tmp.autoindex;
 	content_type = tmp.content_type;
 	it = tmp.it;
@@ -98,38 +91,29 @@ int			Response::error_page(int i)
 
 	if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
 		std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
-		if (i != 500)
-			return (this->error_page(500));
-		else 
-			body << this->error_500 << "\r\n\r\n";
+			body << ::error_page(i) << "\r\n\r\n";
 	}
-	else 
+	else
 	{
 		while ((res = read(fd, buff, 99999)) > 0) {
 			buff[res] = '\0';
 			body << buff;
 		}
-		body << "\r\n\r\n";
 		if (res < 0) {
 			std::cout << "CAN'T READ FILE: " << file.str() << std::endl;
-			body.ignore(9999999);
-			body << this->error_500 << "\r\n\r\n";
+			body << ::error_500();
 		}
-		else
-			close(fd);
+		body << "\r\n\r\n";
+		close(fd);
 	}
 
 	response << "HTTP/1.1 " << itoa(i) << status_codes(i);
-	if (i == 405) {
-		response << "Allow: " << "GET" << "\r\n"
-		<< "Content-Length: 0\r\n\r\n";
-	}
-	else {
-		response << "Version: " << "HTTP/1.1\r\n"
-		<< get_headers(file.str());
-		response << "Content-Length: " << body.str().length()
-		<< "\r\n\r\n" << body.str();
-	}
+	if (i == 405)
+		response << "Allow: " << this->get_method();
+	response << "Version: HTTP/1.1\r\n"
+	<< get_headers(file.str())
+	<< "Content-Length: " << body.str().length()
+	<< "\r\n\r\n" << body.str();
 	this->answer = response.str();
 	
 	this->response_done	= 1;
@@ -149,6 +133,8 @@ std::string			Response::status_codes(int i)
 		str = " Not Found\r\n";
 	else if (i == 405)
 		str = " Method Not Allowed\r\n";
+	else if (i == 413)
+		str = " Payload Too Large\r\n";
 	else if (i == 500)
 		str = " Internal Server Error\r\n";
 
@@ -167,6 +153,21 @@ int			Response::compare_prefix(std::string loc, std::string res)
 	if (loc[i] == '\0')
 		return (i);
 	return (0);
+}
+
+std::string Response::get_method()
+{
+	int i = it->methods[0];
+	std::string str = " \r\n";
+	if (i == GET)
+		str = "GET\r\n";
+	else if (i == POST)
+		str = "POST\r\n";
+	else if (i == DELETE)
+		str = "DELETE\r\n";
+	else if (i == PUT)
+		str = "PUT\r\n";
+	return str;
 }
 
 int			Response::check_method(std::vector<size_t>& methods, size_t cmd)
@@ -461,11 +462,11 @@ int			Response::method_POST(loc_iter &it)
 		std::cout << "\n! body.size > max_body\n";                    // for test
 		error_page(413);
 	}
-	else if(req.body.empty() and query_string.empty())
-	{
-		std::cout << "\n! body.size == max_body\n";                   // for test
-		create_response(*it);
-	}
+	// else if(req.body.empty() and query_string.empty() && it->exec.find(".") == std::string::npos)
+	// {
+	// 	std::cout << "\n! body.size == max_body\n";                   // for test
+	// 	create_response(*it);
+	// }
 	else
 	{
 		std::cout << "\n! POST \n";                                        // for test
