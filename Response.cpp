@@ -31,25 +31,8 @@ Response::Response(const Request& req, Settings set)
 	this->content_type = "";
 
 	/*				ngonzo						*/
-<<<<<<< HEAD
-    query_string.clear();
-    // std::cout << "! it->exec - " << it->exec << std::endl;
-    // std::cout << "! req.resource - " << this->req.resource << std::endl;
-    if(settings->redirect.empty() && it->exec != "")
-    {
-         if(this->req.resource.find("?") != std::string::npos)
-        {
-            int    ind = this->req.resource.find("?");
-            query_string = this->req.resource.substr(ind + 1);
-            ind = this->req.resource.size() - query_string.size();
-            this->req.resource = this->req.resource.substr(0, ind - 1);
-        }
-    }
-    // std::cout << "! req.resource - " << this->req.resource << std::endl;
-    // std::cout << "! query_string - " << query_string << std::endl;
-=======
 	query_string.clear();
-	if(it->exec != "")
+	if(settings->redirect.empty() && it->exec != "")
 	{
 		int	ind = this->req.resource.find("?");
 		if(ind != std::string::npos)
@@ -59,7 +42,6 @@ Response::Response(const Request& req, Settings set)
 			this->req.resource = this->req.resource.substr(0, ind - 1);
 		}
 	}
->>>>>>> master
 	/*				ngonzo						*/
 
 	find_method();
@@ -512,7 +494,7 @@ int			Response::redirect()
 	std::string status = " 301 Moved Permanently\r\n";
 
 	response << req.version << status
-	<< "Location: " << settings->redirect << "\r\n\r\n";
+	<< "Location: " << "http://" << settings->redirect << "/\r\n\r\n";
 	this->answer = response.str();
 	this->response_done	= 1;
 

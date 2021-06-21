@@ -171,7 +171,7 @@ int 	Socket::socket_write(int fd)
 	response = resp[fd].get_response();
 	if (response != "")
 	{
-		// std::cout << "RESPONSE: \n" << response << std::endl;
+		std::cout << "RESPONSE: \n" << response << std::endl;
 		if ((res = send(fd, response.c_str(), response.length(), 0)) < 0) 
 		{
 			std::cout << "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";

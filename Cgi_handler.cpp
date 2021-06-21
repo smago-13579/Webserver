@@ -176,13 +176,9 @@ bool		cgi_handler::execute_pipe()
 	dup2(fd_pipe[1], 1);
 	if (fork() == 0)
 	{
-<<<<<<< HEAD:ngonzo/cgi_handler.cpp
 		char **args;
-		strcpy(args[0], _filename.c_str()); ///////////////////////
+		strcpy(args[0], _filename.c_str());
 		if(execve(_filename.c_str(), args, _env) == -1)
-=======
-		if(execve(_filename.c_str(), NULL, _env) == -1)
->>>>>>> master:Cgi_handler.cpp
 		{
 			_restore_fd_and_close(fd_pipe, fd_save);
 			exit(127);
@@ -220,13 +216,9 @@ bool		cgi_handler::execute_tester()
 	{
 		dup2(fd[0], 0);
 		dup2(fd[1], 1);
-<<<<<<< HEAD:ngonzo/cgi_handler.cpp
 		char **args;
 		strcpy(args[0], _filename.c_str());   ///////////////////////////
 		if (execve(_filename.c_str(), args, _env) == -1)
-=======
-		if (execve(_filename.c_str(), NULL, _env) == -1)
->>>>>>> master:Cgi_handler.cpp
 		{
 			_restore_fd_and_close(fd, fd_save);
 			exit(127);
