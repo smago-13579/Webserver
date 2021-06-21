@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 14:36:54 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/21 16:27:44 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,7 +204,7 @@ int			Response::create_response(const Location& loc, std::string status)
 			else if (errno == ENOENT)
 				return (error_page(404));
 		}
-		if (req.type == "POST" && loc.exec != "")
+		if (format == TEXT && loc.exec != "")
 			body << res_body << "\r\n\r\n";
 		else if (format == TEXT)
 		{
@@ -251,7 +251,7 @@ Response::loc_iter	Response::find_location()
 	
 	for (loc_iter it = settings->locations.begin(); it != settings->locations.end(); it++)
 	{
-		std::cout << "it->location: " << it->location << "\treq.resource: " << req.resource << std::endl;
+		// std::cout << "it->location: " << it->location << "\treq.resource: " << req.resource << std::endl;
 		if (it->location == req.resource)
 			return (it);
 	}
@@ -346,7 +346,7 @@ std::string			Response::get_path(const Location& loc)
 		pos++;
 	
 	if (req.resource == loc.location && req.type != "DELETE") {
-		if (this->autoindex == OFF && req.type != "POST")
+		if (this->autoindex == OFF)
 			str << loc.root << "/" << loc.index;
 		else
 			str << loc.root;
@@ -356,8 +356,8 @@ std::string			Response::get_path(const Location& loc)
 		<< req.resource.substr(pos, len - pos);
 	}
 	get_format(str.str());
-	if (this->format == DIRC && this->autoindex == OFF && req.type != "POST")
-		str << "/" << it->index;
+	// if (this->format == DIRC && this->autoindex == OFF && req.type != "POST")
+	// 	str << "/" << it->index;
 	return str.str();
 }
 
@@ -378,7 +378,7 @@ int			Response::method_GET()
 	if (check_method(it->methods, GET) == 1) {
 		if(it->exec.find(".") != std::string::npos)
 		{
-			req.type = "POST";
+			// req.type = "POST";
 			method_POST(it);
 		}
 		else
@@ -509,12 +509,12 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	tmp.push_back("CONTENT_TYPE=" + content_type);
 	tmp.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	tmp.push_back("PATH_INFO=" + req.resource);
-	tmp.push_back("PATH_TRANSLATED=" + it->root + req.resource);
+	tmp.push_back("PATH_TRANSLATED=" + it->root);
 	tmp.push_back("QUERY_STRING=" + query_string);
 	tmp.push_back("REMOTE_ADDR=" + settings->ip);
 	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
 	tmp.push_back("REMOTE_USER=");
-	tmp.push_back("REQUEST_METHOD=" + req.type);
+	tmp.push_back("REQUEST_METHOD=GET");// + req.type);
 	tmp.push_back("REQUEST_URI=" + req.resource);
 	tmp.push_back("SCRIPT_NAME=" + it->exec);
 	tmp.push_back("SERVER_NAME=" + settings->server_name);
