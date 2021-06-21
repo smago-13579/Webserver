@@ -15,10 +15,10 @@ main = '''
 			<p class="header_text header_text_2">webserv</p>
 		</div>
 		<div class="header_body">
-			<a class="header_btext header_body_link" href="../index.html">Index</a>
-			<a class="header_btext header_body_link" href="Home.html">Home</a>
+			<a class="header_btext header_body_link" href="ind_on">Index</a>
+			<a class="header_btext header_body_link" href="home.html">Home</a>
 			<a class="header_text header_body_link" href="cgi-bin">Game</a>
-			<a class="header_text header_body_link" href="trash_page">Error</a>
+			<a class="header_text header_body_link" href="cgi-php">cgi-php</a>
 		</div>
 		<div class="header_footer">
 			<p class="header_text header_text_1">made by</p>
