@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/15 16:49:01 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/21 13:16:11 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	Server::server_run()
 			str += strerror(errno);
 			std::cout << str << std::endl;
 			for (cls_iter it = clients.begin(); it != clients.end(); it++)
-				close(it->first);
+				it->second->close_socket(it->first);
 			clients.clear();
 			message.clear();
 			continue;
@@ -88,12 +88,12 @@ void	Server::server_run()
 			if (FD_ISSET(*it, &writefds)) {
 				int fd = *it;
 				int i = clients[fd]->socket_write(fd);
-				if (i != 2)
+				if (i != 2)				// (i == 2) if reply not fully sent
 				{
 					message.erase(it);
-					if (i == 1) {
+					if (i == -1) {			// in case of error 
+						clients[fd]->close_socket(fd);
 						clients.erase(fd);
-						close(fd);
 					}
 				}
 				break;
@@ -103,13 +103,9 @@ void	Server::server_run()
 		{
 			if (FD_ISSET(it->first, &readfds)) {
 				int i = it->second->socket_read(it->first);
-				if (i == 0) {
-					std::cout << "socket closed: " << it->first << std::endl;
-					close(it->first);
-					it->second->erase_request(it->first);
+				if (i == -1)
 					clients.erase(it->first);
-				}
-				else if (i == 1)
+				else if (i == 0)
 					message.push_back(it->first);
 				break;
 			}
@@ -130,4 +126,8 @@ void	Server::server_run()
 Server::~Server() 
 {
 	delete(config);
+	for (serv_iter it = servers.begin(); it != servers.end(); it++)
+	{
+		close(it->first);
+	}
 };

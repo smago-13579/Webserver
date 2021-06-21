@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/20 18:30:30 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/21 14:44:50 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,17 +89,18 @@ int		Socket::create()
 	if (bind(socket_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
 		std::string str = "BIND ERROR: ";
 		std::cout << str << strerror(errno) << std::endl;
+		close(socket_fd);
 		return (1);
 	}
 
-	/*		CHECK SUBJECT 9 POINT			*/
 	/*		SET NON_BLOCK TO SERVER			*/
 	fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 
 	/*		LISTEN MODE						*/
-	if (listen(socket_fd, 1000) < 0) {		// the Queue could be much longer (about 1000)
+	if (listen(socket_fd, 1000) < 0) {
 		std::string str = "LISTEN ERROR: ";
 		std::cout << str << strerror(errno);
+		close(socket_fd);
 		return (1);
 	}
 	return (0);
@@ -122,9 +123,9 @@ void	Socket::erase_request(int fd)
 int 	Socket::socket_read(int fd)
 {
 	int res;
-	char buffer[32648];		
+	char buffer[100000];		
 	std::string str;		
-	res = recv(fd, buffer, 32647, 0);
+	res = recv(fd, buffer, 99999, 0);
 	
 	if (res > 0) {
 		buffer[res] = '\0';
@@ -150,16 +151,16 @@ int 	Socket::socket_read(int fd)
 
 		/*			Delete request from client			*/
 		req.erase(fd);
-		return 1;
+		return 0;
 	}
 	else if (res < 0) {
-		std::string str = "ERROR WHEN READING FROM THE CLIENT'S FD: ";
-		str += itoa(fd);
-		str += "\t";
-		str += strerror(errno);
-		std::cout <<  str << std::endl;
+		std::cout << "ERROR WHEN READING FROM THE CLIENT'S FD: ";
+		std::cout << fd << std::endl;
 	}
-	return 0;
+	else
+		std::cout << "socket closed: " << fd << std::endl;
+	this->close_socket(fd);
+	return -1;
 }
 
 int 	Socket::socket_write(int fd)
@@ -173,21 +174,26 @@ int 	Socket::socket_write(int fd)
 		// std::cout << "RESPONSE: \n" << response << std::endl;
 		if ((res = send(fd, response.c_str(), response.length(), 0)) < 0) 
 		{
-			std::string str = "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";
-			str += itoa(fd);
-			str += ": ";
-			str += strerror(errno);
-			return (1);
+			std::cout << "ERROR WHEN WRITING TO CLIENT'S SOCKET FD ";
+			std::cout << fd << std::endl;
+			resp.erase(fd);
+			return (-1);
 		}
 		resp[fd].erase_answer(res);
 		if (resp[fd].get_response().empty())
 		{
 			std::cout << "REQUEST DONE\n";
+			resp.erase(fd);
 			return (0);
 		}
-		return (2);
+		return (2);				// reply not fully sent
 	}
-	
-	return (1);
+	resp.erase(fd);
+	return (-1);
 }
 
+void	Socket::close_socket(int fd)
+{
+	close(fd);
+	this->erase_request(fd);
+}

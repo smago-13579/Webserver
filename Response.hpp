@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/18 19:43:16 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/21 14:29:29 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "webserv.hpp"
 # include "Request.hpp"
 # include "Autoindex.hpp"
+# include "errors.hpp"
 # include <algorithm>
 # include <cstdio>
 
@@ -57,7 +58,6 @@ private:
 	std::string			answer;
 	std::string			content_type;
 	size_t				response_done;
-	std::string			error_500;
     std::string         query_string;
 	loc_iter			it;
 
@@ -69,6 +69,7 @@ private:
 	void			find_method(const Request& req);
 	int				get_format(std::string str);
 	std::string		get_headers(std::string str, std::string type = "", std::string location = "");
+	std::string 	get_method();
 	std::string		get_path(const Location& loc);
 	int 			method_GET();
 	int				method_DELETE();
