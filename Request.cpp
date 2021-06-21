@@ -190,7 +190,6 @@ void	Request::filling_chunked_body()
 		if (new_str[0] == '\r' && new_str[1] == '\n')
 			new_str.erase(0, 2);
     }
-	//проверить не больше ли размер тела, чем нам нужно
 }
 
 /***************/

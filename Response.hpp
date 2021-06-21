@@ -66,15 +66,16 @@ private:
 	int				create_response(const Location& loc, std::string status = " 200 OK\r\n");
 	int				check_method(std::vector<size_t>& methods, size_t cmd);
 	loc_iter		find_location();
-	void			find_method(const Request& req);
+	void			find_method();
 	int				get_format(std::string str);
 	std::string		get_headers(std::string str, std::string type = "", std::string location = "");
 	std::string 	get_method();
 	std::string		get_path(const Location& loc);
 	int 			method_GET();
 	int				method_DELETE();
-	int				method_PUT(const Request& req);
+	int				method_PUT();
 	int				method_POST(loc_iter &it);
+	int				redirect();
 	array			cgi_env(loc_iter &it);
 	std::string		status_codes(int i);
 

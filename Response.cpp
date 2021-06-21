@@ -22,19 +22,20 @@ Response::Response(const Request& req, Settings set)
 	this->response_done	= 0;
 	this->settings = &set;
 	
-	if ((it = find_location()) == settings->locations.end()) {
+	if (settings->redirect.empty() && (it = find_location()) == settings->locations.end()) {
 		std::cout << "\nBAD REQUEST\n";
 		this->error_page(400);
 			return ;
 	}
-	this->autoindex = it->autoindex;
+	if (settings->redirect.empty())
+		this->autoindex = it->autoindex;
 	this->content_type = "";
 
 	/*				ngonzo						*/
     query_string.clear();
     // std::cout << "! it->exec - " << it->exec << std::endl;
     // std::cout << "! req.resource - " << this->req.resource << std::endl;
-    if(it->exec != "")
+    if(settings->redirect.empty() && it->exec != "")
     {
          if(this->req.resource.find("?") != std::string::npos)
         {
@@ -48,7 +49,7 @@ Response::Response(const Request& req, Settings set)
     // std::cout << "! query_string - " << query_string << std::endl;
 	/*				ngonzo						*/
 
-	find_method(req);
+	find_method();
 }
 
 Response::Response(int error, Settings set)
@@ -267,14 +268,16 @@ Response::loc_iter	Response::find_location()
 	return (itn);
 }
 
-void		Response::find_method(const Request& req)
+void		Response::find_method()
 {
-	if (req.type == "GET")
+	if (!(settings->redirect.empty()))
+		this->redirect();
+	else if (req.type == "GET")
 		this->method_GET();
 	else if (req.type == "DELETE")
 		this->method_DELETE();
 	else if (req.type == "PUT")
-		this->method_PUT(req);
+		this->method_PUT();
 	else if (req.type == "POST")
 		this->method_POST(it);
 	else
@@ -414,7 +417,7 @@ int			Response::method_DELETE()
 	return (0);
 }
 
-int			Response::method_PUT(const Request& req)
+int			Response::method_PUT()
 {
 	std::string status = " 200 OK\r\n";
 
@@ -487,6 +490,19 @@ int			Response::method_POST(loc_iter &it)
 		}
 	}
 	return 0;
+}
+
+int			Response::redirect()
+{
+	std::stringstream response;
+	std::string status = " 301 Moved Permanently\r\n";
+
+	response << req.version << status
+	<< "Location: " << settings->redirect << "\r\n\r\n";
+	this->answer = response.str();
+	this->response_done	= 1;
+
+	return (0);
 }
 
 std::vector<std::string>		Response::cgi_env(loc_iter &it)
