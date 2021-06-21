@@ -49,6 +49,7 @@ struct Settings
 	std::string             server_name;
 	std::string             error_page;
 	std::vector<Location>   locations;
+	std::string				redirect;
 
 	Settings&			operator=(Settings& set)
 	{
