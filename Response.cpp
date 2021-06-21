@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 18:40:57 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/21 20:24:49 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,10 @@ Response::Response(const Request& req, Settings set)
 	this->req = req;
 	this->response_done	= 0;
 	this->settings = &set;
+	this->connection = ON;
+	if (this->req.headers.find("Connection") != this->req.headers.end() && \
+		this->req.headers["Connection"] == "close")
+		this->connection = OFF;
 	
 	if ((it = find_location()) == settings->locations.end()) {
 		std::cout << "\nBAD REQUEST\n";
@@ -199,7 +203,7 @@ int			Response::create_response(const Location& loc, std::string status)
 			else if (errno == ENOENT)
 				return (error_page(404));
 		}
-		if (format == TEXT && loc.exec != "")
+		if (req.type == "POST" && loc.exec != "")
 			body << res_body << "\r\n\r\n";
 		else if (format == TEXT)
 		{
@@ -246,7 +250,7 @@ Response::loc_iter	Response::find_location()
 	
 	for (loc_iter it = settings->locations.begin(); it != settings->locations.end(); it++)
 	{
-		// std::cout << "it->location: " << it->location << "\treq.resource: " << req.resource << std::endl;
+		std::cout << "it->location: " << it->location << "\treq.resource: " << req.resource << std::endl;
 		if (it->location == req.resource)
 			return (it);
 	}
@@ -341,7 +345,7 @@ std::string			Response::get_path(const Location& loc)
 		pos++;
 	
 	if (req.resource == loc.location && req.type != "DELETE") {
-		if (this->autoindex == OFF)
+		if (this->autoindex == OFF && req.type != "POST")
 			str << loc.root << "/" << loc.index;
 		else
 			str << loc.root;
@@ -351,8 +355,8 @@ std::string			Response::get_path(const Location& loc)
 		<< req.resource.substr(pos, len - pos);
 	}
 	get_format(str.str());
-	// if (this->format == DIRC && this->autoindex == OFF && req.type != "POST")
-	// 	str << "/" << it->index;
+	if (this->format == DIRC && this->autoindex == OFF && req.type != "POST")
+		str << "/" << it->index;
 	return str.str();
 }
 
@@ -373,7 +377,7 @@ int			Response::method_GET()
 	if (check_method(it->methods, GET) == 1) {
 		if(it->exec.find(".") != std::string::npos)
 		{
-			// req.type = "POST";
+			req.type = "POST";
 			method_POST(it);
 		}
 		else
@@ -514,3 +518,5 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	// // print env end
 	return tmp;
 }
+
+int		Response::get_connection() { return this->connection; }

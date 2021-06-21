@@ -37,7 +37,7 @@
 				echo "Name : " . $result['name'] . "<br>";
 				echo "Nickname : " . $result['nickname'] . "<br>";
 				echo "Date : " . $result['data'] . "<br>";
-				$f = fopen('html/users_base', 'a+');
+				$f = fopen('html/cgi-php/users_base', 'a+');
 				if($result) {
 					fwrite($f, "Name=" . $result['name'] . " && ");
 					fwrite($f, "Nickname=" . $result['nickname'] . " && ");

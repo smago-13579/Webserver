@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 16:02:00 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/21 20:16:46 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,11 +166,12 @@ int 	Socket::socket_read(int fd)
 int 	Socket::socket_write(int fd)
 {
 	std::string response;
-	int res;
+	int res, connection;
 
 	response = resp[fd].get_response();
 	if (response != "")
 	{
+		connection = resp[fd].get_connection();
 		// std::cout << "RESPONSE: \n" << response << std::endl;
 		if ((res = send(fd, response.c_str(), response.length(), 0)) < 0) 
 		{
@@ -184,6 +185,8 @@ int 	Socket::socket_write(int fd)
 		{
 			std::cout << "REQUEST DONE\n";
 			resp.erase(fd);
+			if (connection == OFF)
+				return (1);
 			return (0);
 		}
 		return (2);				// reply not fully sent
