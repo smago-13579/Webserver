@@ -3,14 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2021/06/21 16:27:44 by smago            ###   ########.fr       */
-=======
-/*   Updated: 2021/06/21 17:00:34 by ngonzo           ###   ########.fr       */
->>>>>>> d6e21f7a3482a96e39109c8fdf9827a9c0e13fdb
+/*   Updated: 2021/06/21 18:40:57 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -497,11 +493,7 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	tmp.push_back("CONTENT_TYPE=" + content_type);
 	tmp.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	tmp.push_back("PATH_INFO=" + req.resource);
-<<<<<<< HEAD
-	tmp.push_back("PATH_TRANSLATED=" + it->root);
-=======
 	tmp.push_back("PATH_TRANSLATED=" + it->root);// + req.resource);
->>>>>>> d6e21f7a3482a96e39109c8fdf9827a9c0e13fdb
 	tmp.push_back("QUERY_STRING=" + query_string);
 	tmp.push_back("REMOTE_ADDR=" + settings->ip);
 	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
