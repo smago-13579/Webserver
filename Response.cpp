@@ -3,18 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 14:36:54 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/21 16:29:48 by ngonzo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
-#include "ngonzo/cgi_handler.hpp"
+#include "Cgi_handler.hpp"
 
 Response::Response() {}
-
 
 Response::Response(const Request& req, Settings set)
 {
@@ -32,6 +31,7 @@ Response::Response(const Request& req, Settings set)
 	this->content_type = "";
 
 	/*				ngonzo						*/
+<<<<<<< HEAD
     query_string.clear();
     // std::cout << "! it->exec - " << it->exec << std::endl;
     // std::cout << "! req.resource - " << this->req.resource << std::endl;
@@ -47,6 +47,19 @@ Response::Response(const Request& req, Settings set)
     }
     // std::cout << "! req.resource - " << this->req.resource << std::endl;
     // std::cout << "! query_string - " << query_string << std::endl;
+=======
+	query_string.clear();
+	if(it->exec != "")
+	{
+		int	ind = this->req.resource.find("?");
+		if(ind != std::string::npos)
+		{
+			query_string = this->req.resource.substr(ind + 1);
+			ind = this->req.resource.size() - query_string.size();
+			this->req.resource = this->req.resource.substr(0, ind - 1);
+		}
+	}
+>>>>>>> master
 	/*				ngonzo						*/
 
 	find_method();
@@ -184,7 +197,7 @@ int			Response::check_method(std::vector<size_t>& methods, size_t cmd)
 int			Response::create_response(const Location& loc, std::string status)
 {
 	std::stringstream	response, body;
-    std::ifstream 		image;
+	std::ifstream 		image;
 	std::string			file;
 	int 				fd, res;
 	char 				buff[100000];
@@ -232,9 +245,9 @@ int			Response::create_response(const Location& loc, std::string status)
 	response << req.version << status
 	<< "Version: " << req.version << "\r\n"
 	<< get_headers(file, req.type, req.resource);
-    if (req.type != "DELETE" && req.type != "PUT")
+	if (req.type != "DELETE" && req.type != "PUT")
 	{
-        response << "Content-Length: " << body.str().length()
+		response << "Content-Length: " << body.str().length()
 		<< "\r\n\r\n" << body.str();
 	}
 	this->answer = response.str();
@@ -462,7 +475,7 @@ int			Response::method_POST(loc_iter &it)
 	}
 	else if(req.body.size() > it->max_body)
 	{
-		std::cout << "\n! body.size > max_body\n";                    // for test
+		// std::cout << "\n! body.size > max_body\n";                    // for test
 		error_page(413);
 	}
 	// else if(req.body.empty() and query_string.empty() && it->exec.find(".") == std::string::npos)
@@ -472,10 +485,11 @@ int			Response::method_POST(loc_iter &it)
 	// }
 	else
 	{
-		std::cout << "\n! POST \n";                                        // for test
+		// std::cout << "\n! POST \n";                                        // for test
 		std::vector<std::string> env = cgi_env(it);
 		cgi_handler cgi(env, it->root);
-		cgi.req_body_to_fd(req.body);
+		if(it->exec == "cgi_tester")
+			cgi.req_body_to_fd(req.body);
 		bool check = cgi.execute();
 		if (check == true)
 		{
@@ -507,30 +521,18 @@ int			Response::redirect()
 
 std::vector<std::string>		Response::cgi_env(loc_iter &it)
 {
-//    int             ind;
-//    std::string     query_string = "";
-//    if(it->exec != "" and (ind = req.resource.find(it->exec)) != std::string::npos)
-//    {
-//            ind += it->exec.size();
-//            query_string = req.resource.substr(ind);
-//            ind = req.resource.size() - query_string.size();
-//            req.resource = req.resource.substr(0, ind);
-//    }
-//    std::cout << "! req.resource - " << req.resource << std::endl;
-//    std::cout << "! tmp_query_string - " << query_string << std::endl;
-
-    std::vector<std::string>	tmp;
+	std::vector<std::string>	tmp;
 	tmp.push_back("AUTH_TYPE=anonymous");
 	tmp.push_back("CONTENT_LENGTH=" + itoa(req.body.size()));
 	tmp.push_back("CONTENT_TYPE=" + content_type);
 	tmp.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	tmp.push_back("PATH_INFO=" + req.resource);
-	tmp.push_back("PATH_TRANSLATED=" + it->root + req.resource);
+	tmp.push_back("PATH_TRANSLATED=" + it->root);// + req.resource);
 	tmp.push_back("QUERY_STRING=" + query_string);
 	tmp.push_back("REMOTE_ADDR=" + settings->ip);
 	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
 	tmp.push_back("REMOTE_USER=");
-	tmp.push_back("REQUEST_METHOD=" + req.type);
+	tmp.push_back("REQUEST_METHOD=GET");// + req.type);
 	tmp.push_back("REQUEST_URI=" + req.resource);
 	tmp.push_back("SCRIPT_NAME=" + it->exec);
 	tmp.push_back("SERVER_NAME=" + settings->server_name);
@@ -540,9 +542,9 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	std::map<std::string, std::string>::iterator	begin = req.headers.begin(), end = req.headers.end();
 	for (; begin != end; ++begin)
 		tmp.push_back("HTTP_" + begin->first + "=" + begin->second);
-//	// print env
-//	for (std::vector<std::string>::iterator	begin = tmp.begin(), end = tmp.end(); begin != end; ++begin)
-//		std::cout << "! " << *begin << std::endl;
-//	// print env end
+	// // print env
+	// for (std::vector<std::string>::iterator	begin = tmp.begin(), end = tmp.end(); begin != end; ++begin)
+	// 	std::cout << "! " << *begin << std::endl;
+	// // print env end
 	return tmp;
 }
