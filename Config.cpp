@@ -313,11 +313,11 @@ Config::Server  *Config::parser_server()
         delete loc;
         pos_begin = pos_end + 1;
     }
-    if (count_locations == 0)
-    {
-        delete point_to_serv;
-        throw(Config::Missing_field());
-    }
+    // if (count_locations == 0)
+    // {
+    //     delete point_to_serv;
+    //     throw(Config::Missing_field());
+    // }
 
     return (point_to_serv);
 }
