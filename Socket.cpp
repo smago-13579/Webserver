@@ -18,6 +18,7 @@ Socket::Socket(Config::Server& server)
 	settings.port = server.port;
 	settings.server_name = server.server_name;
 	settings.error_page = server.error_page;
+	settings.redirect = server.redirect;
 	
 	std::vector<Location> vec;
 	for (config_iter it = server.locations.begin(); it != server.locations.end(); it++)

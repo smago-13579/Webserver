@@ -57,6 +57,7 @@ class Config
             std::string             server_name;
             std::string             error_page;
             std::vector<Location>   locations;
+            std::string             redirect;
         };
 
         class Missing_field : public std::exception
