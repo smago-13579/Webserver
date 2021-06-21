@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 16:15:42 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/21 18:00:59 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,12 @@ public:
 
 	void				erase_answer(int i);
 	std::string			get_response();
+	int					get_connection();
 	
 private:
 	int					autoindex;
 	int					format;
+	int					connection;
 	std::string			res_body;
 	Request				req;
 	Settings* 			settings;

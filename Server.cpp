@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 13:16:11 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/21 20:16:45 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void	Server::server_run()
 				if (i != 2)				// (i == 2) if reply not fully sent
 				{
 					message.erase(it);
-					if (i == -1) {			// in case of error 
+					if (i == -1 || i == 1) {			// in case of error OR connection=close
 						clients[fd]->close_socket(fd);
 						clients.erase(fd);
 					}

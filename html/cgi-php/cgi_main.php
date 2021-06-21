@@ -15,7 +15,7 @@
 			<p class="header_text header_text_2">webserv</p>
 		</div>
 		<div class="header_body">
-			<a class="header_btext header_body_link" href="ind_on">Index</a>
+			<a class="header_btext header_body_link" href="/">Index</a>
 			<a class="header_btext header_body_link" href="home.html">Home</a>
 			<a class="header_text header_body_link" href="cgi-bin">Game</a>
 			<a class="header_text header_body_link" href="cgi-php">cgi-php</a>
@@ -31,20 +31,18 @@
 		<div class="jeka_php">
 			<form action="cgi-php?name=Anonimus&nickname=Mortas&data=Ta-tata-ta" method="post">
 				<button><a class="jeka_php_b">Create default</a></button>
-				<!-- <input type="submit" value="Create default"> -->
-				<!-- <button name="action" value="button4"><p class="simvol">{button4}</p></button> -->
 			</form>
-		<!-- </div>
-		<div class="jeka_php"> -->
 			<?php
 				parse_str($_ENV["QUERY_STRING"], $result);
 				echo "Name : " . $result['name'] . "<br>";
 				echo "Nickname : " . $result['nickname'] . "<br>";
 				echo "Date : " . $result['data'] . "<br>";
-				$f = fopen('data.txt', 'w+');
-				fwrite($f, "Name : " . $result['name'] . " && ");
-				fwrite($f, "Nickname : " . $result['nickname'] . " && ");
-				fwrite($f, "Date : " . $result['data'] . " EOF");
+				$f = fopen('html/cgi-php/users_base', 'a+');
+				if($result) {
+					fwrite($f, "Name=" . $result['name'] . " && ");
+					fwrite($f, "Nickname=" . $result['nickname'] . " && ");
+					fwrite($f, "Data=" . $result['data'] . " ;\r\n");
+				}
 				fclose($f);
 			?>
 		</div>

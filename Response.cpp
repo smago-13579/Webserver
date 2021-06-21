@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 16:29:48 by ngonzo           ###   ########.fr       */
+/*   Updated: 2021/06/21 20:24:49 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,10 @@ Response::Response(const Request& req, Settings set)
 	this->req = req;
 	this->response_done	= 0;
 	this->settings = &set;
+	this->connection = ON;
+	if (this->req.headers.find("Connection") != this->req.headers.end() && \
+		this->req.headers["Connection"] == "close")
+		this->connection = OFF;
 	
 	if (settings->redirect.empty() && (it = find_location()) == settings->locations.end()) {
 		std::cout << "\nBAD REQUEST\n";
@@ -530,3 +534,5 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	// // print env end
 	return tmp;
 }
+
+int		Response::get_connection() { return this->connection; }
