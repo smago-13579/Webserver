@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: smago <smago@student.42.fr>                +#+  +:+       +#+         #
+#    By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/05/25 14:03:12 by smago             #+#    #+#              #
-#    Updated: 2021/06/21 14:37:55 by smago            ###   ########.fr        #
+#    Updated: 2021/06/21 14:54:10 by ngonzo           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserver
 
 SRCS = main.cpp Server.cpp Socket.cpp Request.cpp Response.cpp Config.cpp \
-		ngonzo/cgi_handler.cpp Autoindex.cpp errors.cpp
+		Cgi_handler.cpp Autoindex.cpp errors.cpp
 
 FLAGS = -Wall -Wextra -Werror
 
