@@ -13,18 +13,28 @@ echo "Content-Type: text/html\r\n\r\n";
 	<title>Document</title>
 </head>
 <body>
-	<div>
-		<p>Привет! Как твои дела?</p>
-		<?php
-		parse_str($_ENV["QUERY_STRING"], $result);
-		if ($result == "хорошо") {
-			echo "<h2>Мы очень рады за тебя!</h2></br>";
-		} elseif ($result == "плохо") {
-			echo "<h2>Мы надеемся что когда ты проставишь нам бонусы тебе бедет веселее</h2></br>";
-		} else {
-			echo "<h2>Напиши плохо или хорошо!";
-		}
-		?>
-	</div>
+	<header class="header">
+		<div class="header_head">
+			<p class="header_text header_text_1">Project</p>
+			<p class="header_text header_text_2">webserv</p>
+		</div>
+		<div class="header_body">
+			<a class="header_btext header_body_link" href="ind_on">Index</a>
+			<a class="header_btext header_body_link" href="../home.html">Home</a>
+			<a class="header_text header_body_link" href="../cgi-bin">Game</a>
+			<a class="header_text header_body_link" href="../cgi-php">cgi-php</a>
+		</div>
+		<div class="header_footer">
+			<p class="header_text header_text_1">made by</p>
+			<a class="header_text header_text_2" href="https://profile.intra.42.fr/users/smago">smago</a>
+			<a class="header_text header_text_2" href="https://profile.intra.42.fr/users/kbatwoma">kbatwoma</a>
+			<a class="header_text header_text_2" href="https://profile.intra.42.fr/users/ngonzo">ngonzo</a>
+		</div>
+	</header>
+	<form action="cgi-php/send.php" method="post">
+		<input type="text" name="fio" placeholder="Укажите ФИО" required>
+		<input type="text" name="email" placeholder="Укажите e-mail" required>
+		<input type="submit" value="Отправить">
+	</form>
 </body>
 </html>

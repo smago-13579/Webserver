@@ -130,6 +130,7 @@ if	str[0] == str[1] == str[2] and str[0] != " "\
 		delete="New game", end=cc.end_o))
 
 else:
+	print('Status: 200 OK\r\n')
 	print('Content-type: text/html\r\n\r\n')
 	print(cc.main.format(button1=button1, button2=button2, button3=button3,
 		button4=button4, button5=button5, button6=button6,

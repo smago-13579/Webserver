@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/18 20:00:52 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/21 14:36:54 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,10 @@ Response::Response(const Request& req, Settings set)
 	this->req = req;
 	this->response_done	= 0;
 	this->settings = &set;
-	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
-	this->error_500 += "Error 500</h1><h2 style=\"font-size:160%;\">";
-	this->error_500 += "Internal Server Error</h2></body></html>";
 	
 	if ((it = find_location()) == settings->locations.end()) {
 		std::cout << "\nBAD REQUEST\n";
-		error_page(400);
+		this->error_page(400);
 			return ;
 	}
 	this->autoindex = it->autoindex;
@@ -35,8 +32,8 @@ Response::Response(const Request& req, Settings set)
 
 	/*				ngonzo						*/
     query_string.clear();
-    std::cout << "! it->exec - " << it->exec << std::endl;
-    std::cout << "! req.resource - " << this->req.resource << std::endl;
+    // std::cout << "! it->exec - " << it->exec << std::endl;
+    // std::cout << "! req.resource - " << this->req.resource << std::endl;
     if(it->exec != "")
     {
          if(this->req.resource.find("?") != std::string::npos)
@@ -47,8 +44,8 @@ Response::Response(const Request& req, Settings set)
             this->req.resource = this->req.resource.substr(0, ind - 1);
         }
     }
-    std::cout << "! req.resource - " << this->req.resource << std::endl;
-    std::cout << "! query_string - " << query_string << std::endl;
+    // std::cout << "! req.resource - " << this->req.resource << std::endl;
+    // std::cout << "! query_string - " << query_string << std::endl;
 	/*				ngonzo						*/
 
 	find_method(req);
@@ -58,9 +55,6 @@ Response::Response(int error, Settings set)
 {
 	this->response_done	= 0;
 	this->settings = &set;
-	this->error_500 = "<!DOCTYPE html><html><body><h1 style=\"font-size:300%;\">";
-	this->error_500 += "Error 500</h1><h2 style=\"font-size:160%;\">";
-	this->error_500 += "Internal Server Error</h2></body></html>";
 	this->error_page(error);
 }
 
@@ -72,7 +66,6 @@ Response&	Response::operator=(const Response& tmp)
 	settings = tmp.settings;
 	answer = tmp.answer;
 	response_done = tmp.response_done;
-	error_500 = tmp.error_500;
 	autoindex = tmp.autoindex;
 	content_type = tmp.content_type;
 	it = tmp.it;
@@ -98,31 +91,28 @@ int			Response::error_page(int i)
 
 	if ((fd = open(file.str().c_str(), O_RDONLY)) < 0) {
 		std::cout << "CAN'T OPEN FILE: " << file.str() << std::endl;
-		if (i != 500)
-			return (this->error_page(500));
-		else 
-			body << this->error_500 << "\r\n\r\n";
+			body << ::error_page(i) << "\r\n\r\n";
 	}
-	else 
+	else
 	{
 		while ((res = read(fd, buff, 99999)) > 0) {
 			buff[res] = '\0';
 			body << buff;
 		}
-		body << "\r\n\r\n";
 		if (res < 0) {
 			std::cout << "CAN'T READ FILE: " << file.str() << std::endl;
-			body.ignore(9999999);
-			body << this->error_500 << "\r\n\r\n";
+			body << ::error_500();
 		}
-		else
-			close(fd);
+		body << "\r\n\r\n";
+		close(fd);
 	}
 
-	response << "HTTP/1.1 " << itoa(i) << status_codes(i)
-	<< "Version: " << "HTTP/1.1\r\n"
-	<< get_headers(file.str());
-	response << "Content-Length: " << body.str().length()
+	response << "HTTP/1.1 " << itoa(i) << status_codes(i);
+	if (i == 405)
+		response << "Allow: " << this->get_method();
+	response << "Version: HTTP/1.1\r\n"
+	<< get_headers(file.str())
+	<< "Content-Length: " << body.str().length()
 	<< "\r\n\r\n" << body.str();
 	this->answer = response.str();
 	
@@ -141,6 +131,10 @@ std::string			Response::status_codes(int i)
 		str = " Forbidden\r\n";
 	else if (i == 404)
 		str = " Not Found\r\n";
+	else if (i == 405)
+		str = " Method Not Allowed\r\n";
+	else if (i == 413)
+		str = " Payload Too Large\r\n";
 	else if (i == 500)
 		str = " Internal Server Error\r\n";
 
@@ -159,6 +153,21 @@ int			Response::compare_prefix(std::string loc, std::string res)
 	if (loc[i] == '\0')
 		return (i);
 	return (0);
+}
+
+std::string Response::get_method()
+{
+	int i = it->methods[0];
+	std::string str = " \r\n";
+	if (i == GET)
+		str = "GET\r\n";
+	else if (i == POST)
+		str = "POST\r\n";
+	else if (i == DELETE)
+		str = "DELETE\r\n";
+	else if (i == PUT)
+		str = "PUT\r\n";
+	return str;
 }
 
 int			Response::check_method(std::vector<size_t>& methods, size_t cmd)
@@ -195,7 +204,7 @@ int			Response::create_response(const Location& loc, std::string status)
 			else if (errno == ENOENT)
 				return (error_page(404));
 		}
-		if (format == TEXT && loc.exec != "")
+		if (req.type == "POST" && loc.exec != "")
 			body << res_body << "\r\n\r\n";
 		else if (format == TEXT)
 		{
@@ -208,8 +217,6 @@ int			Response::create_response(const Location& loc, std::string status)
 				std::cout << "CAN'T READ FILE\n";
 				return (error_page(500));
 			}
-			else
-				close(fd);
 		}
 		else
 		{
@@ -218,6 +225,7 @@ int			Response::create_response(const Location& loc, std::string status)
 			image.clear();
 			image.close();
 		}
+		close(fd);
 	}
 
 	response << req.version << status
@@ -243,6 +251,7 @@ Response::loc_iter	Response::find_location()
 	
 	for (loc_iter it = settings->locations.begin(); it != settings->locations.end(); it++)
 	{
+		std::cout << "it->location: " << it->location << "\treq.resource: " << req.resource << std::endl;
 		if (it->location == req.resource)
 			return (it);
 	}
@@ -268,6 +277,8 @@ void		Response::find_method(const Request& req)
 		this->method_PUT(req);
 	else if (req.type == "POST")
 		this->method_POST(it);
+	else
+		error_page(405);
 }
 
 int					Response::get_format(std::string str)
@@ -335,7 +346,7 @@ std::string			Response::get_path(const Location& loc)
 		pos++;
 	
 	if (req.resource == loc.location && req.type != "DELETE") {
-		if (this->autoindex == OFF)
+		if (this->autoindex == OFF && req.type != "POST")
 			str << loc.root << "/" << loc.index;
 		else
 			str << loc.root;
@@ -345,6 +356,8 @@ std::string			Response::get_path(const Location& loc)
 		<< req.resource.substr(pos, len - pos);
 	}
 	get_format(str.str());
+	if (this->format == DIRC && this->autoindex == OFF && req.type != "POST")
+		str << "/" << it->index;
 	return str.str();
 }
 
@@ -363,15 +376,18 @@ void			Response::erase_answer(int i)
 int			Response::method_GET()
 {
 	if (check_method(it->methods, GET) == 1) {
-		if(it->exec != "")
+		if(it->exec.find(".") != std::string::npos)
+		{
+			req.type = "POST";
 			method_POST(it);
+		}
 		else
 			create_response(*it);
 	}
 	else
 	{
 		std::cout << "\nBAD REQUEST\n";
-		error_page(400);
+		error_page(405);
 	}
 	return (0);
 }
@@ -393,7 +409,7 @@ int			Response::method_DELETE()
 	else
 	{
 		std::cout << "\nPERMISSION DENIED\n";
-		error_page(403);
+		error_page(405);
 	}
 	return (0);
 }
@@ -431,55 +447,46 @@ int			Response::method_PUT(const Request& req)
 	else
 	{
 		std::cout << "\nPERMISSION DENIED\n";
-		error_page(403);
+		error_page(405);
 	}
 	return (0);
 }
 
 int			Response::method_POST(loc_iter &it)
 {
-	// if(req.body.size() > it->max_body)
+	if (check_method(it->methods, POST) != 1) {
+		error_page(405);
+	}
+	else if(req.body.size() > it->max_body)
+	{
+		std::cout << "\n! body.size > max_body\n";                    // for test
+		error_page(413);
+	}
+	// else if(req.body.empty() and query_string.empty() && it->exec.find(".") == std::string::npos)
 	// {
-	// 	req.body.clear();
-	// 	// req.status_code_int_val = 413;
-	// 	// req.reason_phrase = "Payload Too Large";
-	// 	// req.headers.add_header("Content-Length", "0");
+	// 	std::cout << "\n! body.size == max_body\n";                   // for test
+	// 	create_response(*it);
 	// }
-	// else if(req.body.size() == it->max_body or req.body.empty()) // and req.get_query_string().empty() )
-	// {
-	// 	req.body.clear(); // r.body = req.get_body();
-	// 	// req.status_code_int_val = 200;
-	// 	// req.reason_phrase = "OK";
-	// 	// req.headers.add_header("Content-Length", std::to_string(req.body.size()));
-	// }
-	// else
-	// {
-//		std::cout << "!!! POST - ";                                        // for test
-        std::vector<std::string>    env = cgi_env(it);
+	else
+	{
+		std::cout << "\n! POST \n";                                        // for test
+		std::vector<std::string> env = cgi_env(it);
 		cgi_handler cgi(env, it->root);
 		cgi.req_body_to_fd(req.body);
 		bool check = cgi.execute();
-//		std::cout << "get_filename: " << cgi.get_filename() << std::endl; // for test
-        // std::cout << "get_status_code: " << cgi.get_status_code() << std::endl;				// for test
-        // std::cout << "get_str_content_type: " << cgi.get_str_content_type() << std::endl;	// for test
-        // std::cout << "get_str_status_code: " << cgi.get_str_status_code() << std::endl;		// for test
-        // std::cout << "get_response_body: " << cgi.get_response_body() << std::endl;			// for test
 		if (check == true)
 		{
-            res_body = cgi.get_response_body();
-            create_response(*it);
-//            req.status_code_int_val = cgi.get_status_code();
-//            req.reason_phrase = cgi.get_str_status_code();
-//            req.headers.add_header("Content-Type", cgi.get_str_content_type());
-//            req.headers.add_header("Content-Length", std::to_string(cgi.get_response_body().size()));
+			res_body = cgi.get_response_body();
+			create_response(*it);
 			return (0);
 		}
 		else
 		{
-			return (-1);// ERROR
+			error_page(500);
+			return -1;
 		}
-//	 }
-	return (-1);// ERROR
+	}
+	return 0;
 }
 
 std::vector<std::string>		Response::cgi_env(loc_iter &it)
