@@ -194,11 +194,14 @@ a {
 }
 
 .jeka_php {
-	/* display: flex; */
+	margin: 0;
+	padding: 0;
+	display: flex;
 	justify-content: center;
 	align-items: center;
 	margin-left: 2vw;
-	font-size: 4rem;
+	font-size: 2rem;
+	border-radius: .4rem;
 }
 .jeka_php_b {
 	margin: 0;
@@ -208,6 +211,15 @@ a {
 	align-items: center;
 	margin-left: 0vw;
 	font-size: 3rem;
+	border-radius: .4rem;
+}
+
+button_send {
+	height: 5rem;
+	width: 5rem;
+	margin: .5rem;
+	background: rgb(126, 200, 235);
+	border: 1px solid rgba(0, 0, 0, .2);;
 	border-radius: .4rem;
 }
 

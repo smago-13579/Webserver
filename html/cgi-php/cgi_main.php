@@ -29,19 +29,29 @@
 	</header>
 	<body>
 		<div class="jeka_php">
-			<form action="cgi-php?name=Anonimus&nickname=Mortas&data=Ta-tata-ta" method="post">
-				<button><a class="jeka_php_b">Create default</a></button>
-			</form>
 			<?php
 				parse_str($_ENV["QUERY_STRING"], $result);
-				echo "Name : " . $result['name'] . "<br>";
-				echo "Nickname : " . $result['nickname'] . "<br>";
-				echo "Date : " . $result['data'] . "<br>";
+				if($result) {
+				echo "Login : " . $result['Login'] . "<br>";
+				echo "Nickname : " . $result['Nickname'] . "<br>";
+				echo "Data : " . $result['Data'] . "<br>";
+				}
+				else {
+					echo '<form action="cgi-php?login=Anonimus&Nickname=Mortas&Data=Ta-tata-ta" method="get">';
+					echo 'Input Login:';
+					echo '<input name="Login"required type="text"><br>';
+					echo 'Input Nickname:';
+					echo '<input name="Nickname" required type="text"><br>';
+					echo 'Input Data:';
+					echo '<input name="Data" type="text"><br>';
+					echo '<button><h1>Send</h1></button>';
+					echo '</form>';
+				}
 				$f = fopen('html/cgi-php/users_base', 'a+');
 				if($result) {
-					fwrite($f, "Name=" . $result['name'] . " && ");
-					fwrite($f, "Nickname=" . $result['nickname'] . " && ");
-					fwrite($f, "Data=" . $result['data'] . " ;\r\n");
+					fwrite($f, ";Login=" . $result['Login'] . " && ");
+					fwrite($f, "Nickname=" . $result['Nickname'] . " && ");
+					fwrite($f, "Data=" . $result['Data'] . ";\r\n");
 				}
 				fclose($f);
 			?>

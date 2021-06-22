@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/22 12:29:26 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 19:06:00 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 Response::Response() {}
 
-Response::Response(const Request& req, Settings set): connection(ON)
+Response::Response(const Request& req, Settings set): connection(ON), cookie("")
 {
 	this->req = req;
 	this->response_done	= 0;
@@ -41,6 +41,12 @@ Response::Response(const Request& req, Settings set): connection(ON)
 		if(ind != std::string::npos)
 		{
 			query_string = this->req.resource.substr(ind + 1);
+			int login;
+			if ((login = query_string.find("login=")) != query_string.npos) {
+				cookie = std::string(query_string, login + 6, query_string.find("&", login) - login - 6);
+				cookie = "Login=" + cookie;
+				std::cout << "COOKIE " << cookie << std::endl;
+			}
 			ind = this->req.resource.size() - query_string.size();
 			this->req.resource = this->req.resource.substr(0, ind - 1);
 		}
@@ -230,6 +236,9 @@ int			Response::create_response(const Location& loc, std::string status)
 	response << req.version << status
 	<< "Version: " << req.version << "\r\n"
 	<< get_headers(file, req.type, req.resource);
+	if ((req.headers.find("Cookie") == req.headers.end() || \
+		req.headers["Cookie"] != cookie) && cookie != "")
+		response << "Set-Cookie: " << cookie << "\r\n";
 	if (req.type != "DELETE" && req.type != "PUT")
 	{
 		response << "Content-Length: " << body.str().length()
@@ -396,7 +405,7 @@ int			Response::method_DELETE()
 {
 	std::string file;
 
-	if (check_method(it->methods, DELETE) == 1 && it->location.find("/images_for_delete/") != it->location.npos)
+	if (check_method(it->methods, DELETE) == 1 && it->location.find("/images_for_delete") != it->location.npos)
 	{
 		file = get_path(*it);
 		if (remove(file.c_str()) != 0)
@@ -470,6 +479,30 @@ int			Response::method_POST(loc_iter &it)
 	else
 	{
 		// std::cout << "\n! POST \n";                                        // for test
+		std::string kook, buffer = "";
+		int fd, res;
+		char buf[1024];
+		if (req.headers.find("Cookie") != req.headers.end() && query_string.empty())
+		{
+			std::stringstream str;
+			kook = req.headers["Cookie"];
+			if ((fd = open("html/cgi-php/users_base", O_RDONLY)) > 0) 
+			{
+				while ((res = read(fd, buf, 1023)) > 0)
+				{
+					buf[res] = '\0';
+					buffer += std::string(buf);
+				}
+				std::cout << "USERSBASE: \n" << buffer << std::endl;
+				if (buffer.find(kook) != buffer.npos) {
+					int i = buffer.find(kook);
+					int fin = buffer.find(";", i);
+					std::string strinfo(buffer, i, fin - i);
+					std::cout << "STRINFO: " << strinfo << std::endl;
+					query_string = strinfo;
+				}
+			}
+		}
 		std::vector<std::string> env = cgi_env(it);
 		cgi_handler cgi(env, it->root);
 		if(it->exec == "cgi_tester")

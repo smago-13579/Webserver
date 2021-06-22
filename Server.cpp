@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 12:45:09 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 20:16:45 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 16:33:45 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ const char* Server::Abort_server::what() const throw()
 Server::Server(std::string str) 
 {
 	config = new Config(str);
-	
+	remove("html/cgi-bin/for_game.tmp");
+
     std::vector<Config::Server> serv = config->getServers();
 	for (conf_iter it = serv.begin(); \
 			it != serv.end(); it++)

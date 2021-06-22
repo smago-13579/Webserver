@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 18:00:59 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 18:25:21 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ private:
 	int					autoindex;
 	int					format;
 	int					connection;
+	std::string			cookie;
 	std::string			res_body;
 	Request				req;
 	Settings* 			settings;
