@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/21 13:25:41 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 20:57:46 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void 	Request::processRequest(std::string &str)
 			buf.clear();
 			_body_size = 0;
 		}
-		else if (_body_size > 0 && buf.length() >= _body_size)
+		else if (_body_size > 0 && buf.length() >= static_cast<size_t>(_body_size))
 		{
 			body = std::string(buf, 0, _body_size);
 			buf.clear();
@@ -111,7 +111,6 @@ void    Request::filling_start_line()
 {
     size_t  pos_space = 0;
     size_t  pos_begin = 0;
-    size_t  i = 0;
     std::string new_str(buf, 0, buf.find(NEXT_STR));
 	if ((pos_space = new_str.find(' ', pos_begin)) != new_str.npos)
 	{

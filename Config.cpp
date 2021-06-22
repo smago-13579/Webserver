@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/17 20:57:10 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/22 20:39:19 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,7 @@ Config::Server  *Config::parser_server()
     Config::Server  *point_to_serv = new Config::Server;
 
     /**************/
-    /*   listen   */ //обязательное поле
+    /*   listen   */
     /**************/
     if ((pos_begin = _server_line.find("listen")) != _server_line.npos)
     {
@@ -217,7 +217,7 @@ Config::Server  *Config::parser_server()
     }
 
     /*******************/
-    /*   server_name   */ //не обязательный параметр 
+    /*   server_name   */
     /*******************/
     pos_begin = 0;
     if ((pos_begin = _server_line.find("server_name")) != _server_line.npos)
@@ -238,7 +238,7 @@ Config::Server  *Config::parser_server()
     }
 
     /****************/
-    /*   redirect   */ //не обязательный параметр 
+    /*   redirect   */
     /****************/
     pos_begin = 0;
     if ((pos_begin = _server_line.find("return301")) != _server_line.npos)
@@ -259,7 +259,7 @@ Config::Server  *Config::parser_server()
     }
 
     /******************/
-    /*   error_page   */ //обязательное поле
+    /*   error_page   */
     /******************/
     pos_begin = 0;
     if ((pos_begin = _server_line.find("error_page")) != _server_line.npos)
@@ -285,7 +285,7 @@ Config::Server  *Config::parser_server()
     }
     
     /*****************/
-    /*   locations   */ //обязательное поле
+    /*   locations   */
     /*****************/
     pos_begin = 0;
     int count_locations = 0;
@@ -313,11 +313,6 @@ Config::Server  *Config::parser_server()
         delete loc;
         pos_begin = pos_end + 1;
     }
-    // if (count_locations == 0)
-    // {
-    //     delete point_to_serv;
-    //     throw(Config::Missing_field());
-    // }
 
     return (point_to_serv);
 }
@@ -332,7 +327,7 @@ Config::Location  *Config::parser_location()
     
     
     /****************/
-    /*   location   */ //обязательное поле
+    /*   location   */
     /****************/
     if ((pos_end = _location_line.find("{")) == _location_line.npos)
     {
@@ -349,7 +344,7 @@ Config::Location  *Config::parser_location()
     pos_start = pos_begin;
 
     /***************/
-    /*   methods   */ // обязательное поле
+    /*   methods   */
     /***************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("methods")) != _location_line.npos)
@@ -393,7 +388,7 @@ Config::Location  *Config::parser_location()
 
 
     /************/
-    /*   root   */ //обязательное поле
+    /*   root   */
     /************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("root")) != _location_line.npos)
@@ -415,7 +410,7 @@ Config::Location  *Config::parser_location()
     }
 
     /*****************/
-    /*   autoindex   */ //не обязательное поле - по умолчанию на off
+    /*   autoindex   */
     /*****************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("autoindex")) != _location_line.npos)
@@ -442,7 +437,7 @@ Config::Location  *Config::parser_location()
     }
 
     /*************/
-    /*   index   */ // не обязательное поле
+    /*   index   */
     /*************/    
     if ((pos_begin = _location_line.find("index")) != _location_line.npos)
     {
@@ -462,7 +457,7 @@ Config::Location  *Config::parser_location()
     }
 
     /****************/
-    /*   max_body   */ //не обязательное поле - по умолчанию на max int
+    /*   max_body   */
     /****************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("max_body")) != _location_line.npos)
@@ -483,7 +478,7 @@ Config::Location  *Config::parser_location()
     }
 
     /************/
-    /*   exec   */ //не обязательное поле
+    /*   exec   */
     /************/
     pos_begin = pos_start;
     if ((pos_begin = _location_line.find("exec")) != _location_line.npos)

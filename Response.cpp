@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/22 20:14:38 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 20:58:06 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,17 +31,19 @@ Response::Response(const Request& req, Settings set): connection(ON), cookie("")
 	}
 	if (settings->redirect.empty())
 		this->autoindex = it->autoindex;
+	if (req.body.size() > static_cast<size_t>(it->max_body))
+		error_page(413);
 	this->content_type = "";
 
 	/*				ngonzo						*/
 	query_string.clear();
 	if(settings->redirect.empty() && it->exec != "")
 	{
-		int	ind = this->req.resource.find("?");
+		size_t	ind = this->req.resource.find("?");
 		if(ind != std::string::npos)
 		{
 			query_string = this->req.resource.substr(ind + 1);
-			int login;
+			size_t login;
 			if ((login = query_string.find("Login=")) != query_string.npos) {
 				cookie = std::string(query_string, login + 6, query_string.find("&", login) - login - 6);
 				cookie = "Login=" + cookie;
@@ -234,7 +236,7 @@ int			Response::create_response(const Location& loc, std::string status)
 
 	response << req.version << status
 	<< "Version: " << req.version << "\r\n"
-	<< get_headers(file, req.type, req.resource);
+	<< get_headers(file, req.resource);
 	if ((req.headers.find("Cookie") == req.headers.end() || \
 		req.headers["Cookie"] != cookie) && cookie != "")
 		response << "Set-Cookie: " << cookie << "\r\n";
@@ -315,7 +317,7 @@ int					Response::get_format(std::string str)
 	return (format);
 }
 
-std::string			Response::get_headers(std::string str, std::string type, std::string location)
+std::string			Response::get_headers(std::string str, std::string location)
 {
 	std::stringstream headers;
 	time_t raw;
@@ -465,8 +467,6 @@ int			Response::method_POST(loc_iter &it)
 	if (check_method(it->methods, POST) != 1) {
 		error_page(405);
 	}
-	else if(req.body.size() > it->max_body)
-		error_page(413);
 	else
 	{
 		std::string kook, buffer = "";
@@ -532,12 +532,12 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	tmp.push_back("CONTENT_TYPE=" + content_type);
 	tmp.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	tmp.push_back("PATH_INFO=" + req.resource);
-	tmp.push_back("PATH_TRANSLATED=" + it->root);// + req.resource);
+	tmp.push_back("PATH_TRANSLATED=" + it->root);
 	tmp.push_back("QUERY_STRING=" + query_string);
 	tmp.push_back("REMOTE_ADDR=" + settings->ip);
 	tmp.push_back("REMOTE_IDENT=." + req.headers["Host"]);
 	tmp.push_back("REMOTE_USER=");
-	tmp.push_back("REQUEST_METHOD=GET");// + req.type);
+	tmp.push_back("REQUEST_METHOD=GET");
 	tmp.push_back("REQUEST_URI=" + req.resource);
 	tmp.push_back("SCRIPT_NAME=" + it->exec);
 	tmp.push_back("SERVER_NAME=" + settings->server_name);

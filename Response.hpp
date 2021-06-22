@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:27:58 by smago             #+#    #+#             */
-/*   Updated: 2021/06/22 18:25:21 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 20:56:05 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ private:
 	loc_iter		find_location();
 	void			find_method();
 	int				get_format(std::string str);
-	std::string		get_headers(std::string str, std::string type = "", std::string location = "");
+	std::string		get_headers(std::string str, std::string location = "");
 	std::string 	get_method();
 	std::string		get_path(const Location& loc);
 	int 			method_GET();

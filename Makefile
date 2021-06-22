@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ngonzo <ngonzo@student.42.fr>              +#+  +:+       +#+         #
+#    By: smago <smago@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/05/25 14:03:12 by smago             #+#    #+#              #
-#    Updated: 2021/06/21 14:54:10 by ngonzo           ###   ########.fr        #
+#    Updated: 2021/06/22 20:40:27 by smago            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ S = -fsanitize=address
 all: $(NAME)
 
 $(NAME): $(SRCS)
-	clang++ $(SRCS) -g -o $(NAME) 
+	clang++ $(SRCS) $(FLAGS) -g -o $(NAME) 
 
 clean:
 	rm -rf $(NAME) $(NAME).dSYM
