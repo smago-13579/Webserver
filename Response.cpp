@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/21 20:24:49 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 12:29:26 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,11 @@
 
 Response::Response() {}
 
-Response::Response(const Request& req, Settings set)
+Response::Response(const Request& req, Settings set): connection(ON)
 {
 	this->req = req;
 	this->response_done	= 0;
 	this->settings = &set;
-	this->connection = ON;
 	if (this->req.headers.find("Connection") != this->req.headers.end() && \
 		this->req.headers["Connection"] == "close")
 		this->connection = OFF;
@@ -251,7 +250,6 @@ Response::loc_iter	Response::find_location()
 	
 	for (loc_iter it = settings->locations.begin(); it != settings->locations.end(); it++)
 	{
-		std::cout << "it->location: " << it->location << "\treq.resource: " << req.resource << std::endl;
 		if (it->location == req.resource)
 			return (it);
 	}
