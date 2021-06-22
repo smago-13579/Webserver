@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:20:44 by smago             #+#    #+#             */
-/*   Updated: 2021/06/22 17:06:06 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 20:14:55 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,6 @@ public:
 private:
 	std::map<int, Response> resp;
 	std::map<int, Request> req;
-	// std::map<std::string, 
-	// std::map<std::string, std::string> answer;
 	struct 	sockaddr_in	addr;
 	int 	socket_fd;
 

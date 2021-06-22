@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/10 15:27:39 by smago             #+#    #+#             */
-/*   Updated: 2021/06/22 16:22:04 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 20:19:28 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,14 +55,6 @@ int		Socket::accept_client()
 		std::cout << "\n----CONNECTION ACCEPTED----\n";
 		std::cout << "Client's FD: " << new_fd << "\tip: " << settings.ip << \
 				"\tport: " << settings.port << std::endl;
-	
-		/*		GET CLIENT'S ADDRESS			*/
-		if (inet_ntop(AF_INET, &new_addr, buff, 256) != NULL)
-		{
-			std::string ip(buff);
-			// api.insert(std::make_pair(new_fd, ip));
-			std::cout << "client: " << ip << std::endl;
-		}
 		
 	/*		SET NON_BLOCK TO CLIENT			*/
 		fcntl(new_fd, F_SETFL, O_NONBLOCK);

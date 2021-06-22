@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/22 19:06:00 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 20:14:38 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,9 @@ Response::Response(const Request& req, Settings set): connection(ON), cookie("")
 		{
 			query_string = this->req.resource.substr(ind + 1);
 			int login;
-			if ((login = query_string.find("login=")) != query_string.npos) {
+			if ((login = query_string.find("Login=")) != query_string.npos) {
 				cookie = std::string(query_string, login + 6, query_string.find("&", login) - login - 6);
 				cookie = "Login=" + cookie;
-				std::cout << "COOKIE " << cookie << std::endl;
 			}
 			ind = this->req.resource.size() - query_string.size();
 			this->req.resource = this->req.resource.substr(0, ind - 1);
@@ -467,18 +466,9 @@ int			Response::method_POST(loc_iter &it)
 		error_page(405);
 	}
 	else if(req.body.size() > it->max_body)
-	{
-		// std::cout << "\n! body.size > max_body\n";                    // for test
 		error_page(413);
-	}
-	// else if(req.body.empty() and query_string.empty() && it->exec.find(".") == std::string::npos)
-	// {
-	// 	std::cout << "\n! body.size == max_body\n";                   // for test
-	// 	create_response(*it);
-	// }
 	else
 	{
-		// std::cout << "\n! POST \n";                                        // for test
 		std::string kook, buffer = "";
 		int fd, res;
 		char buf[1024];
@@ -493,12 +483,10 @@ int			Response::method_POST(loc_iter &it)
 					buf[res] = '\0';
 					buffer += std::string(buf);
 				}
-				std::cout << "USERSBASE: \n" << buffer << std::endl;
 				if (buffer.find(kook) != buffer.npos) {
 					int i = buffer.find(kook);
 					int fin = buffer.find(";", i);
 					std::string strinfo(buffer, i, fin - i);
-					std::cout << "STRINFO: " << strinfo << std::endl;
 					query_string = strinfo;
 				}
 			}
@@ -559,10 +547,6 @@ std::vector<std::string>		Response::cgi_env(loc_iter &it)
 	std::map<std::string, std::string>::iterator	begin = req.headers.begin(), end = req.headers.end();
 	for (; begin != end; ++begin)
 		tmp.push_back("HTTP_" + begin->first + "=" + begin->second);
-	// // print env
-	// for (std::vector<std::string>::iterator	begin = tmp.begin(), end = tmp.end(); begin != end; ++begin)
-	// 	std::cout << "! " << *begin << std::endl;
-	// // print env end
 	return tmp;
 }
 
