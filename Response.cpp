@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/22 20:58:06 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/22 22:13:44 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,10 @@ Response::Response(const Request& req, Settings set): connection(ON), cookie("")
 	}
 	if (settings->redirect.empty())
 		this->autoindex = it->autoindex;
-	if (req.body.size() > static_cast<size_t>(it->max_body))
+	if (req.body.size() > static_cast<size_t>(it->max_body)) {
 		error_page(413);
+		return ;
+	}
 	this->content_type = "";
 
 	/*				ngonzo						*/
@@ -406,7 +408,9 @@ int			Response::method_DELETE()
 {
 	std::string file;
 
-	if (check_method(it->methods, DELETE) == 1 && it->location.find("/images_for_delete") != it->location.npos)
+	if (check_method(it->methods, DELETE) != 1)
+		return (error_page(405));
+	else if (it->location.find("/images_for_delete/") != it->location.npos)
 	{
 		file = get_path(*it);
 		if (remove(file.c_str()) != 0)
@@ -419,7 +423,7 @@ int			Response::method_DELETE()
 	else
 	{
 		std::cout << "\nPERMISSION DENIED\n";
-		error_page(405);
+		error_page(403);
 	}
 	return (0);
 }

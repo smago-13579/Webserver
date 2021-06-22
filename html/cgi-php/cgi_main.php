@@ -32,12 +32,12 @@
 			<?php
 				parse_str($_ENV["QUERY_STRING"], $result);
 				if($result) {
-				echo "Login : " . $result['Login'] . "<br>";
-				echo "Nickname : " . $result['Nickname'] . "<br>";
-				echo "Data : " . $result['Data'] . "<br>";
+					echo "Login : " . $result['Login'] . "<br>";
+					echo "Nickname : " . $result['Nickname'] . "<br>";
+					echo "Data : " . $result['Data'] . "<br>";
 				}
 				else {
-					echo '<form action="cgi-php?login=Anonimus&Nickname=Mortas&Data=Ta-tata-ta" method="get">';
+					echo '<form action="cgi-php" method="get">';
 					echo 'Input Login:';
 					echo '<input name="Login"required type="text"><br>';
 					echo 'Input Nickname:';
@@ -47,13 +47,16 @@
 					echo '<button><h1>Send</h1></button>';
 					echo '</form>';
 				}
-				$f = fopen('html/cgi-php/users_base', 'a+');
 				if($result) {
-					fwrite($f, ";Login=" . $result['Login'] . " && ");
-					fwrite($f, "Nickname=" . $result['Nickname'] . " && ");
-					fwrite($f, "Data=" . $result['Data'] . ";\r\n");
+					$str = "Login=" . $result['Login'] . "&" . "Nickname=" . $result['Nickname'] . "&" . "Data=" . $result['Data'] . ";\r\n";
+					$file = file("html/cgi-php/users_base");
+					if(!in_array($str, $file))
+					{
+						$f = fopen('html/cgi-php/users_base', 'a+');
+						fwrite($f, $str);
+						fclose($f);
+					}
 				}
-				fclose($f);
 			?>
 		</div>
 	</body>
