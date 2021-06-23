@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/22 20:57:46 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/23 10:32:45 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ void    Request::filling_start_line()
         pos_begin = pos_space + 1;
 	}
 
-    if (type.empty() || resource.empty() || version.empty())
+    if (type.empty() || resource.empty() || version.empty() || (!version.empty() && version != "HTTP/1.1"))
 		_request_done = ERROR;
 }
 
