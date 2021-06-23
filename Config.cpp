@@ -6,7 +6,7 @@
 /*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/08 10:30:18 by kbatwoma          #+#    #+#             */
-/*   Updated: 2021/06/22 21:23:46 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/23 13:11:27 by smago            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -401,7 +401,7 @@ Config::Location  *Config::parser_location()
         }
         (*point_to_location).root = std::string(_location_line, pos_begin, pos_end - pos_begin);
 
-        std::cout << (*point_to_location).root << std::endl;
+        // std::cout << (*point_to_location).root << std::endl;
     }
     else
     {
@@ -433,7 +433,7 @@ Config::Location  *Config::parser_location()
         }
         pos_begin -= 9;
         _location_line.erase(pos_begin, 9);
-        std::cout << _location_line << std::endl;
+        // std::cout << _location_line << std::endl;
     }
 
     /*************/

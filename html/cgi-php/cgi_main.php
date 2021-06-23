@@ -34,7 +34,8 @@
 				if($result) {
 					echo "Login : " . $result['Login'] . "<br>";
 					echo "Nickname : " . $result['Nickname'] . "<br>";
-					echo "Data : " . $result['Data'] . "<br>";
+					if($result['Data'])
+						echo "Data : " . $result['Data'] . "<br>";
 				}
 				else {
 					echo '<form action="cgi-php" method="get">';
@@ -48,14 +49,16 @@
 					echo '</form>';
 				}
 				if($result) {
+					$f = fopen('html/cgi-php/users_base', 'a+');
 					$str = "Login=" . $result['Login'] . "&" . "Nickname=" . $result['Nickname'] . "&" . "Data=" . $result['Data'] . ";\r\n";
-					$file = file("html/cgi-php/users_base");
-					if(!in_array($str, $file))
-					{
-						$f = fopen('html/cgi-php/users_base', 'a+');
+					if(!file_get_contents("html/cgi-php/users_base"))
 						fwrite($f, $str);
-						fclose($f);
+					else {
+						$file = file("html/cgi-php/users_base");
+						if(!in_array($str, $file))
+						fwrite($f, $str);
 					}
+					fclose($f);
 				}
 			?>
 		</div>
