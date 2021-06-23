@@ -50,8 +50,6 @@ public:
 
 	// methods
 	bool	execute();
-	bool	execute_pipe();
-	bool	execute_tester();
 	void	req_body_to_fd(str & request_body);
 
 };

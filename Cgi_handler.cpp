@@ -109,14 +109,6 @@ std::string const		cgi_handler::get_filename() const
 
 bool		cgi_handler::execute()
 {
-
-	if(_exec == "cgi_tester")
-		return execute_tester();
-	return execute_pipe();
-}
-
-bool		cgi_handler::execute_pipe()
-{
 	int		fd_pipe[2], fd_save[2], tmp;
 	char	buff[buffer_size];
 
@@ -143,44 +135,6 @@ bool		cgi_handler::execute_pipe()
 
 	_parse_cgi();
 	_restore_fd_and_close(fd_pipe, fd_save);
-	return true;
-}
-
-bool		cgi_handler::execute_tester()
-{
-	int		fd[2], fd_save[2], tmp;
-	char	buff[buffer_size];
-
-	std::ofstream   temp(_root + "/temp");
-	temp.open(_root + "/temp");
-
-	fd[0] = open(std::string(_root + "/_input_data").c_str(), O_RDONLY);
-	fd[1] = open(std::string(_root + "/temp").c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
-
-	fd_save[0] = dup(0);
-	fd_save[1] = dup(1);
-	if (fork() == 0)
-	{
-		dup2(fd[0], 0);
-		dup2(fd[1], 1);
-		if (execve(_filename.c_str(), NULL, _env) == -1)
-		{
-			_restore_fd_and_close(fd, fd_save);
-			exit(127);
-		}
-	}
-	wait(&tmp);
-	if(WEXITSTATUS(tmp) == 127)
-		return _restore_fd_and_close(fd, fd_save);
-	_response_body.clear();
-	close(fd[0]);
-	fd[0] = open(std::string(_root + "/temp").c_str(), O_RDONLY);
-	dup2(fd[0], 0);
-	for(tmp = buffer_size; tmp == buffer_size ; _response_body += std::string(buff, tmp))
-		if((tmp = read(fd[0], buff, buffer_size)) == -1)
-			return _restore_fd_and_close(fd, fd_save);
-	_parse_cgi();
-	_restore_fd_and_close(fd, fd_save);
 	return true;
 }
 
