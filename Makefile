@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+         #
+#    By: smago <smago@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/05/25 14:03:12 by smago             #+#    #+#              #
-#    Updated: 2021/06/23 12:28:56 by kbatwoma         ###   ########.fr        #
+#    Updated: 2021/06/23 12:46:44 by smago            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,16 +15,30 @@ NAME = webserver
 SRCS = main.cpp Server.cpp Socket.cpp Request.cpp Response.cpp Config.cpp \
 		Cgi_handler.cpp Autoindex.cpp errors.cpp
 
-FLAGS = -Wall -Wextra -Werror
+HEADERS = Autoindex.hpp Cgi_handler.hpp Config.hpp errors.hpp Request.hpp \
+		Response.hpp Server.hpp Socket.hpp webserv.hpp
 
-S = -fsanitize=address
+OBJDIR = ./obj/
+
+OBJS = $(SRCS:%.cpp=$(OBJDIR)%.o)
+
+FLAGS = -Wall -Wextra -Werror
 
 all: $(NAME)
 
-$(NAME): $(SRCS)
-	clang++ $(SRCS) $(FLAGS) -g -o $(NAME)
+$(NAME): $(OBJDIR) $(OBJS) $(HEADERS)
+	clang++ $(FLAGS) $(OBJS) -o $(NAME) 
+
+$(OBJDIR)%.o : %.cpp 
+	clang++ -c $(FLAGS) $< -o $@
+
+$(OBJDIR):
+	mkdir $(OBJDIR)
 
 clean:
-	rm -rf $(NAME) $(NAME).dSYM
+	rm -rf $(OBJDIR)
 
-re: clean all
+fclean: clean
+	rm -rf $(NAME)
+
+re: fclean all
