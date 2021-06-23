@@ -50,8 +50,6 @@ public:
 
 	// methods
 	bool	execute();
-	void	req_body_to_fd(str & request_body);
-
 };
 
 #endif

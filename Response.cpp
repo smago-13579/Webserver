@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: smago <smago@student.42.fr>                +#+  +:+       +#+        */
+/*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/22 22:13:44 by smago            ###   ########.fr       */
+/*   Updated: 2021/06/23 11:55:07 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -497,10 +497,7 @@ int			Response::method_POST(loc_iter &it)
 		}
 		std::vector<std::string> env = cgi_env(it);
 		cgi_handler cgi(env, it->root);
-		if(it->exec == "cgi_tester")
-			cgi.req_body_to_fd(req.body);
-		bool check = cgi.execute();
-		if (check == true)
+		if (cgi.execute() == true)
 		{
 			res_body = cgi.get_response_body();
 			create_response(*it);

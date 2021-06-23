@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 15:15:16 by monie             #+#    #+#             */
-/*   Updated: 2021/06/23 10:32:45 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/23 11:52:42 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void 	Request::processRequest(std::string &str)
 			_body_size = 0;
 		}
 		std::cout << buf << std::endl;
-		}
+	}
 	/*************/
 	/*   check   */
 	/*************/
@@ -128,7 +128,7 @@ void    Request::filling_start_line()
         pos_begin = pos_space + 1;
 	}
 
-    if (type.empty() || resource.empty() || version.empty() || (!version.empty() && version != "HTTP/1.1"))
+    if (type.empty() || resource.empty() || version.empty() || version != "HTTP/1.1")
 		_request_done = ERROR;
 }
 

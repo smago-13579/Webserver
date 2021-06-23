@@ -137,10 +137,3 @@ bool		cgi_handler::execute()
 	_restore_fd_and_close(fd_pipe, fd_save);
 	return true;
 }
-
-void			cgi_handler::req_body_to_fd(std::string & request_body)
-{
-	_root_req_body = _root + "/_input_data";
-	std::ofstream	req_body(_root_req_body);
-	req_body << request_body;
-}
