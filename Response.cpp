@@ -6,7 +6,7 @@
 /*   By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/11 17:31:33 by smago             #+#    #+#             */
-/*   Updated: 2021/06/23 11:55:07 by kbatwoma         ###   ########.fr       */
+/*   Updated: 2021/06/23 12:38:03 by kbatwoma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -363,10 +363,12 @@ std::string			Response::get_path(const Location& loc)
 		else
 			str << loc.root;
 	}
-	else {
+	else if (pos <= len) {
 		str << loc.root << "/"
 		<< req.resource.substr(pos, len - pos);
 	}
+	else 
+		return ("");
 	get_format(str.str());
 	if (this->format == DIRC && this->autoindex == OFF && req.type != "POST")
 		str << "/" << it->index;
@@ -412,7 +414,8 @@ int			Response::method_DELETE()
 		return (error_page(405));
 	else if (it->location.find("/images_for_delete/") != it->location.npos)
 	{
-		file = get_path(*it);
+		if ((file = get_path(*it)) == "")
+			return error_page(500);
 		if (remove(file.c_str()) != 0)
 		{
 			std::cout << "\nFILE NOT FOUND\n";

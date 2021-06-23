@@ -6,7 +6,7 @@
 #    By: kbatwoma <kbatwoma@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/05/25 14:03:12 by smago             #+#    #+#              #
-#    Updated: 2021/06/23 11:22:48 by kbatwoma         ###   ########.fr        #
+#    Updated: 2021/06/23 12:28:56 by kbatwoma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ S = -fsanitize=address
 all: $(NAME)
 
 $(NAME): $(SRCS)
-	clang++ $(SRCS) $(FLAGS) -g -o $(NAME) $(S)
+	clang++ $(SRCS) $(FLAGS) -g -o $(NAME)
 
 clean:
 	rm -rf $(NAME) $(NAME).dSYM
